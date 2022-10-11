@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Dongdae</string>
+    <string name="app_explanation">Hi</string>
+
+    <string name="license">License</string>
+
+    <string name="show_full">Show Full License</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+
+    <string name="info">Application Info</string>
+
+    <string name="info_name">Application Name</string>
+    <string name="info_package">Application Package</string>
+    <string name="info_version_name">Application Version</string>
+    <string name="info_version_code">Application Version Code</string>
+    <string name="info_maker">Application Maker</string>
+    <string name="info_explanation">Application Explanation</string>
+
+    <string name="load_data_message">Data has been loaded.</string>
+
+    <string name="error_happen">Error Happen (%1$s)</string>
+    <string name="copy_toast_message">%1$s copied</string>
+    <string name="copy_toast_message_with_label">%2$s copied to %1$s</string>
 </resources>

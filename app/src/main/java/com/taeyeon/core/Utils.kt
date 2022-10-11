@@ -7,7 +7,7 @@ import android.content.Intent
 import android.os.Vibrator
 import android.widget.Toast
 import androidx.core.content.getSystemService
-import com.taeyeon.schoolviolencebreaker.R
+import com.taeyeon.dongdae.R
 import kotlin.system.exitProcess
 
 object Utils {

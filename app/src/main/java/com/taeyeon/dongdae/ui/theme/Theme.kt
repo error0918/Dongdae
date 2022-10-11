@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
+import com.taeyeon.core.Settings
 
 private val LightColorScheme = lightColorScheme(
     primary = md_theme_light_primary,
@@ -105,4 +106,23 @@ fun DongdaeTheme(
         typography = Typography,
         content = content
     )
+}
+
+@Composable
+fun Theme(
+    darkTheme: Boolean = when (com.taeyeon.dongdae.darkMode) {
+        Settings.SYSTEM_MODE -> isSystemInDarkTheme()
+        Settings.LIGHT_MODE -> false
+        Settings.DARK_MODE -> true
+        else -> isSystemInDarkTheme()
+    },
+    dynamicColor: Boolean = com.taeyeon.dongdae.dynamicColor,
+    content: @Composable () -> Unit
+) {
+    DongdaeTheme(
+        darkTheme = darkTheme,
+        dynamicColor = dynamicColor
+    ) {
+        content()
+    }
 }

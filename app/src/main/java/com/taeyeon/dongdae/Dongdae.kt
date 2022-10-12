@@ -1,8 +1,11 @@
 package com.taeyeon.dongdae
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.taeyeon.core.Settings
 
 var fullScreenMode by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.FullScreenMode)
@@ -27,3 +30,11 @@ fun save() {
 
     Settings.saveSettings()
 }
+
+data class Partition(
+    val title: String,
+    val filledIcon: ImageVector,
+    val outlinedIcon: ImageVector,
+    val fab: (@Composable () -> Unit)? = null,
+    val composable: @Composable () -> Unit
+)

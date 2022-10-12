@@ -5,6 +5,8 @@ package com.taeyeon.dongdae
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -12,18 +14,20 @@ import android.view.animation.AnticipateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.ViewCompat
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.dongdae.ui.theme.Theme
@@ -46,7 +50,6 @@ class MainActivity : ComponentActivity() {
             }
         }
         installSplashScreen()
-
 
         Core.initialize(applicationContext)
 
@@ -88,7 +91,7 @@ object Main {
     fun Main() {
         Scaffold(
             topBar = { Toolbar() },
-            floatingActionButton = {},
+            floatingActionButton = partitionList[position].fab ?: {},
             bottomBar = { NavigationBar() },
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { paddingValues ->
@@ -96,10 +99,38 @@ object Main {
         }
     }
 
+    @Suppress("DEPRECATION")
+    @SuppressLint("FrequentlyChangedStateReadInComposition")
     @Composable
     fun Toolbar() {
+        val toolbarColor = animateColorAsState(
+            targetValue =
+                if(partitionList[position].lazyListState?.firstVisibleItemIndex != 0 || partitionList[position].lazyListState?.firstVisibleItemScrollOffset != 0)
+                    MaterialTheme.colorScheme.surfaceVariant
+                else
+                    MaterialTheme.colorScheme.surface
+        ).value
+
+        val view = LocalView.current
+        val darkMode = when (com.taeyeon.dongdae.darkMode) {
+            Settings.SYSTEM_MODE -> isSystemInDarkTheme()
+            Settings.LIGHT_MODE -> false
+            Settings.DARK_MODE -> true
+            else -> isSystemInDarkTheme()
+        }
+        if (!view.isInEditMode) {
+            SideEffect {
+                (view.context as Activity).window.statusBarColor = toolbarColor.toArgb()
+                ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = !darkMode
+            }
+        }
+
         CenterAlignedTopAppBar(
-            title = { Text(text = stringResource(id = R.string.app_name)) }
+            title = { Text(text = stringResource(id = R.string.app_name)) },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = toolbarColor,
+                titleContentColor = contentColorFor(toolbarColor)
+            )
         )
     }
 

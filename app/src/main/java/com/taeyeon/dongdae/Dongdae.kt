@@ -1,6 +1,7 @@
 package com.taeyeon.dongdae
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +36,7 @@ data class Partition(
     val title: String,
     val filledIcon: ImageVector,
     val outlinedIcon: ImageVector,
+    val lazyListState: LazyListState? = null,
     val fab: (@Composable () -> Unit)? = null,
     val composable: @Composable () -> Unit
 )

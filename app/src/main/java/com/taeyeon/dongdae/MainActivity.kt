@@ -136,6 +136,9 @@ object Main {
 
     @Composable
     fun NavigationBar() {
+        val view = LocalView.current
+        (view.context as Activity).window.navigationBarColor = MaterialTheme.colorScheme.surface.toArgb()
+
         NavigationBar {
             partitionList.forEachIndexed { index, partition ->
                 val selected = index == position

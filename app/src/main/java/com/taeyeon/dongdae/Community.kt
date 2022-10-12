@@ -1,6 +1,5 @@
 package com.taeyeon.dongdae
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -34,6 +33,9 @@ object Community {
             state = lazyListState,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             items(100) {
                 Text(
                     text = "dfsaaaaaa${lazyListState.firstVisibleItemIndex != 0 || lazyListState.firstVisibleItemScrollOffset != 0}",
@@ -46,6 +48,9 @@ object Community {
                         )
                         .padding(16.dp)
                 )
+            }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
@@ -63,7 +68,10 @@ object Community {
                 contentDescription = "글쓰기"
             )
             AnimatedVisibility(visible = !lazyListState.isScrollInProgress) {
-                Text(text = "글쓰기")
+                Text(
+                    text = "글쓰기",
+                    modifier = Modifier.padding(start = 8.dp)
+                )
             }
         }
     }

@@ -15,16 +15,21 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
@@ -103,41 +108,66 @@ object Main {
     @SuppressLint("FrequentlyChangedStateReadInComposition")
     @Composable
     fun Toolbar() {
-        val toolbarColor = animateColorAsState(
+        val isScrolled = if (partitionList[position].lazyListState != null) partitionList[position].lazyListState!!.firstVisibleItemIndex != 0 || partitionList[position].lazyListState!!.firstVisibleItemScrollOffset != 0 else false
+        val toolbarColor by animateColorAsState(
             targetValue =
-                if(partitionList[position].lazyListState?.firstVisibleItemIndex != 0 || partitionList[position].lazyListState?.firstVisibleItemScrollOffset != 0)
+                if(isScrolled)
                     MaterialTheme.colorScheme.surfaceVariant
                 else
-                    MaterialTheme.colorScheme.surface
-        ).value
+                    MaterialTheme.colorScheme.surface,
+            tween(durationMillis = 1000)
+        )
+        val toolbarContentColor by animateColorAsState(
+            targetValue =
+                contentColorFor(
+                    backgroundColor = if(isScrolled)
+                        MaterialTheme.colorScheme.surfaceVariant
+                    else
+                        MaterialTheme.colorScheme.surface
+                ),
+            tween(durationMillis = 1000)
+        )
+
+        CenterAlignedTopAppBar(
+            title = { Text(text = stringResource(id = R.string.app_name)) },
+            navigationIcon = {
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowLeft,
+                        contentDescription = null
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowRight,
+                        contentDescription = null
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = toolbarColor,
+                navigationIconContentColor = toolbarContentColor,
+                titleContentColor = toolbarContentColor,
+                actionIconContentColor = toolbarContentColor
+            )
+        )
 
         val view = LocalView.current
-        val darkMode = when (com.taeyeon.dongdae.darkMode) {
+        (view.context as Activity).window.statusBarColor = toolbarColor.toArgb()
+        ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = !when (darkMode) {
             Settings.SYSTEM_MODE -> isSystemInDarkTheme()
             Settings.LIGHT_MODE -> false
             Settings.DARK_MODE -> true
             else -> isSystemInDarkTheme()
         }
-        if (!view.isInEditMode) {
-            SideEffect {
-                (view.context as Activity).window.statusBarColor = toolbarColor.toArgb()
-                ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = !darkMode
-            }
-        }
-
-        CenterAlignedTopAppBar(
-            title = { Text(text = stringResource(id = R.string.app_name)) },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = toolbarColor,
-                titleContentColor = contentColorFor(toolbarColor)
-            )
-        )
     }
 
     @Composable
     fun NavigationBar() {
         val view = LocalView.current
-        (view.context as Activity).window.navigationBarColor = MaterialTheme.colorScheme.surface.toArgb()
+        (view.context as Activity).window.navigationBarColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp).toArgb()
 
         NavigationBar {
             partitionList.forEachIndexed { index, partition ->

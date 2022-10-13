@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.taeyeon.core.Core
 
 object Community {
     private val lazyListState = LazyListState()
@@ -31,14 +32,13 @@ object Community {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = lazyListState,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
             items(100) {
+                val androidId = android.provider.Settings.Secure.getString(Core.getContext().contentResolver, android.provider.Settings.Secure.ANDROID_ID)
                 Text(
-                    text = "dfsaaaaaa${lazyListState.firstVisibleItemIndex != 0 || lazyListState.firstVisibleItemScrollOffset != 0}",
+                    text = "dfsaaaaaa ${androidId} ${Integer.parseInt(androidId.substring(0..5), 16)}",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
@@ -48,9 +48,6 @@ object Community {
                         )
                         .padding(16.dp)
                 )
-            }
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

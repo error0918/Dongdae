@@ -36,9 +36,8 @@ object Community {
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             items(100) {
-                val androidId = android.provider.Settings.Secure.getString(Core.getContext().contentResolver, android.provider.Settings.Secure.ANDROID_ID)
                 Text(
-                    text = "dfsaaaaaa ${androidId} ${Integer.parseInt(androidId.substring(0..5), 16)}",
+                    text = "dfsaaaaaa ${name} (${subName})",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)

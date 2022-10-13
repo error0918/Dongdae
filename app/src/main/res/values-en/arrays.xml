@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="endangered_species">
+        <item>Canis lupus coreanus</item>
+        <item>Cervus nippon hortulorum</item>
+        <item>Ursus thibetanus ussuricus </item>
+        <item>Myotis rufoniger</item>
+        <item>Moschus moschiferus</item>
+        <item>Naemorhedus caudatus</item>
+        <item>Lutra lutra</item>
+        <item>Lynx lynx</item>
+        <item>Vulpes vulpes peculiosa </item>
+        <item>Murina ussuriensis</item>
+        <item>Panthera pardus orientalis </item>
+        <item>Panthera tigris altaica</item>
+        <item>Martes flavigula</item>
+        <item>Mustela nivalis</item>
+        <item>Callorhinus ursinus</item>
+        <item>Phoca largha</item>
+        <item>Prionailurus bengalensis</item>
+        <item>Eumetopias jubatus</item>
+        <item>Plecotus auritus</item>
+        <item>Pteromys volans aluco</item>
+        <item>Aquila chrysaetos</item>
+        <item>Eurynorhynchus pygmeus</item>
+        <item>Egretta eulophotes</item>
+        <item>Grus japonensis</item>
+        <item>Falco peregrinus</item>
+        <item>Ciconia nigra</item>
+        <item>Platalea minor</item>
+        <item>Haliaeetus pelagicus</item>
+        <item>Tringa guttifer</item>
+        <item>Dryocopus javensis</item>
+        <item>Mergus squamatus</item>
+        <item>Cygnus olor</item>
+        <item>Ciconia boyciana</item>
+        <item>Haliaeetus albicilla</item>
+        <item>Anser cygnoides</item>
+        <item>Larus saundersi</item>
+        <item>Haematopus ostralegus</item>
+        <item>Emberiza aureola</item>
+        <item>Grus grus</item>
+        <item>Cygnus columbianus</item>
+        <item>Larus relictus</item>
+        <item>Terpsiphone atrocaudata</item>
+        <item>Strix uralensis</item>
+        <item>Dryocopus martius</item>
+        <item>Platalea leucorodia</item>
+        <item>Otis tarda</item>
+        <item>Aegypius monachus</item>
+        <item>Nipponia nippon</item>
+        <item>Gallicrex cinerea</item>
+        <item>Emberiza sulphurata</item>
+        <item>Pandion haliaetus</item>
+        <item>Pernis ptilorhynchus</item>
+        <item>Accipiter soloensis</item>
+        <item>Calidris tenuirostris</item>
+        <item>Gorsachius goisagi</item>
+        <item>Synthliboramphus wumizusume</item>
+        <item>Galerida cristata</item>
+        <item>Accipiter nisus</item>
+        <item>Falco subbuteo</item>
+        <item>Locustella pleskei</item>
+        <item>Milvus migrans</item>
+        <item>Emberiza yessoensis</item>
+        <item>Bubo bubo</item>
+        <item>Circus melanoleucos</item>
+        <item>Numenius madagascariensis</item>
+        <item>Columba rupestris </item>
+        <item>Strix aluco</item>
+        <item>Grus vipio</item>
+        <item>Circus cyaneus</item>
+        <item>Accipiter gularis</item>
+        <item>Accipiter gentilis</item>
+        <item>Cygnus cygnus</item>
+        <item>Anser fabalis</item>
+        <item>Ixobrychus eurhythmus</item>
+        <item>Buteo hemilasius</item>
+        <item>Pitta nympha</item>
+        <item>Aquila clanga</item>
+        <item>Branta bernicla</item>
+        <item>Grus monacha</item>
+        <item>Columba janthina</item>
+        <item>Charadrius placidus</item>
+        <item>Anser erythropus</item>
+        <item>Aquila heliaca</item>
+        <item>Sibynophis chinensis</item>
+        <item>Hyla suweonensis</item>
+        <item>Hynobius yangi</item>
+        <item>Elaphe schrenckii</item>
+        <item>Pelophylax chosenicus</item>
+        <item>Mauremys reevesii</item>
+        <item>Kaloula borealis   </item>
+        <item>Eremias argus  </item>
+        <item>Pseudopungtungia nigra</item>
+        <item>Pseudobagrus brevicorpus</item>
+        <item>Odontobutis obscura</item>
+        <item>Microphysogobio koreensis</item>
+        <item>Cobitis choii</item>
+        <item>Koreocobitis naktongensis</item>
+        <item>Microphysogobio rapidus</item>
+        <item>Acheilognathus somjinensis</item>
+        <item>Kichulchoia brevifasciata</item>
+        <item>Liobagrus obesus</item>
+        <item>Gobiobotia nakdongensis</item>
+        <item>Pseudopungtungia tenuicorpa</item>
+        <item>Pungitius sinensis</item>
+        <item>Coreoperca kawamebari</item>
+        <item>Gobiobotia macrocephala</item>
+        <item>Lethenteron reissneri</item>
+        <item>Gobiobotia brevibarba</item>
+        <item>Acheilognathus signifer</item>
+        <item>Culter brevicauda</item>
+        <item>Rhynchocypris semotilus</item>
+        <item>Iksookimia pumila</item>
+        <item>Phoxinus phoxinus</item>
+        <item>Brachymystax lenok tsinlingensis</item>
+        <item> Lethenteron japonicus</item>
+        <item>Acheilognathus majusculus</item>
+        <item>Rhodeus pseudosericeus</item>
+        <item>Cottus hangiongensis</item>
+        <item>Parnassius bremeri</item>
+        <item>Chrysochroa coreana산굴뚝나비 Hipparchia autonoe</item>
+        <item>Aporia crataegi</item>
+        <item>Polyphylla laticollis manchurica</item>
+        <item>Callipogon relictus</item>
+        <item>Protantigius superans</item>
+        <item>Nannophya pygmaea</item>
+        <item>Macromia daimoji</item>
+        <item>Cicindela anchoralis</item>
+        <item> Libellula angelina</item>
+        <item>Prosopocoilus astacoides blanchardi</item>
+        <item>Haplotropis brunneriana </item>
+        <item>Damaster mirabilissimus</item>
+        <item>Cybister chinensis </item>
+        <item>Lethocerus deyrolli</item>
+        <item>Gymnopleurus mopsus</item>
+        <item>Cigaritis takanonis</item>
+        <item>Copris tripartitus</item>
+        <item>Mellicta ambigua</item>
+        <item>Argynnis nerippe</item>
+        <item>Leptalina unicolor</item>
+        <item>Bombus koreanus</item>
+        <item>Damaster changeonleei</item>
+        <item>Osmoderma opicum</item>
+        <item>Sinia divina</item>
+        <item>Cristaria plicata</item>
+        <item>Charonia lampas sauliae</item>
+        <item>Pseudohelice subquadrata</item>
+        <item>Lamprotula coreana</item>
+        <item>Chasmagnathus convexus</item>
+        <item>Satsuma myomphala </item>
+        <item>Dendronephthya suensoni</item>
+        <item>Tubastraea coccinea</item>
+        <item>Clithon retropictus</item>
+        <item>Plumarella spinosa</item>
+        <item>Ellobium chinense</item>
+        <item>Euplexaura crassa</item>
+        <item>Echinogorgia reticulata</item>
+        <item>Argyroneta aquatica</item>
+        <item>Dendronephthya castanea</item>
+        <item>Verrucella stellata</item>
+        <item>Sesarmops intermedius</item>
+        <item>Ophiacantha linea</item>
+        <item>Dendronephthya mollis</item>
+        <item>Koreanomelania nodifila</item>
+        <item>Karaftohelix adamsi </item>
+        <item>Dendrophyllia cribrosa</item>
+        <item>Nacospatangus alta</item>
+        <item>Dendronephthya putteri</item>
+        <item>Dendrophyllia ijimai</item>
+        <item>Plumarella adhaerens</item>
+        <item>Koreanohadra koreana</item>
+        <item>Echinogorgia complexa</item>
+        <item>Gammarus zeongogensis</item>
+        <item>Myriopathes japonica</item>
+        <item>Uca lactea</item>
+        <item>Dendronephthya alba</item>
+        <item>Cypripedium japonicum</item>
+        <item>Gastrochilus fuscopunctatus</item>
+        <item>Sedirea japonica</item>
+        <item>Euchresta japonica</item>
+        <item>Thrixspermum japonicum </item>
+        <item>Diapensia lapponica var. obovata</item>
+        <item>Cymbidium lancifolium</item>
+        <item>Cypripedium guttatum</item>
+        <item>Neofinetia falcata</item>
+        <item>Leontopodium hallaisanense</item>
+        <item>Cymbidium kanran</item>
+        <item>Lychnis kiusiana </item>
+        <item>Euryale ferox</item>
+        <item>Eleutherococcus senticosus</item>
+        <item>Nymphaea tetragona var. minima</item>
+        <item>Quercus gilva</item>
+        <item>Astilboides tabularis</item>
+        <item>Glaux maritima var. obtusifolia</item>
+        <item>Cyclosorus interruptus</item>
+        <item>Gymnadenia cucullata</item>
+        <item>Trientalis europaea ssp. arctica</item>
+        <item>Drosera peltata var. nipponica</item>
+        <item>Kirengeshoma koreana</item>
+        <item>Lilium dauricum </item>
+        <item>Viola mirabilis</item>
+        <item>Rhododendron aureum</item>
+        <item>Iris koreana</item>
+        <item>Aster altaicus var. uchiyamae</item>
+        <item>Halenia corniculata</item>
+        <item>Anagallidium dichotomum</item>
+        <item>Iris dichotoma</item>
+        <item>Cymbidium macrorhizon</item>
+        <item>Cicuta virosa</item>
+        <item>Cremastra unguiculata </item>
+        <item>Ranunculus trichophyllus var. kadzusensis</item>
+        <item>Lasianthus japonicus</item>
+        <item>Ceratopteris thalictroides</item>
+        <item>Habenaria flagellifera</item>
+        <item>Aconitum coreanum</item>
+        <item>Orobanche filicicola </item>
+        <item>Vexillabium yakusimensis var. nakaianum</item>
+        <item>Cypripedium macranthos</item>
+        <item>Silene capitata </item>
+        <item>Viburnum burejaeticum </item>
+        <item>Paeonia obovata</item>
+        <item>Saururus chinensis</item>
+        <item>Woodwardia japonica</item>
+        <item>Pterygopleurum neurophyllum</item>
+        <item>Dendrobium moniliforme</item>
+        <item>Viola raddeana</item>
+        <item>Cotoneaster wilsonii</item>
+        <item>Scrophularia takesimensis</item>
+        <item>Bupleurum latissimum</item>
+        <item>Aconitum austrokoreense</item>
+        <item>Gymnadenia conopsea</item>
+        <item>Iris ruthenica var. nana </item>
+        <item>Psilotum nudum</item>
+        <item>Brasenia schreberi</item>
+        <item>Calanthe aristulifera</item>
+        <item>Pedicularis ishidoyana </item>
+        <item>Thalictrum coreanum</item>
+        <item>Viola websteri</item>
+        <item>Cyrtosia septentrionalis</item>
+        <item>Utricularia yakusimensis</item>
+        <item>Dysophylla yatabeana </item>
+        <item>Amsonia elliptica </item>
+        <item>Lychnis wilfordii </item>
+        <item>Iris laevigata</item>
+        <item>Mankyua chejuense</item>
+        <item>Menyanthes trifoliata</item>
+        <item>Sarcandra glabra</item>
+        <item>Cleisostoma scolopendrifolium</item>
+        <item>Lycoris chinensis var. sinuolata</item>
+        <item>Oberonia japonica</item>
+        <item>Isoetes coreana </item>
+        <item>Michelia compressa </item>
+        <item>Metanarthecium luteo-viride </item>
+        <item>Bulbophyllum drymoglossum  </item>
+        <item>Epilobium hirsutum</item>
+        <item>Gastrochilus japonicus</item>
+        <item>Asplenium antiquum</item>
+        <item>Stellera chamaejasme </item>
+        <item>Pedicularis hallaisanensis</item>
+        <item>Liparis auriculata</item>
+        <item>Habenaria radiata</item>
+        <item>Bulbophyllum inconspicuum</item>
+        <item>Arctous alpinus var. japonicus</item>
+        <item>Hibiscus hamabo</item>
+        <item>Dictyosphaeria cavernosa</item>
+        <item>Coccophora langsdorfii</item>
+        <item>Lampteromyces japonicus</item>
+    </string-array>
+</resources>

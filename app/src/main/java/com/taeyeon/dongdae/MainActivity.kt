@@ -21,8 +21,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -37,6 +35,7 @@ import androidx.core.view.ViewCompat
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.dongdae.ui.theme.Theme
+import kotlinx.coroutines.CoroutineScope
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,9 +91,12 @@ object Main {
         Profile.partition
     )
     var position by mutableStateOf(1)
+    lateinit var scope: CoroutineScope
 
     @Composable
     fun Main() {
+        scope = rememberCoroutineScope()
+
         Scaffold(
             topBar = { Toolbar() },
             floatingActionButton = partitionList[position].fab ?: {},
@@ -131,14 +133,6 @@ object Main {
 
         CenterAlignedTopAppBar(
             title = { Text(text = stringResource(id = R.string.app_name)) },
-            navigationIcon = {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Filled.KeyboardArrowLeft,
-                        contentDescription = null
-                    )
-                }
-            },
             actions = {
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(

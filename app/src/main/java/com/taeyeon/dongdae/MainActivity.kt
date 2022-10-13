@@ -91,7 +91,7 @@ object Main {
         Community.partition,
         Profile.partition
     )
-    private var position by mutableStateOf(1)
+    var position by mutableStateOf(1)
 
     @Composable
     fun Main() {
@@ -113,7 +113,7 @@ object Main {
         val toolbarColor by animateColorAsState(
             targetValue =
                 if(isScrolled)
-                    MaterialTheme.colorScheme.surfaceVariant
+                    MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
                 else
                     MaterialTheme.colorScheme.surface,
             tween(durationMillis = 1000)
@@ -122,7 +122,7 @@ object Main {
             targetValue =
                 contentColorFor(
                     backgroundColor = if(isScrolled)
-                        MaterialTheme.colorScheme.surfaceVariant
+                        MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
                     else
                         MaterialTheme.colorScheme.surface
                 ),

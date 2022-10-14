@@ -4,6 +4,7 @@
 package com.taeyeon.dongdae
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -81,34 +82,30 @@ object Chat {
                 }
             }
 
-            Surface(
+            var text by rememberSaveable { mutableStateOf("") }
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                shape = MaterialTheme.shapes.medium,
+                trailingIcon = {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(
+                            imageVector = Icons.Filled.Send,
+                            contentDescription = null
+                        )
+                    }
+                },
                 modifier = Modifier
                     .padding(16.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = MaterialTheme.shapes.medium
+                    )
                     .fillMaxWidth()
                     .height(80.dp)
-                    .align(Alignment.BottomCenter),
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colorScheme.primaryContainer
-            ) {
-                var text by rememberSaveable { mutableStateOf("") }
-                OutlinedTextField(
-                    value = text,
-                    onValueChange = { text = it },
-                    shape = MaterialTheme.shapes.medium,
-                    trailingIcon = {
-                        IconButton(onClick = { /*TODO*/ }) {
-                            Icon(
-                                imageVector = Icons.Filled.Send,
-                                contentDescription = null
-                            )
-                        }
-                    },
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                )
-            }
+                    .padding(8.dp)
+                    .align(Alignment.BottomCenter)
+            )
         }
 
         Popup(

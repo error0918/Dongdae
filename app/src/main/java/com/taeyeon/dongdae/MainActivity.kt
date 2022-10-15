@@ -1,4 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class,
+    ExperimentalPagerApi::class
+)
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
 package com.taeyeon.dongdae
@@ -29,10 +31,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.dongdae.ui.theme.Theme
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 var screen by mutableStateOf(Screen.Main)
 
@@ -76,8 +83,8 @@ class MainActivity : ComponentActivity() {
                                 load()
                                 Box(
                                     modifier = Modifier.animateEnterExit(
-                                        enter = fadeIn() + scaleIn(),
-                                        exit = fadeOut() + scaleOut()
+                                        enter = scaleIn(),
+                                        exit = scaleOut()
                                     )
                                 ) {
                                     Main.Main()
@@ -86,8 +93,8 @@ class MainActivity : ComponentActivity() {
                             Screen.Welcome -> {
                                 Box(
                                     modifier = Modifier.animateEnterExit(
-                                        enter = fadeIn() + scaleIn(),
-                                        exit = fadeOut() + scaleOut()
+                                        enter = scaleIn(),
+                                        exit = scaleOut()
                                     )
                                 ) {
                                     Welcome.Welcome()
@@ -96,8 +103,8 @@ class MainActivity : ComponentActivity() {
                             Screen.InternetDisconnected -> {
                                 Box(
                                     modifier = Modifier.animateEnterExit(
-                                        enter = fadeIn() + scaleIn(),
-                                        exit = fadeOut() + scaleOut()
+                                        enter = scaleIn(),
+                                        exit = scaleOut()
                                     )
                                 ) {
                                 }
@@ -123,22 +130,24 @@ class MainActivity : ComponentActivity() {
 }
 
 object Main {
+    lateinit var pagerState: PagerState
+
     private val snackbarHostState = SnackbarHostState()
     private val partitionList = listOf(
         Chat.partition,
         Community.partition,
         Profile.partition
     )
-    var position by mutableStateOf(1)
     lateinit var scope: CoroutineScope
 
     @Composable
     fun Main() {
         scope = rememberCoroutineScope()
+        pagerState = rememberPagerState()
 
         Scaffold(
             topBar = { Toolbar() },
-            floatingActionButton = partitionList[position].fab ?: {},
+            floatingActionButton = partitionList[pagerState.currentPage].fab ?: {},
             bottomBar = { NavigationBar() },
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { paddingValues ->
@@ -150,7 +159,7 @@ object Main {
     @SuppressLint("FrequentlyChangedStateReadInComposition")
     @Composable
     fun Toolbar() {
-        val isScrolled = if (partitionList[position].lazyListState != null) partitionList[position].lazyListState!!.firstVisibleItemIndex != 0 || partitionList[position].lazyListState!!.firstVisibleItemScrollOffset != 0 else false
+        val isScrolled = if (partitionList[pagerState.currentPage].lazyListState != null) partitionList[pagerState.currentPage].lazyListState!!.firstVisibleItemIndex != 0 || partitionList[pagerState.currentPage].lazyListState!!.firstVisibleItemScrollOffset != 0 else false
         val toolbarColor by animateColorAsState(
             targetValue =
                 if(isScrolled)
@@ -205,10 +214,14 @@ object Main {
 
         NavigationBar {
             partitionList.forEachIndexed { index, partition ->
-                val selected = index == position
+                val selected = index == pagerState.currentPage
                 NavigationBarItem(
                     selected = selected,
-                    onClick = { position = index },
+                    onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    },
                     icon = {
                         Icon(
                             imageVector = if (selected) partition.filledIcon else partition.outlinedIcon,
@@ -231,7 +244,11 @@ object Main {
                 .padding(paddingValues),
             color = MaterialTheme.colorScheme.background
         ) {
-            Crossfade(targetState = position) {
+            HorizontalPager(
+                count = partitionList.size,
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) {
                 partitionList[it].composable()
             }
         }

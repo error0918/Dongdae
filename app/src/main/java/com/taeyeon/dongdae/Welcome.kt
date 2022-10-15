@@ -112,7 +112,7 @@ object Welcome {
                     FloatingActionButton(
                         onClick = {
                             scope.launch {
-                                if (pagerState.currentPage + 1 < pagerState.pageCount) pagerState.animateScrollToPage(page = pagerState.currentPage + 1)
+                                if (pagerState.currentPage + 2 < pagerState.pageCount) pagerState.animateScrollToPage(page = pagerState.currentPage + 1)
                                 else screen = checkScreen()
                             }
                         }
@@ -331,7 +331,6 @@ object Welcome {
             modifier = Modifier.fillMaxSize()
         ) { page ->
             pageList[page](paddingValues = paddingValues)
-
         }
 
     }

@@ -1,4 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class,
+    ExperimentalPagerApi::class
+)
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
 package com.taeyeon.dongdae
@@ -23,6 +25,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.coroutines.launch
 
 object Chat {
@@ -121,7 +124,7 @@ object Chat {
                 modifier = Modifier.size(48.dp)
             ) {
                 AnimatedVisibility(
-                    visible = Main.position == 0,
+                    visible = Main.pagerState.currentPage == 0,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {

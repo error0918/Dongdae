@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalAnimationApi::class)
+@file:OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
 package com.taeyeon.dongdae
@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.coroutines.launch
 
 object Community {
@@ -62,7 +63,7 @@ object Community {
                 modifier = Modifier.size(48.dp)
             ) {
                 AnimatedVisibility(
-                    visible = Main.position == 1,
+                    visible = Main.pagerState.currentPage == 1,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {

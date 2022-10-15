@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -21,7 +22,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -47,7 +50,7 @@ object Chat {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 state = lazyListState,
-                contentPadding = PaddingValues(bottom = 80.dp + 16.dp * 2)
+                contentPadding = PaddingValues(bottom = 100.dp + 8.dp * 2)
             ) {
                 items(100) {
                     Box(
@@ -86,20 +89,61 @@ object Chat {
             }
 
             var text by rememberSaveable { mutableStateOf("") }
+            val maxLength = 300
             OutlinedTextField(
                 value = text,
-                onValueChange = { text = it },
+                onValueChange = { if(it.length <= maxLength) text = it },
+                isError = text.length >= maxLength,
                 shape = MaterialTheme.shapes.medium,
+                label = {
+                    if (text.isNotEmpty()) {
+                        Text(text = "${text.length}/$maxLength")
+                    }
+                },
                 trailingIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(
+                        onClick = { /*TODO*/ },
+                        enabled = text.isNotBlank()
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.Send,
                             contentDescription = null
                         )
                     }
                 },
+                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Justify),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    textColor = MaterialTheme.colorScheme.primary,
+                    disabledTextColor = MaterialTheme.colorScheme.outlineVariant,
+                    containerColor = Color.Transparent,
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    errorCursorColor = MaterialTheme.colorScheme.error,
+                    selectionColors = LocalTextSelectionColors.current,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    disabledBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                    errorBorderColor = MaterialTheme.colorScheme.error,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.outline,
+                    disabledLeadingIconColor = MaterialTheme.colorScheme.outlineVariant,
+                    errorLeadingIconColor = MaterialTheme.colorScheme.error,
+                    focusedTrailingIconColor = MaterialTheme.colorScheme.primary,
+                    unfocusedTrailingIconColor = MaterialTheme.colorScheme.outline,
+                    disabledTrailingIconColor = MaterialTheme.colorScheme.outlineVariant,
+                    errorTrailingIconColor = MaterialTheme.colorScheme.error,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.outline,
+                    disabledLabelColor = MaterialTheme.colorScheme.outlineVariant,
+                    errorLabelColor = MaterialTheme.colorScheme.error,
+                    placeholderColor = MaterialTheme.colorScheme.primary,
+                    disabledPlaceholderColor = MaterialTheme.colorScheme.outlineVariant,
+                    focusedSupportingTextColor = MaterialTheme.colorScheme.primary,
+                    unfocusedSupportingTextColor = MaterialTheme.colorScheme.outline,
+                    disabledSupportingTextColor = MaterialTheme.colorScheme.outlineVariant,
+                    errorSupportingTextColor = MaterialTheme.colorScheme.error
+                ),
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(8.dp)
                     .background(
                         color = MaterialTheme.colorScheme.primaryContainer,
                         shape = MaterialTheme.shapes.medium
@@ -116,7 +160,7 @@ object Chat {
             offset = IntOffset(
                 x = 0,
                 y = with(LocalDensity.current) {
-                    -(80.dp + 16.dp * 2).toPx().toInt()
+                    -(80.dp + 8.dp * 2).toPx().toInt()
                 }
             )
         ) {

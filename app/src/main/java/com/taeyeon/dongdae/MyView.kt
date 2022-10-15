@@ -847,27 +847,44 @@ object MyView {
 
 
     object ShadowedTextDefaults {
+        val Modifier: Modifier = androidx.compose.ui.Modifier
         val Shadow = 10.dp
+        val Color = androidx.compose.ui.graphics.Color.Unspecified
+        val FontSize = TextUnit.Unspecified
+        val FontStyle: FontStyle? = null
+        val fontWeight: FontWeight? = null
+        val fontFamily: FontFamily? = null
+        val LetterSpacing = TextUnit.Unspecified
+        val TextDecoration: TextDecoration? = null
+        val TextAlign: TextAlign? = null
+        val LineHeight = TextUnit.Unspecified
+        val Overflow = TextOverflow.Clip
+        const val SoftWrap = true
+        const val MaxLines = Int.MAX_VALUE
+        val onTextLayout = { _: TextLayoutResult -> }
+        @Composable fun getStyle(): TextStyle = LocalTextStyle.current
     }
 
+    @SuppressLint("ModifierParameter")
     @Composable
     fun ShadowedText(
         text: String,
-        modifier: Modifier = Modifier,
-        color: Color = Color.Unspecified,
-        fontSize: TextUnit = TextUnit.Unspecified,
-        fontStyle: FontStyle? = null,
-        fontWeight: FontWeight? = null,
-        fontFamily: FontFamily? = null,
-        letterSpacing: TextUnit = TextUnit.Unspecified,
-        textDecoration: TextDecoration? = null,
-        textAlign: TextAlign? = null,
-        lineHeight: TextUnit = TextUnit.Unspecified,
-        overflow: TextOverflow = TextOverflow.Clip,
-        softWrap: Boolean = true,
-        maxLines: Int = Int.MAX_VALUE,
-        onTextLayout: (TextLayoutResult) -> Unit = {},
-        style: TextStyle = LocalTextStyle.current
+        modifier: Modifier = ShadowedTextDefaults.Modifier,
+        shadow: Dp = ShadowedTextDefaults.Shadow,
+        color: Color = ShadowedTextDefaults.Color,
+        fontSize: TextUnit = ShadowedTextDefaults.FontSize,
+        fontStyle: FontStyle? = ShadowedTextDefaults.FontStyle,
+        fontWeight: FontWeight? = ShadowedTextDefaults.fontWeight,
+        fontFamily: FontFamily? = ShadowedTextDefaults.fontFamily,
+        letterSpacing: TextUnit = ShadowedTextDefaults.LetterSpacing,
+        textDecoration: TextDecoration? = ShadowedTextDefaults.TextDecoration,
+        textAlign: TextAlign? = ShadowedTextDefaults.TextAlign,
+        lineHeight: TextUnit = ShadowedTextDefaults.LineHeight,
+        overflow: TextOverflow = ShadowedTextDefaults.Overflow,
+        softWrap: Boolean = ShadowedTextDefaults.SoftWrap,
+        maxLines: Int = ShadowedTextDefaults.MaxLines,
+        onTextLayout: (TextLayoutResult) -> Unit = ShadowedTextDefaults.onTextLayout,
+        style: TextStyle = ShadowedTextDefaults.getStyle()
     ) {
         Box(
             modifier = modifier
@@ -890,8 +907,8 @@ object MyView {
                     style = style,
                     modifier = Modifier
                         .align(Alignment.Center)
-                        .blur(10.dp)
-                        .padding(10.dp)
+                        .blur(shadow)
+                        .padding(shadow)
                 )
             }
             Text(

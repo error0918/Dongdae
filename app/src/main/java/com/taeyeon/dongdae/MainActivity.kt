@@ -147,7 +147,7 @@ object Main {
 
         Scaffold(
             topBar = { Toolbar() },
-            floatingActionButton = partitionList[pagerState.currentPage].fab ?: {},
+            floatingActionButton = { if (!pagerState.isScrollInProgress) partitionList[pagerState.currentPage].fab?.let { it() } },
             bottomBar = { NavigationBar() },
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { paddingValues ->

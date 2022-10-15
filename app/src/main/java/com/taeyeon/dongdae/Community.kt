@@ -3,6 +3,7 @@
 
 package com.taeyeon.dongdae
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -25,7 +26,7 @@ import kotlinx.coroutines.launch
 object Community {
     private val lazyListState = LazyListState()
     val partition = Partition(
-        title = "asdf",
+        title = "TEST",
         filledIcon = Icons.Filled.People,
         outlinedIcon = Icons.Outlined.PeopleOutline,
         lazyListState = lazyListState,
@@ -33,6 +34,7 @@ object Community {
         composable = { Community() }
     )
 
+    @SuppressLint("FrequentlyChangedStateReadInComposition")
     @Composable
     fun Community() {
         LazyColumn(
@@ -43,7 +45,7 @@ object Community {
         ) {
             items(100) {
                 Text(
-                    text = "dfsaaaaaa ${name} (${subName})",
+                    text = "TEST $name (${subName})",
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
@@ -90,6 +92,7 @@ object Community {
         }
     }
 
+    @SuppressLint("FrequentlyChangedStateReadInComposition")
     @Composable
     fun Fab() {
         ExtendedFloatingActionButton(

@@ -88,6 +88,7 @@ object Welcome {
 
                 HorizontalPagerIndicator(
                     pagerState = pagerState,
+                    pageCount = pagerState.pageCount - 1,
                     modifier = Modifier.align(Alignment.Center),
                     activeColor = MaterialTheme.colorScheme.onSurface,
                     inactiveColor = MaterialTheme.colorScheme.onSurface.copy(0.4f),

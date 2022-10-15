@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.*
@@ -68,11 +69,12 @@ class MainActivity : ComponentActivity() {
 
         Core.activityCreated(this)
 
-        //screen = checkScreen()
-        screen = Screen.Welcome
-
         setContent {
+            //screen = rememberSaveable { checkScreen() }
+            screen = rememberSaveable { Screen.Welcome }
+
             loadSettings()
+
             Theme {
                 Surface {
                     AnimatedContent(

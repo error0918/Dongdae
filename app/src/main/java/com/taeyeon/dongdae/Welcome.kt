@@ -1,5 +1,5 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class,
-    ExperimentalPagerApi::class
+@file:OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalAnimationApi::class
 )
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
@@ -7,6 +7,7 @@ package com.taeyeon.dongdae
 
 import android.app.Activity
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -17,23 +18,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.view.ViewCompat
 import com.google.accompanist.pager.*
@@ -46,10 +36,10 @@ object Welcome {
     private lateinit var scope: CoroutineScope
     private lateinit var pagerState: PagerState
     private val pageList = listOf<@Composable (paddingValues: PaddingValues) -> Unit>(
-        { paddingValues ->  Page1(paddingValues = paddingValues) },
-        { Box() {} },
-        { Box() {} },
-        { Box() {} }
+        { paddingValues -> Page1(paddingValues = paddingValues) },
+        { paddingValues -> Page2(paddingValues = paddingValues) },
+        { paddingValues -> Page3(paddingValues = paddingValues) },
+        { paddingValues -> Page4(paddingValues = paddingValues) }
     )
 
     @Composable
@@ -82,7 +72,7 @@ object Welcome {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 8.dp)
             ) {
                 ExtendedFloatingActionButton(
                     onClick = {
@@ -135,7 +125,7 @@ object Welcome {
     }
 
     @Composable
-    fun Page1(paddingValues: PaddingValues) {
+    fun Page1(paddingValues: PaddingValues = PaddingValues()) {
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxSize()
@@ -146,23 +136,37 @@ object Welcome {
                     end = paddingValues.calculateEndPadding(LocalLayoutDirection.current) + 16.dp
                 )
         ) {
-            val (appNameText, simpleAppExplanationText) = createRefs()
+            val (appIconImage, appNameText, simpleAppExplanationText) = createRefs()
 
             /* TODO
             Image(
                 bitmap = ImageBitmap.imageResource(id = R.mipmap.ic_launcher_round),
                 contentDescription = stringResource(id = R.string.app_name),
                 modifier = Modifier
+                    .size(200.dp)
                     .constrainAs(appIconImage) {
                         bottom.linkTo(appNameText.top, margin = 16.dp)
                     }
             )
             TODO */
 
+            Spacer(
+                modifier = Modifier
+                    .size(200.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .constrainAs(appIconImage) {
+                        centerTo(parent)
+                    }
+            )
+
             Box(
                 modifier = Modifier
                     .constrainAs(appNameText) {
-                        centerTo(parent)
+                        top.linkTo(appIconImage.bottom, margin = 8.dp)
+                        centerHorizontallyTo(parent)
                     }
             ) {
                 if (Locale.getDefault() == Locale.KOREA) {
@@ -182,7 +186,7 @@ object Welcome {
 
                     Row {
                         if (pagerState.currentPage == 0 && !pagerState.isScrollInProgress) {
-                            ShadowedText(
+                            MyView.ShadowedText(
                                 text = "동",
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontWeight = FontWeight.Bold,
@@ -214,7 +218,7 @@ object Welcome {
                         Spacer(modifier = Modifier.width(16.dp))
 
                         if (pagerState.currentPage == 0 && !pagerState.isScrollInProgress) {
-                            ShadowedText(
+                            MyView.ShadowedText(
                                 text = "대",
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontWeight = FontWeight.Bold,
@@ -244,7 +248,7 @@ object Welcome {
                         }
                     }
                 } else {
-                    ShadowedText(
+                    MyView.ShadowedText(
                         text = stringResource(id = R.string.app_name),
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold,
@@ -260,17 +264,31 @@ object Welcome {
                 modifier = Modifier
                     .constrainAs(simpleAppExplanationText) {
                         top.linkTo(appNameText.bottom, margin = 8.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
+                        centerHorizontallyTo(parent)
                     }
             )
 
         }
     }
 
+    @Composable
+    fun Page2(paddingValues: PaddingValues = PaddingValues()) {
+        Text(text = stringResource(id = R.string.app_explanation), modifier = Modifier.padding(paddingValues))
+    }
+
+    @Composable
+    fun Page3(paddingValues: PaddingValues = PaddingValues()) {
+        Page1(paddingValues = paddingValues)
+    }
+
+    @Composable
+    fun Page4(paddingValues: PaddingValues = PaddingValues()) {
+        Page1(paddingValues = paddingValues)
+    }
+
     @Suppress("DEPRECATION")
     @Composable
-    fun WelcomeScreen(paddingValues: PaddingValues) {
+    fun WelcomeScreen(paddingValues: PaddingValues = PaddingValues()) {
         val view = LocalView.current
         (view.context as Activity).window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
         ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = !when (darkMode) {
@@ -289,76 +307,6 @@ object Welcome {
 
         }
 
-    }
-
-     object ShadowedTextDefaults {
-         val Shadow = 10.dp
-     }
-
-    @Composable
-    fun ShadowedText(
-        text: String,
-        modifier: Modifier = Modifier,
-        color: Color = Color.Unspecified,
-        fontSize: TextUnit = TextUnit.Unspecified,
-        fontStyle: FontStyle? = null,
-        fontWeight: FontWeight? = null,
-        fontFamily: FontFamily? = null,
-        letterSpacing: TextUnit = TextUnit.Unspecified,
-        textDecoration: TextDecoration? = null,
-        textAlign: TextAlign? = null,
-        lineHeight: TextUnit = TextUnit.Unspecified,
-        overflow: TextOverflow = TextOverflow.Clip,
-        softWrap: Boolean = true,
-        maxLines: Int = Int.MAX_VALUE,
-        onTextLayout: (TextLayoutResult) -> Unit = {},
-        style: TextStyle = LocalTextStyle.current
-    ) {
-        Box(
-            modifier = modifier
-        ) {
-            Popup(alignment = Alignment.Center) {
-                Text(
-                    text = text,
-                    color = color.copy(alpha = 0.6f),
-                    fontSize = fontSize,
-                    fontStyle = fontStyle,
-                    fontWeight = fontWeight,
-                    fontFamily = fontFamily,
-                    letterSpacing = letterSpacing,
-                    textDecoration = textDecoration,
-                    textAlign = textAlign,
-                    lineHeight = lineHeight,
-                    overflow = overflow,
-                    softWrap = softWrap,
-                    maxLines = maxLines,
-                    style = style,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .blur(10.dp)
-                        .padding(10.dp)
-                )
-            }
-            Text(
-                text = text,
-                color = color,
-                fontSize = fontSize,
-                fontStyle = fontStyle,
-                fontWeight = fontWeight,
-                fontFamily = fontFamily,
-                letterSpacing = letterSpacing,
-                textDecoration = textDecoration,
-                textAlign = textAlign,
-                lineHeight = lineHeight,
-                overflow = overflow,
-                softWrap = softWrap,
-                maxLines = maxLines,
-                onTextLayout = onTextLayout,
-                style = style,
-                modifier = Modifier
-                    .align(Alignment.Center)
-            )
-        }
     }
 
 }

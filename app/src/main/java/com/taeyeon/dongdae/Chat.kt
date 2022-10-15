@@ -95,11 +95,9 @@ object Chat {
                 onValueChange = { if(it.length <= maxLength) text = it },
                 isError = text.length >= maxLength,
                 shape = MaterialTheme.shapes.medium,
-                label = {
-                    if (text.isNotEmpty()) {
-                        Text(text = "${text.length}/$maxLength")
-                    }
-                },
+                label =
+                    if (text.isNotEmpty()) { { Text(text = "${text.length}/$maxLength") } }
+                    else null,
                 trailingIcon = {
                     IconButton(
                         onClick = { /*TODO*/ },

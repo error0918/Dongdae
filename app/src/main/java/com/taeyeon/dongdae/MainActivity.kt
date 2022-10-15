@@ -253,6 +253,9 @@ object Main {
             ) {
                 partitionList[it].composable()
             }
+            LaunchedEffect(true) {
+                pagerState.scrollToPage(1)
+            }
         }
     }
 

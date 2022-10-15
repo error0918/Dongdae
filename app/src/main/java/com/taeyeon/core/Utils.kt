@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Vibrator
 import android.widget.Toast
 import androidx.core.content.getSystemService
@@ -52,5 +53,10 @@ object Utils {
 
     fun initializeData() {
         SharedPreferencesManager.clearAllSharedPreferencesManagers()
+    }
+
+    // Custom
+    fun checkInternet(): Boolean {
+        return Core.getContext().getSystemService<ConnectivityManager>()?.activeNetworkInfo?.isConnectedOrConnecting ?: false
     }
 }

@@ -156,6 +156,7 @@ object Chat {
         Default, Sequence, SequenceLast
     }
 
+    // TODO: IMAGE
     @Composable
     fun BoxScope.ChatUnit(
         isMe: Boolean,

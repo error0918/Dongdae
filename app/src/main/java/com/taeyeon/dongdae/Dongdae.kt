@@ -1,7 +1,6 @@
 package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -10,6 +9,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
+import com.taeyeon.core.SharedPreferencesManager
+import com.taeyeon.core.Utils
 
 var fullScreenMode by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.FullScreenMode)
 var screenAlwaysOn by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.ScreenAlwaysOn)
@@ -20,7 +21,18 @@ var id by mutableStateOf(getAndroidId())
 var name by mutableStateOf(getName(id))
 var subName by mutableStateOf(getSubName(id))
 
+
 fun load() {
+    loadSettings()
+    // TODO
+}
+
+fun save() {
+    saveSettings()
+    // TODO
+}
+
+fun loadSettings() {
     Settings.loadSettings()
 
     fullScreenMode = Settings.settingsData.FullScreenMode
@@ -29,13 +41,30 @@ fun load() {
     dynamicColor = Settings.settingsData.DynamicColor
 }
 
-fun save() {
+fun saveSettings() {
     Settings.settingsData.FullScreenMode = fullScreenMode
     Settings.settingsData.ScreenAlwaysOn = screenAlwaysOn
     Settings.settingsData.DarkMode = darkMode
     Settings.settingsData.DynamicColor = dynamicColor
 
     Settings.saveSettings()
+}
+
+enum class Screen {
+    Main, Welcome, InternetDisconnected
+}
+
+fun checkScreen(): Screen {
+    return if (checkFirstOpen()) Screen.Welcome
+        else if (!Utils.checkInternet()) Screen.InternetDisconnected
+        else Screen.Main
+}
+
+fun checkFirstOpen(): Boolean {
+    val key = "OPENED"
+    if (SharedPreferencesManager.Companion.Public.contains(key)) return false
+    SharedPreferencesManager.Companion.Public.putBoolean(key, true)
+    return true
 }
 
 data class Partition(

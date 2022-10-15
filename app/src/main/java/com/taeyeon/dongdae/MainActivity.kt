@@ -1,6 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
-    ExperimentalLayoutApi::class
-)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
 package com.taeyeon.dongdae
@@ -13,10 +11,11 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AnticipateInterpolator
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -25,23 +24,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
-import androidx.core.content.getSystemService
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.dongdae.ui.theme.Theme
 import kotlinx.coroutines.CoroutineScope
 
 class MainActivity : ComponentActivity() {
+    private var screen by mutableStateOf(Screen.Main)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             splashScreen.setOnExitAnimationListener { splashScreenView ->
@@ -66,10 +64,26 @@ class MainActivity : ComponentActivity() {
 
         Core.activityCreated(this)
 
+        //screen = checkScreen()
+        screen = Screen.Welcome
+
         setContent {
-            load()
+            loadSettings()
             Theme {
-                Main.Main()
+                AnimatedContent(targetState = screen) {
+                    when (it) {
+                        Screen.Main -> {
+                            load()
+                            Main.Main()
+                        }
+                        Screen.Welcome -> {
+                            Welcome.Welcome()
+                        }
+                        Screen.InternetDisconnected -> {
+
+                        }
+                    }
+                }
             }
         }
     }

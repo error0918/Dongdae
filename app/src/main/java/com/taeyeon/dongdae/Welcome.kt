@@ -18,12 +18,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.view.ViewCompat
 import com.google.accompanist.pager.*
@@ -39,7 +41,8 @@ object Welcome {
         { paddingValues -> Page1(paddingValues = paddingValues) },
         { paddingValues -> Page2(paddingValues = paddingValues) },
         { paddingValues -> Page3(paddingValues = paddingValues) },
-        { paddingValues -> Page4(paddingValues = paddingValues) }
+        { paddingValues -> Page4(paddingValues = paddingValues) },
+        { paddingValues -> PageLast(paddingValues = paddingValues) }
     )
 
     @Composable
@@ -284,6 +287,30 @@ object Welcome {
     @Composable
     fun Page4(paddingValues: PaddingValues = PaddingValues()) {
         Page1(paddingValues = paddingValues)
+    }
+
+    @Composable
+    fun PageLast(paddingValues: PaddingValues = PaddingValues()) {
+        Surface(
+            color = MaterialTheme.colorScheme.primary
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                Text(
+                    text = "시작하기",
+                    letterSpacing = 10.sp,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier
+                        .rotate(90f)
+                        .align(Alignment.CenterStart)
+                )
+            }
+        }
+
+        if (pagerState.currentPage == pagerState.pageCount - 1) screen = checkScreen()
     }
 
     @Suppress("DEPRECATION")

@@ -13,10 +13,7 @@ import android.view.View
 import android.view.animation.AnticipateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -37,9 +34,9 @@ import com.taeyeon.core.Settings
 import com.taeyeon.dongdae.ui.theme.Theme
 import kotlinx.coroutines.CoroutineScope
 
-class MainActivity : ComponentActivity() {
-    private var screen by mutableStateOf(Screen.Main)
+var screen by mutableStateOf(Screen.Main)
 
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             splashScreen.setOnExitAnimationListener { splashScreenView ->
@@ -70,17 +67,41 @@ class MainActivity : ComponentActivity() {
         setContent {
             loadSettings()
             Theme {
-                AnimatedContent(targetState = screen) {
-                    when (it) {
-                        Screen.Main -> {
-                            load()
-                            Main.Main()
-                        }
-                        Screen.Welcome -> {
-                            Welcome.Welcome()
-                        }
-                        Screen.InternetDisconnected -> {
-
+                Surface {
+                    AnimatedContent(
+                        targetState = screen
+                    ) {
+                        when (it) {
+                            Screen.Main -> {
+                                load()
+                                Box(
+                                    modifier = Modifier.animateEnterExit(
+                                        enter = fadeIn() + scaleIn(),
+                                        exit = fadeOut() + scaleOut()
+                                    )
+                                ) {
+                                    Main.Main()
+                                }
+                            }
+                            Screen.Welcome -> {
+                                Box(
+                                    modifier = Modifier.animateEnterExit(
+                                        enter = fadeIn() + scaleIn(),
+                                        exit = fadeOut() + scaleOut()
+                                    )
+                                ) {
+                                    Welcome.Welcome()
+                                }
+                            }
+                            Screen.InternetDisconnected -> {
+                                Box(
+                                    modifier = Modifier.animateEnterExit(
+                                        enter = fadeIn() + scaleIn(),
+                                        exit = fadeOut() + scaleOut()
+                                    )
+                                ) {
+                                }
+                            }
                         }
                     }
                 }

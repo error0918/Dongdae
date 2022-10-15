@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">동대</string>
     <string name="app_explanation">안녕</string>
+    <string name="simple_app_explanation">안녕</string>
     <string name="maker" translatable="false">TAEYEON</string>
 
     <string name="license">라이선스</string>

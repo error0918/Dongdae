@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Dongdae</string>
     <string name="app_explanation">Hi</string>
+    <string name="simple_app_explanation">Hi</string>
 
     <string name="license">License</string>
 

@@ -2,11 +2,16 @@ package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.core.SharedPreferencesManager
@@ -86,4 +91,19 @@ fun getName(androidId: String = getAndroidId()): String {
 
 fun getSubName(androidId: String = getAndroidId()): String {
     return androidId.substring(androidId.length - 6, androidId.length - 1)
+}
+
+@Composable
+fun getCornerSize(shape: CornerBasedShape): Dp {
+    var cornerRadius: Dp = 0.dp
+    shape.let {
+        val size = Size.Unspecified
+        with(LocalDensity.current) {
+            val corners = listOf(it.topStart, it.topEnd, it.bottomStart, it.bottomEnd)
+            corners.forEach { corner ->
+                cornerRadius += corner.toPx(size, this).toDp() / corners.size
+            }
+        }
+    }
+    return cornerRadius
 }

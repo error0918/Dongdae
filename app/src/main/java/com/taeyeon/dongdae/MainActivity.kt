@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             //screen = rememberSaveable { checkScreen() }
-            screen = rememberSaveable { Screen.Welcome }
+            screen = rememberSaveable { Screen.InternetDisconnected }
 
             loadSettings()
 
@@ -109,6 +109,7 @@ class MainActivity : ComponentActivity() {
                                         exit = scaleOut()
                                     )
                                 ) {
+                                    InternetDisconnected.InternetDisconnected()
                                 }
                             }
                         }

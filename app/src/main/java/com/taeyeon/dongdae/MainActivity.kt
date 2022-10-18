@@ -151,7 +151,7 @@ object Main {
         Scaffold(
             topBar = { Toolbar() },
             floatingActionButton = { if (!pagerState.isScrollInProgress) partitionList[pagerState.currentPage].fab?.let { it() } },
-            bottomBar = { NavigationBar() },
+            bottomBar = { BottomBar() },
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ) { paddingValues ->
             MainContent(paddingValues = paddingValues)
@@ -200,20 +200,14 @@ object Main {
             )
         )
 
-        val view = LocalView.current
-        (view.context as Activity).window.statusBarColor = toolbarColor.toArgb()
-        ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = !when (darkMode) {
-            Settings.SYSTEM_MODE -> isSystemInDarkTheme()
-            Settings.LIGHT_MODE -> false
-            Settings.DARK_MODE -> true
-            else -> isSystemInDarkTheme()
-        }
+        SetStatusBarColor(
+            color = toolbarColor
+        )
     }
 
     @Composable
-    fun NavigationBar() {
-        val view = LocalView.current
-        (view.context as Activity).window.navigationBarColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp).toArgb()
+    fun BottomBar() {
+        SetNavigationBarColor()
 
         NavigationBar {
             partitionList.forEachIndexed { index, partition ->

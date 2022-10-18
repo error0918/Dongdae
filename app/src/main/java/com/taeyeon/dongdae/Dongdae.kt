@@ -1,17 +1,22 @@
 package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CornerBasedShape
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.view.ViewCompat
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.core.SharedPreferencesManager
@@ -55,6 +60,7 @@ fun saveSettings() {
     Settings.saveSettings()
 }
 
+
 enum class Screen {
     Main, Welcome, InternetDisconnected
 }
@@ -65,12 +71,14 @@ fun checkScreen(): Screen {
         else Screen.Main
 }
 
+
 fun checkFirstOpen(): Boolean {
     val key = "OPENED"
     if (SharedPreferencesManager.Companion.Public.contains(key)) return false
     SharedPreferencesManager.Companion.Public.putBoolean(key, true)
     return true
 }
+
 
 data class Partition(
     val title: String,
@@ -81,17 +89,6 @@ data class Partition(
     val composable: @Composable () -> Unit
 )
 
-@SuppressLint("HardwareIds")
-fun getAndroidId(): String = android.provider.Settings.Secure.getString(Core.getContext().contentResolver, android.provider.Settings.Secure.ANDROID_ID)
-
-fun getName(androidId: String = getAndroidId()): String {
-    val endangeredSpecies = Core.getContext().resources.getStringArray(R.array.endangered_species)
-    return endangeredSpecies[Integer.parseInt(androidId.substring(1..5), 16) % endangeredSpecies.size]
-}
-
-fun getSubName(androidId: String = getAndroidId()): String {
-    return androidId.substring(androidId.length - 6, androidId.length - 1)
-}
 
 @Composable
 fun getCornerSize(shape: CornerBasedShape): Dp {
@@ -106,4 +103,39 @@ fun getCornerSize(shape: CornerBasedShape): Dp {
         }
     }
     return cornerRadius
+}
+
+@Composable
+fun SetStatusBarColor(
+    color: Color = MaterialTheme.colorScheme.surface,
+    isAppearanceLightStatusBars: Boolean = !when (darkMode) {
+        Settings.SYSTEM_MODE -> isSystemInDarkTheme()
+        Settings.LIGHT_MODE -> false
+        Settings.DARK_MODE -> true
+        else -> isSystemInDarkTheme()
+    }
+) {
+    val view = LocalView.current
+    (view.context as Activity).window.statusBarColor = color.toArgb()
+    ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = isAppearanceLightStatusBars
+}
+
+@Composable
+fun SetNavigationBarColor(
+    color: Color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp) // BottomBar Color
+) {
+    val view = LocalView.current
+    (view.context as Activity).window.navigationBarColor = color.toArgb()
+}
+
+@SuppressLint("HardwareIds")
+fun getAndroidId(): String = android.provider.Settings.Secure.getString(Core.getContext().contentResolver, android.provider.Settings.Secure.ANDROID_ID)
+
+fun getName(androidId: String = getAndroidId()): String {
+    val endangeredSpecies = Core.getContext().resources.getStringArray(R.array.endangered_species)
+    return endangeredSpecies[Integer.parseInt(androidId.substring(1..5), 16) % endangeredSpecies.size]
+}
+
+fun getSubName(androidId: String = getAndroidId()): String {
+    return androidId.substring(androidId.length - 6, androidId.length - 1)
 }

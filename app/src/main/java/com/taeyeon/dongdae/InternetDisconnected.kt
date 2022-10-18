@@ -3,26 +3,22 @@
 
 package com.taeyeon.dongdae
 
-import android.net.ConnectivityManager
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.core.content.getSystemService
-import com.taeyeon.core.Core
 import com.taeyeon.core.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -35,119 +31,138 @@ object InternetDisconnected {
     fun InternetDisconnected() {
         scope = rememberCoroutineScope()
         Scaffold(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
+            topBar = { TopBar() },
+            bottomBar = { BottomBar() },
             snackbarHost = { SnackbarHost(snackbarHostState) },
             modifier = Modifier.fillMaxSize()
         ) { paddingValues ->
-            ConstraintLayout(
-                modifier = Modifier
-                    .padding(
-                        top = paddingValues.calculateTopPadding() + 16.dp,
-                        bottom = paddingValues.calculateBottomPadding() + 16.dp,
-                        start = paddingValues.calculateStartPadding(LocalLayoutDirection.current) + 16.dp,
-                        end = paddingValues.calculateEndPadding(LocalLayoutDirection.current) + 16.dp
-                    )
-                    .fillMaxSize()
-            ) {
-                val (closeButton, appImage, appName, message, retry) = createRefs()
+            InternetDisconnectedContent(paddingValues = paddingValues)
+        }
+    }
 
-                Button(
-                    onClick = { Utils.shutDownApp() },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    border = BorderStroke(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    contentPadding = PaddingValues(horizontal = 8.dp),
-                    modifier = Modifier
-                        .constrainAs(closeButton) {
-                            top.linkTo(parent.top)
-                            start.linkTo(parent.start)
-                        }
+    @Composable
+    fun TopBar() {
+        SetStatusBarColor()
+
+        var isShowingDialog by rememberSaveable { mutableStateOf(false) }
+        if (isShowingDialog) {
+            MyView.MessageDialog(
+                onDismissRequest = { isShowingDialog = false },
+                icon = Icons.Filled.Close,
+                title = "닫기",
+                text = "앱을 종료하시겠습니까?",
+                dismissButtonText = "취소",
+                confirmButtonText = "닫기",
+                onConfirmButtonClick = {
+                    Utils.shutDownApp()
+                }
+            )
+        }
+
+        TopAppBar(
+            title = { Text(text = "문제 발생") },
+            actions = {
+                IconButton(
+                    onClick = {
+                        isShowingDialog = true
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Close,
-                        contentDescription = stringResource(id = R.string.close)
-                    )
-                    Text(
-                        text = stringResource(id = R.string.close),
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-                }
-
-                Image(
-                    imageVector = Icons.Filled.Close,//painter = painterResource(id = R.drawable.ic_launcher_round),
-                    contentDescription = stringResource(id = R.string.app_name),
-                    modifier = Modifier
-                        .size(200.dp)
-                        .constrainAs(appImage) {
-                            bottom.linkTo(appName.top, margin = 8.dp)
-                            centerHorizontallyTo(parent)
-                        }
-                )
-
-                Text(
-                    text = stringResource(id = R.string.app_name),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .constrainAs(appName) {
-                            centerTo(parent)
-                        }
-                )
-
-                Text(
-                    text = "테스트", //stringResource(id = R.string.main_network_disconnected_message),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onError,
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.error,
-                            shape = MaterialTheme.shapes.medium
-                        )
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            shape = MaterialTheme.shapes.medium
-                        )
-                        .padding(getCornerSize(shape = MaterialTheme.shapes.medium))
-                        .constrainAs(message) {
-                            top.linkTo(appName.bottom)
-                            bottom.linkTo(retry.top)
-                            centerHorizontallyTo(parent)
-                        }
-                )
-
-                OutlinedButton(
-                    onClick = {
-                        val isNetworkConnected = Core.getContext().getSystemService<ConnectivityManager>()?.activeNetworkInfo?.isConnectedOrConnecting ?: false // Check Network Connected
-                        if (isNetworkConnected) screen = checkScreen()
-                        scope.launch {
-                            //snackbarHostState.showSnackbar(if (isNetworkConnected) Core.getContext().getString(R.string.main_network_connect_success) else Core.getContext().getString(R.string.main_network_connect_fail))
-                        }
-                    },
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f),
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f)
-                    ),
-                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.onPrimary),
-                    shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .constrainAs(retry) {
-                            bottom.linkTo(parent.bottom)
-                            centerHorizontallyTo(parent)
-                        }
-                ) {
-                    Text(
-                        text = "테스트", //stringResource(id = R.string.main_network_network_retry),
-                        modifier = Modifier.padding(16.dp)
+                        contentDescription = "닫기",
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
+        )
+    }
+
+    @Composable
+    fun BottomBar() {
+        SetNavigationBarColor()
+
+        BottomAppBar {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                onClick = {
+                    val isNetworkConnected = Utils.checkInternet()
+                    if (isNetworkConnected) {
+                        screen = checkScreen()
+                    } else {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("연결 실패")
+                        }
+                    }
+                }
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = "다시시도",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun InternetDisconnectedContent(paddingValues: PaddingValues) {
+        ConstraintLayout(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    top = paddingValues.calculateTopPadding() + 16.dp,
+                    bottom = paddingValues.calculateBottomPadding() + 16.dp,
+                    start = paddingValues.calculateStartPadding(LocalLayoutDirection.current) + 16.dp,
+                    end = paddingValues.calculateEndPadding(LocalLayoutDirection.current) + 16.dp
+                )
+        ) {
+            val (appIconImage, appNameText, messageText) = createRefs()
+
+            /* TODO
+            Image(
+                bitmap = ImageBitmap.imageResource(id = R.mipmap.ic_launcher_round),
+                contentDescription = stringResource(id = R.string.app_name),
+                modifier = Modifier
+                    .size(200.dp)
+                    .constrainAs(appIconImage) {
+                        bottom.linkTo(appNameText.top, margin = 16.dp)
+                    }
+            )
+            TODO */
+
+            Spacer(
+                modifier = Modifier
+                    .size(200.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .constrainAs(appIconImage) {
+                        centerTo(parent)
+                    }
+            )
+
+            MyView.AppNameText(
+                modifier = Modifier
+                    .constrainAs(appNameText) {
+                        top.linkTo(appIconImage.bottom, margin = 8.dp)
+                        centerHorizontallyTo(parent)
+                    }
+            )
+
+            Text(
+                text = "인터넷 안됨 ㅇㅇ",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier
+                    .constrainAs(messageText) {
+                        top.linkTo(appNameText.bottom)
+                        bottom.linkTo(parent.bottom)
+                        centerHorizontallyTo(parent)
+                    }
+            )
+
         }
     }
 

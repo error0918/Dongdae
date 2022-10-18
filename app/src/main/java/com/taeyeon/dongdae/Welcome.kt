@@ -1,37 +1,26 @@
-@file:OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class,
-    ExperimentalAnimationApi::class
-)
+@file:OptIn(ExperimentalPagerApi::class, ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
 package com.taeyeon.dongdae
 
-import android.app.Activity
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowLeft
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.core.view.ViewCompat
 import com.google.accompanist.pager.*
-import com.taeyeon.core.Settings
 import kotlinx.coroutines.*
-import java.util.Locale
 
 object Welcome {
     private val snackbarHostState = SnackbarHostState()
@@ -53,14 +42,17 @@ object Welcome {
         Scaffold(
             topBar = { TopBar() },
             bottomBar = { BottomBar() },
-            snackbarHost = { SnackbarHost(snackbarHostState) }
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            modifier = Modifier.fillMaxSize()
         ) { paddingValues ->
-            WelcomeScreen(paddingValues = paddingValues)
+            WelcomeContent(paddingValues = paddingValues)
         }
     }
 
     @Composable
     fun TopBar() {
+        SetStatusBarColor()
+
         TopAppBar(
             title = { Text(text = "환영합니다") }
         )
@@ -68,8 +60,7 @@ object Welcome {
 
     @Composable
     fun BottomBar() {
-        val view = LocalView.current
-        (view.context as Activity).window.navigationBarColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp).toArgb()
+        SetNavigationBarColor()
 
         BottomAppBar {
             Box(
@@ -166,100 +157,14 @@ object Welcome {
                     }
             )
 
-            Box(
+            MyView.AppNameText(
                 modifier = Modifier
                     .constrainAs(appNameText) {
                         top.linkTo(appIconImage.bottom, margin = 8.dp)
                         centerHorizontallyTo(parent)
-                    }
-            ) {
-                if (Locale.getDefault() == Locale.KOREA) {
-                    val firstValues = rememberSaveable { listOf("산", "산중", "산고", "산학원", "산학교", "산학생", "산인").shuffled() }
-                    var firstIndex by rememberSaveable { mutableStateOf(0) }
-                    val secondValues = rememberSaveable { listOf("신", "나무숲", "커뮤").shuffled() }
-                    var secondIndex by rememberSaveable { mutableStateOf(0) }
-                    LaunchedEffect(true) {
-                        while (true) {
-                            delay(1000)
-                            if (firstIndex + 1 < firstValues.size) firstIndex++
-                            else firstIndex = 0
-                            if (secondIndex + 1 < secondValues.size) secondIndex++
-                            else secondIndex = 0
-                        }
-                    }
-
-                    Row {
-                        if (pagerState.currentPage == 0 && !pagerState.isScrollInProgress) {
-                            MyView.ShadowedText(
-                                text = "동",
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.displayLarge
-                            )
-                        } else {
-                            Text(
-                                text = "동",
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.displayLarge
-                            )
-                        }
-                        AnimatedContent(
-                            targetState = firstIndex,
-                            transitionSpec = {
-                                slideInVertically { height -> -height } + fadeIn() with
-                                        slideOutVertically { height -> height } + fadeOut()
-                            }
-                        ) {
-                            Text(
-                                text = firstValues[it],
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.displayLarge
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(16.dp))
-
-                        if (pagerState.currentPage == 0 && !pagerState.isScrollInProgress) {
-                            MyView.ShadowedText(
-                                text = "대",
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.displayLarge
-                            )
-                        } else {
-                            Text(
-                                text = "대",
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.displayLarge
-                            )
-                        }
-                        AnimatedContent(
-                            targetState = secondIndex,
-                            transitionSpec = {
-                                slideInVertically { height -> -height } + fadeIn() with
-                                        slideOutVertically { height -> height } + fadeOut()
-                            }
-                        ) {
-                            Text(
-                                text = secondValues[it],
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.displayLarge
-                            )
-                        }
-                    }
-                } else {
-                    MyView.ShadowedText(
-                        text = stringResource(id = R.string.app_name),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.displayLarge
-                    )
-                }
-            }
+                    },
+                isShadowed = pagerState.currentPage == 0 && !pagerState.isScrollInProgress
+            )
 
             Text(
                 text = stringResource(id = R.string.simple_app_explanation),
@@ -316,16 +221,7 @@ object Welcome {
 
     @Suppress("DEPRECATION")
     @Composable
-    fun WelcomeScreen(paddingValues: PaddingValues = PaddingValues()) {
-        val view = LocalView.current
-        (view.context as Activity).window.statusBarColor = MaterialTheme.colorScheme.surface.toArgb()
-        ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = !when (darkMode) {
-            Settings.SYSTEM_MODE -> isSystemInDarkTheme()
-            Settings.LIGHT_MODE -> false
-            Settings.DARK_MODE -> true
-            else -> isSystemInDarkTheme()
-        }
-
+    fun WelcomeContent(paddingValues: PaddingValues = PaddingValues()) {
         HorizontalPager(
             count = pageList.size,
             state = pagerState,

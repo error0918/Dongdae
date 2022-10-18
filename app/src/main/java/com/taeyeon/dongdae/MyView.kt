@@ -1,14 +1,18 @@
+@file:OptIn(ExperimentalAnimationApi::class)
+@file:Suppress("OPT_IN_IS_NOT_ENABLED")
+
 package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -16,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -30,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.Popup
+import kotlinx.coroutines.delay
+import java.util.*
 
 object MyView {
 
@@ -849,6 +856,7 @@ object MyView {
     object ShadowedTextDefaults {
         val Modifier: Modifier = androidx.compose.ui.Modifier
         val Shadow = 10.dp
+        val ShadowAlpha = 0.6f
         val Color = androidx.compose.ui.graphics.Color.Unspecified
         val FontSize = TextUnit.Unspecified
         val FontStyle: FontStyle? = null
@@ -871,6 +879,7 @@ object MyView {
         text: String,
         modifier: Modifier = ShadowedTextDefaults.Modifier,
         shadow: Dp = ShadowedTextDefaults.Shadow,
+        shadowAlpha: Float = ShadowedTextDefaults.ShadowAlpha,
         color: Color = ShadowedTextDefaults.Color,
         fontSize: TextUnit = ShadowedTextDefaults.FontSize,
         fontStyle: FontStyle? = ShadowedTextDefaults.FontStyle,
@@ -892,7 +901,7 @@ object MyView {
             Popup(alignment = Alignment.Center) {
                 Text(
                     text = text,
-                    color = color.copy(alpha = 0.6f),
+                    color = color.copy(alpha = shadowAlpha),
                     fontSize = fontSize,
                     fontStyle = fontStyle,
                     fontWeight = fontWeight,
@@ -930,6 +939,102 @@ object MyView {
                 modifier = Modifier
                     .align(Alignment.Center)
             )
+        }
+    }
+
+
+    @Composable
+    fun AppNameText(
+        modifier: Modifier = Modifier,
+        isShadowed: Boolean = true
+    ) {
+        Box(modifier = modifier) {
+            if (Locale.getDefault() == Locale.KOREA) {
+                val firstValues = rememberSaveable { listOf("산", "산중", "산고", "산학원", "산학교", "산학생", "산인").shuffled() }
+                var firstIndex by rememberSaveable { mutableStateOf(0) }
+                val secondValues = rememberSaveable { listOf("신", "나무숲", "커뮤").shuffled() }
+                var secondIndex by rememberSaveable { mutableStateOf(0) }
+                LaunchedEffect(true) {
+                    while (true) {
+                        delay(1000)
+                        if (firstIndex + 1 < firstValues.size) firstIndex++
+                        else firstIndex = 0
+                        if (secondIndex + 1 < secondValues.size) secondIndex++
+                        else secondIndex = 0
+                    }
+                }
+
+                Row {
+                    if (isShadowed) {
+                        MyView.ShadowedText(
+                            text = "동",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.displayLarge
+                        )
+                    } else {
+                        Text(
+                            text = "동",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.displayLarge
+                        )
+                    }
+                    AnimatedContent(
+                        targetState = firstIndex,
+                        transitionSpec = {
+                            slideInVertically { height -> -height } + fadeIn() with
+                                    slideOutVertically { height -> height } + fadeOut()
+                        }
+                    ) {
+                        Text(
+                            text = firstValues[it],
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.displayLarge
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    if (isShadowed) {
+                        MyView.ShadowedText(
+                            text = "대",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.displayLarge
+                        )
+                    } else {
+                        Text(
+                            text = "대",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.displayLarge
+                        )
+                    }
+                    AnimatedContent(
+                        targetState = secondIndex,
+                        transitionSpec = {
+                            slideInVertically { height -> -height } + fadeIn() with
+                                    slideOutVertically { height -> height } + fadeOut()
+                        }
+                    ) {
+                        Text(
+                            text = secondValues[it],
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.displayLarge
+                        )
+                    }
+                }
+            } else {
+                MyView.ShadowedText(
+                    text = stringResource(id = R.string.app_name),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.displayLarge
+                )
+            }
         }
     }
 

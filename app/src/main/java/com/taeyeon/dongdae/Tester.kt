@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalAnimationApi::class)
+@file:OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
 package com.taeyeon.dongdae
@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.*
@@ -98,18 +100,34 @@ object Tester {
                     contentAlignment = Alignment.Center
                 ) {
                     if (it) {
-                        Box(modifier = Modifier.size(200.dp)) {
+                        Row(
+                            modifier = Modifier
+                                .width(IntrinsicSize.Min)
+                                .height(IntrinsicSize.Min)
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Text(text = ("adsf".repeat(5) + "\n").repeat(10))
+                            Surface(
+                                modifier = Modifier.fillMaxSize(),
+                                color = Color.Transparent,
+                                shape = MaterialTheme.shapes.small,
+                                onClick = {}
+                            ) {
+                                Box(modifier = Modifier.fillMaxHeight()) {
+                                    Icon(
+                                        imageVector = Icons.Filled.KeyboardArrowLeft,
+                                        contentDescription = null, // TODO
+                                        modifier = Modifier.align(Alignment.Center)
+                                    )
+                                }
+                            }
                         }
                     } else {
-                        val padding by animateDpAsState(
-                            targetValue =
-                            if (isTestMessageShowing) 16.dp
-                            else getCornerSize(shape = MaterialTheme.shapes.small)
-                        )
                         Row(
                             modifier = Modifier
                                 .height(56.dp)
-                                .padding(padding),
+                                .padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
@@ -117,7 +135,7 @@ object Tester {
                                 imageVector = Icons.Filled.Bolt,
                                 contentDescription = null, // TODO
                                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                                modifier = Modifier.size(56.dp - 2 * padding)
+                                modifier = Modifier.size(24.dp)
                             )
                             AnimatedVisibility(visible = isTestMessageShowing) {
                                 Text(

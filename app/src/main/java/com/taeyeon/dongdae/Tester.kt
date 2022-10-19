@@ -12,10 +12,12 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.PictureInPicture
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -91,8 +93,9 @@ object Tester {
                         )
                     },
                 shape = RoundedCornerShape(animateDpAsState(targetValue = if (isExpanded) getCornerSize(shape = MaterialTheme.shapes.large) else getCornerSize(shape = MaterialTheme.shapes.small)).value),
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shadowElevation = 12.dp,
+                color = if (isExpanded) Color.Transparent else MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                shadowElevation = if (isExpanded) 0.dp else 12.dp
             ) {
                 AnimatedContent(
                     targetState = isExpanded,
@@ -100,7 +103,60 @@ object Tester {
                     contentAlignment = Alignment.Center
                 ) {
                     if (it) {
-                        Row(
+                        Column(
+                            modifier = Modifier
+                                .width(IntrinsicSize.Min)
+                        ) {
+                            Surface(
+                                shape = RoundedCornerShape(
+                                    topStart = getCornerSize(shape = MaterialTheme.shapes.large),
+                                    topEnd = getCornerSize(shape = MaterialTheme.shapes.large),
+                                    bottomStart = getCornerSize(shape = MaterialTheme.shapes.large)
+                                ),
+                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            ) {
+                                Text(
+                                    text = ("adsf".repeat(5) + "\n").repeat(10),
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                            Surface(
+                                shape = RoundedCornerShape(
+                                    bottomStart = getCornerSize(shape = MaterialTheme.shapes.large),
+                                    bottomEnd = getCornerSize(shape = MaterialTheme.shapes.large)
+                                ),
+                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier
+                                    .align(Alignment.End)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(16.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    IconButton(
+                                        onClick = { /*TODO*/ },
+                                        modifier = Modifier.size(24.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.KeyboardArrowLeft,
+                                            contentDescription = null // TODO
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { /*TODO*/ },
+                                        modifier = Modifier.size(24.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.PictureInPicture,
+                                            contentDescription = null // TODO
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        /*Row(
                             modifier = Modifier
                                 .width(IntrinsicSize.Min)
                                 .height(IntrinsicSize.Min)
@@ -122,7 +178,7 @@ object Tester {
                                     )
                                 }
                             }
-                        }
+                        }*/
                     } else {
                         Row(
                             modifier = Modifier

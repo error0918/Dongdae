@@ -42,6 +42,7 @@ var screen by mutableStateOf(Screen.Main)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            splashScreen.setSplashScreenTheme(R.style.Theme_Dongdae_Splash)
             splashScreen.setOnExitAnimationListener { splashScreenView ->
                 ObjectAnimator.ofPropertyValuesHolder(
                     splashScreenView.iconView,
@@ -65,7 +66,6 @@ class MainActivity : ComponentActivity() {
         Core.activityCreated(this)
 
         setContent {
-            //screen = rememberSaveable { checkScreen() }
             screen = rememberSaveable { Screen.Welcome }
 
             loadSettings()
@@ -110,6 +110,8 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+
+
             }
         }
     }

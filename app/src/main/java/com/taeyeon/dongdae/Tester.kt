@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalAnimationApi::class)
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
 package com.taeyeon.dongdae
@@ -12,18 +12,14 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.PictureInPicture
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.*
@@ -53,151 +49,140 @@ object Tester {
         Popup(
             offset = IntOffset(x = x.toInt(), y = y.toInt())
         ) {
-            Surface(
+            Column(
                 modifier = Modifier
-                    .indication(
-                        interactionSource,
-                        LocalIndication.current
-                    )
-                    .pointerInput(Unit) {
-                        detectDragGestures { change, dragAmount ->
-                            change.consume()
-                            x += dragAmount.x
-                            y += dragAmount.y
+                    .height(IntrinsicSize.Min)
+            ) {
+                val roundDp by animateDpAsState(targetValue = if (isExpanded) getCornerSize(shape = MaterialTheme.shapes.large) else getCornerSize(shape = MaterialTheme.shapes.small))
+                Surface(
+                    shape = RoundedCornerShape(
+                        topStart = roundDp,
+                        topEnd = roundDp,
+                        bottomStart = roundDp,
+                        bottomEnd = animateDpAsState(targetValue = if (isExpanded) 0.dp else getCornerSize(shape = MaterialTheme.shapes.small)).value
+                    ),
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    modifier = Modifier
+                        .indication(
+                            interactionSource,
+                            LocalIndication.current
+                        )
+                        .pointerInput(Unit) {
+                            detectDragGestures { change, dragAmount ->
+                                change.consume()
+                                x += dragAmount.x
+                                y += dragAmount.y
+                            }
+                        }
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = { offset ->
+                                    if (!isExpanded) {
+                                        scope.launch {
+                                            Utils.vibrate(10)
+                                            val press = PressInteraction.Press(offset)
+                                            interactionSource.emit(press)
+                                            delay(100)
+                                            interactionSource.emit(PressInteraction.Release(press))
+                                        }
+                                        isExpanded = !isExpanded
+                                    }
+                                },
+                                onLongPress = { offset ->
+                                    if (!isExpanded) {
+                                        scope.launch {
+                                            Utils.vibrate(10)
+                                            val press = PressInteraction.Press(offset)
+                                            interactionSource.emit(press)
+                                            delay(100)
+                                            interactionSource.emit(PressInteraction.Release(press))
+                                        }
+                                        isTestMessageShowing = !isTestMessageShowing
+                                    }
+                                }
+                            )
+                        },
+                ) {
+                    AnimatedContent(
+                        targetState = isExpanded,
+                        transitionSpec = { scaleIn() with scaleOut() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (it) {
+                            Text(
+                                text = ("adsf".repeat(7)).repeat(10),
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        } else {
+                            Row(
+                                modifier = Modifier
+                                    .height(56.dp)
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Bolt,
+                                    contentDescription = null, // TODO
+                                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                AnimatedVisibility(visible = isTestMessageShowing) {
+
+                                }
+                            }
                         }
                     }
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onTap = { offset ->
-                                scope.launch {
-                                    Utils.vibrate(10)
-                                    val press = PressInteraction.Press(offset)
-                                    interactionSource.emit(press)
-                                    delay(100)
-                                    interactionSource.emit(PressInteraction.Release(press))
-                                }
-                                isExpanded = !isExpanded
-                            },
-                            onLongPress = { offset ->
-                                if (!isExpanded) {
-                                    scope.launch {
-                                        Utils.vibrate(10)
-                                        val press = PressInteraction.Press(offset)
-                                        interactionSource.emit(press)
-                                        delay(100)
-                                        interactionSource.emit(PressInteraction.Release(press))
-                                    }
-                                    isTestMessageShowing = !isTestMessageShowing
-                                }
-                            }
-                        )
-                    },
-                shape = RoundedCornerShape(animateDpAsState(targetValue = if (isExpanded) getCornerSize(shape = MaterialTheme.shapes.large) else getCornerSize(shape = MaterialTheme.shapes.small)).value),
-                color = if (isExpanded) Color.Transparent else MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                shadowElevation = if (isExpanded) 0.dp else 12.dp
-            ) {
-                AnimatedContent(
-                    targetState = isExpanded,
-                    transitionSpec = { scaleIn() with scaleOut() },
-                    contentAlignment = Alignment.Center
+                }
+                AnimatedVisibility(
+                    visible = isExpanded,
+                    enter = expandIn(),
+                    exit = shrinkOut(),
+                    modifier = Modifier
+                        .align(Alignment.End)
                 ) {
-                    if (it) {
-                        Column(
-                            modifier = Modifier
-                                .width(IntrinsicSize.Min)
-                        ) {
-                            Surface(
-                                shape = RoundedCornerShape(
-                                    topStart = getCornerSize(shape = MaterialTheme.shapes.large),
-                                    topEnd = getCornerSize(shape = MaterialTheme.shapes.large),
-                                    bottomStart = getCornerSize(shape = MaterialTheme.shapes.large)
-                                ),
-                                color = MaterialTheme.colorScheme.secondaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                            ) {
-                                Text(
-                                    text = ("adsf".repeat(5) + "\n").repeat(10),
-                                    modifier = Modifier.padding(16.dp)
-                                )
-                            }
-                            Surface(
-                                shape = RoundedCornerShape(
-                                    bottomStart = getCornerSize(shape = MaterialTheme.shapes.large),
-                                    bottomEnd = getCornerSize(shape = MaterialTheme.shapes.large)
-                                ),
-                                color = MaterialTheme.colorScheme.secondaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                                modifier = Modifier
-                                    .align(Alignment.End)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(16.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                                ) {
-                                    IconButton(
-                                        onClick = { /*TODO*/ },
-                                        modifier = Modifier.size(24.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Filled.KeyboardArrowLeft,
-                                            contentDescription = null // TODO
-                                        )
-                                    }
-                                    IconButton(
-                                        onClick = { /*TODO*/ },
-                                        modifier = Modifier.size(24.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Filled.PictureInPicture,
-                                            contentDescription = null // TODO
-                                        )
-                                    }
+                    Surface(
+                        shape = RoundedCornerShape(
+                            bottomStart = getCornerSize(shape = MaterialTheme.shapes.large),
+                            bottomEnd = getCornerSize(shape = MaterialTheme.shapes.large)
+                        ),
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier
+                            .pointerInput(Unit) {
+                                detectDragGestures { change, dragAmount ->
+                                    change.consume()
+                                    x += dragAmount.x
+                                    y += dragAmount.y
                                 }
                             }
-                        }
-                        /*Row(
-                            modifier = Modifier
-                                .width(IntrinsicSize.Min)
-                                .height(IntrinsicSize.Min)
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Text(text = ("adsf".repeat(5) + "\n").repeat(10))
-                            Surface(
-                                modifier = Modifier.fillMaxSize(),
-                                color = Color.Transparent,
-                                shape = MaterialTheme.shapes.small,
-                                onClick = {}
-                            ) {
-                                Box(modifier = Modifier.fillMaxHeight()) {
-                                    Icon(
-                                        imageVector = Icons.Filled.KeyboardArrowLeft,
-                                        contentDescription = null, // TODO
-                                        modifier = Modifier.align(Alignment.Center)
-                                    )
-                                }
-                            }
-                        }*/
-                    } else {
+                    ) {
                         Row(
                             modifier = Modifier
-                                .height(56.dp)
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+                                .padding(
+                                    bottom = 16.dp,
+                                    start = 16.dp,
+                                    end = 16.dp
+                                ),
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.Bolt,
-                                contentDescription = null, // TODO
-                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            IconButton(
+                                onClick = { /*TODO*/ },
                                 modifier = Modifier.size(24.dp)
-                            )
-                            AnimatedVisibility(visible = isTestMessageShowing) {
-                                Text(
-                                    text = "테스터", // TODO,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                    style = MaterialTheme.typography.labelLarge
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.ViewQuilt,
+                                    contentDescription = null // TODO
+                                )
+                            }
+                            IconButton(
+                                onClick = { isExpanded = false },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.FullscreenExit,
+                                    contentDescription = null // TODO
                                 )
                             }
                         }

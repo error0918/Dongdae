@@ -111,9 +111,9 @@ fun getCornerSize(shape: CornerBasedShape): Dp {
 fun SetStatusBarColor(
     color: Color = MaterialTheme.colorScheme.surface,
     isAppearanceLightStatusBars: Boolean = !when (darkMode) {
-        Settings.SYSTEM_MODE -> isSystemInDarkTheme()
-        Settings.LIGHT_MODE -> false
-        Settings.DARK_MODE -> true
+        Settings.DarkMode.SYSTEM_MODE -> isSystemInDarkTheme()
+        Settings.DarkMode.LIGHT_MODE -> false
+        Settings.DarkMode.DARK_MODE -> true
         else -> isSystemInDarkTheme()
     }
 ) {

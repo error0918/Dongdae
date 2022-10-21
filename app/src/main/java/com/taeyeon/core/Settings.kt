@@ -20,15 +20,15 @@ object Settings {
 
     private const val SETTINGS_KEY = "SETTINGS"
 
-    const val SYSTEM_MODE = 0
-    const val LIGHT_MODE = 1
-    const val DARK_MODE = 2
+    enum class DarkMode {
+        SYSTEM_MODE, LIGHT_MODE, DARK_MODE
+    }
 
     val INITIAL_SETTINGS_DATA =
         SettingsData(
             FullScreenMode = false,
             ScreenAlwaysOn = false,
-            DarkMode = SYSTEM_MODE,
+            DarkMode = DarkMode.SYSTEM_MODE,
             DynamicColor = false
         )
         get() {
@@ -40,7 +40,7 @@ object Settings {
     class SettingsData(
         FullScreenMode: Boolean = INITIAL_SETTINGS_DATA.FullScreenMode,
         ScreenAlwaysOn: Boolean = INITIAL_SETTINGS_DATA.ScreenAlwaysOn,
-        DarkMode: Int = INITIAL_SETTINGS_DATA.DarkMode,
+        DarkMode: DarkMode = INITIAL_SETTINGS_DATA.DarkMode,
         DynamicColor: Boolean = INITIAL_SETTINGS_DATA.DynamicColor
     ) : Cloneable {
         var FullScreenMode: Boolean = false
@@ -53,7 +53,7 @@ object Settings {
                 field = value
                 saveSettings()
             }
-        var DarkMode: Int = SYSTEM_MODE
+        var DarkMode: DarkMode = Settings.DarkMode.SYSTEM_MODE
             set(value) {
                 field = value
                 saveSettings()
@@ -67,9 +67,7 @@ object Settings {
         init {
             this.FullScreenMode = FullScreenMode
             this.ScreenAlwaysOn = ScreenAlwaysOn
-            this.DarkMode =
-                if (DarkMode == SYSTEM_MODE || DarkMode == LIGHT_MODE || DarkMode == DARK_MODE) DarkMode
-                else if (INITIAL_SETTINGS_DATA.DarkMode == SYSTEM_MODE || INITIAL_SETTINGS_DATA.DarkMode == LIGHT_MODE || INITIAL_SETTINGS_DATA.DarkMode == DARK_MODE) INITIAL_SETTINGS_DATA.DarkMode else SYSTEM_MODE
+            this.DarkMode = DarkMode
             this.DynamicColor = DynamicColor
         }
 

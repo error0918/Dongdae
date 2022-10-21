@@ -105,9 +105,9 @@ fun DongdaeTheme(
 @Composable
 fun Theme(
     darkTheme: Boolean = when (com.taeyeon.dongdae.darkMode) {
-        Settings.SYSTEM_MODE -> isSystemInDarkTheme()
-        Settings.LIGHT_MODE -> false
-        Settings.DARK_MODE -> true
+        Settings.DarkMode.SYSTEM_MODE -> isSystemInDarkTheme()
+        Settings.DarkMode.LIGHT_MODE -> false
+        Settings.DarkMode.DARK_MODE -> true
         else -> isSystemInDarkTheme()
     },
     dynamicColor: Boolean = com.taeyeon.dongdae.dynamicColor,

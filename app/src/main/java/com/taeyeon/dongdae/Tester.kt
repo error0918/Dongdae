@@ -5,6 +5,7 @@ package com.taeyeon.dongdae
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -22,12 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.taeyeon.core.Settings
 import com.taeyeon.core.Utils
 import com.taeyeon.dongdae.Main.pagerState
 import kotlinx.coroutines.CoroutineScope
@@ -49,15 +52,27 @@ object Tester {
         var isExpanded by rememberSaveable { mutableStateOf(false) }
         var isAttached by rememberSaveable { mutableStateOf(false) }
         var isTestMessageShowing by rememberSaveable { mutableStateOf(true) }
+
+        var size by remember { mutableStateOf(IntSize.Zero) }
+        var screenSize by remember { mutableStateOf(IntSize.Zero) }
+        screenSize = with(LocalDensity.current) { IntSize(LocalConfiguration.current.screenWidthDp.dp.toPx().toInt(), LocalConfiguration.current.screenHeightDp.dp.toPx().toInt()) }
+
         var x by remember { mutableStateOf(dp16) }
         var y by remember { mutableStateOf(dp16) }
 
         Popup(
-            offset = IntOffset(x = if (isAttached) 0 else x.toInt(), y = y.toInt())
+            offset =
+                IntOffset(
+                    x = animateIntAsState(targetValue = if (isAttached) 0 else x.toInt()).value,
+                    y = y.toInt()
+                )
         ) {
             Column(
                 modifier = Modifier
                     .height(IntrinsicSize.Min)
+                    .onSizeChanged { intSize ->
+                        size = intSize
+                    }
             ) {
                 val roundDp by animateDpAsState(targetValue = if (isExpanded && !isAttached) getCornerSize(shape = MaterialTheme.shapes.large) else getCornerSize(shape = MaterialTheme.shapes.small))
                 val scrollState = rememberScrollState()
@@ -79,8 +94,9 @@ object Tester {
                         .pointerInput(Unit) {
                             detectDragGestures { change, dragAmount ->
                                 change.consume()
-                                if (!isAttached) x += dragAmount.x
-                                y += dragAmount.y
+                                if (!isAttached)
+                                    x = if (x + dragAmount.x < 0) 0f else if (screenSize.width < x + dragAmount.x + size.width) screenSize.width.toFloat() - size.width.toFloat() else x + dragAmount.x
+                                y = if (y + dragAmount.y < 0) 0f else if (screenSize.height < y + dragAmount.y + size.height) screenSize.height.toFloat() - size.height.toFloat() else y + dragAmount.y
                             }
                         }
                         .pointerInput(Unit) {
@@ -150,7 +166,7 @@ object Tester {
                                     ) {
 
                                         Text(
-                                            text = stringResource(id = R.string.app_name),
+                                            text = stringResource(id = R.string.app_name) + "테스터", // TODO
                                             style = MaterialTheme.typography.labelLarge,
                                             modifier = Modifier.align(Alignment.CenterHorizontally)
                                         )
@@ -177,18 +193,19 @@ object Tester {
                                         Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .height(IntrinsicSize.Min)
-                                                .background(
-                                                    color = MaterialTheme.colorScheme.secondary
-                                                        .copy(alpha = 0.2f)
-                                                        .compositeOver(MaterialTheme.colorScheme.secondaryContainer),
-                                                    shape = MaterialTheme.shapes.medium
-                                                )
+                                                .height(IntrinsicSize.Min),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                                         ) {
                                             Text(
                                                 text = "uniqueColor",
                                                 style = MaterialTheme.typography.labelSmall,
                                                 modifier = Modifier
+                                                    .background(
+                                                        color = MaterialTheme.colorScheme.secondary
+                                                            .copy(alpha = 0.2f)
+                                                            .compositeOver(MaterialTheme.colorScheme.secondaryContainer),
+                                                        shape = MaterialTheme.shapes.medium
+                                                    )
                                                     .padding(getCornerSize(shape = MaterialTheme.shapes.medium))
                                             )
                                             Spacer(
@@ -221,27 +238,83 @@ object Tester {
                                                 .fillMaxWidth()
                                         ) {
                                             Text(
-                                                text = "screen: ${screen.name}",
-                                                overflow = TextOverflow.Ellipsis,
-                                                maxLines = 1
+                                                text = "screen: ${screen.name}"
                                             )
                                         }
 
-                                        for (i in 0..10) {
-                                            Button(
-                                                onClick = { },
-                                                colors = ButtonDefaults.buttonColors(
-                                                    containerColor = MaterialTheme.colorScheme.secondary,
-                                                    contentColor = MaterialTheme.colorScheme.onSecondary
-                                                ),
-                                                shape = MaterialTheme.shapes.medium,
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                            ) {
-                                                Text(
-                                                    text = "s"
-                                                )
-                                            }
+                                        Button(
+                                            onClick = {
+                                                fullScreenMode = !fullScreenMode
+                                                save()
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = animateColorAsState(targetValue = if (fullScreenMode) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)).value,
+                                                contentColor = MaterialTheme.colorScheme.onSecondary
+                                            ),
+                                            shape = MaterialTheme.shapes.medium,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = "fullScreenMode: $fullScreenMode"
+                                            )
+                                        }
+
+                                        Button(
+                                            onClick = {
+                                                screenAlwaysOn = !screenAlwaysOn
+                                                save()
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = animateColorAsState(targetValue = if (screenAlwaysOn) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)).value,
+                                                contentColor = MaterialTheme.colorScheme.onSecondary
+                                            ),
+                                            shape = MaterialTheme.shapes.medium,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = "screenAlwaysOn: $screenAlwaysOn"
+                                            )
+                                        }
+
+                                        val darkModeList = Settings.DarkMode.values()
+                                        Button(
+                                            onClick = {
+                                                darkMode =
+                                                    if (darkModeList.indexOf(darkMode) == -1 || darkModeList.indexOf(darkMode) + 1 >= darkModeList.size) darkModeList[0]
+                                                    else darkModeList[darkModeList.indexOf(darkMode) + 1]
+                                                save()
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = MaterialTheme.colorScheme.secondary,
+                                                contentColor = MaterialTheme.colorScheme.onSecondary
+                                            ),
+                                            shape = MaterialTheme.shapes.medium,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = "darkMode: ${darkMode}"
+                                            )
+                                        }
+
+                                        Button(
+                                            onClick = {
+                                                dynamicColor = !dynamicColor
+                                                save()
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = animateColorAsState(targetValue = if (dynamicColor) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f)).value,
+                                                contentColor = MaterialTheme.colorScheme.onSecondary
+                                            ),
+                                            shape = MaterialTheme.shapes.medium,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = "dynamicColor: $dynamicColor"
+                                            )
                                         }
 
                                     }

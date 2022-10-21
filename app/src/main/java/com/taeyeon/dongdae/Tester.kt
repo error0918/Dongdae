@@ -1,14 +1,15 @@
-@file:OptIn(ExperimentalAnimationApi::class)
+@file:OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
 package com.taeyeon.dongdae
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.indication
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
@@ -20,11 +21,17 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.taeyeon.core.Utils
+import com.taeyeon.dongdae.Main.pagerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -54,6 +61,8 @@ object Tester {
                     .height(IntrinsicSize.Min)
             ) {
                 val roundDp by animateDpAsState(targetValue = if (isExpanded) getCornerSize(shape = MaterialTheme.shapes.large) else getCornerSize(shape = MaterialTheme.shapes.small))
+                val scrollState = rememberScrollState()
+
                 Surface(
                     shape = RoundedCornerShape(
                         topStart = roundDp,
@@ -110,10 +119,81 @@ object Tester {
                         contentAlignment = Alignment.Center
                     ) {
                         if (it) {
-                            Text(
-                                text = ("adsf".repeat(7)).repeat(10),
-                                modifier = Modifier.padding(16.dp)
-                            )
+                            Column(
+                                modifier = Modifier
+                                    .width(250.dp)
+                                    .height(300.dp)
+                                    .padding(16.dp)
+                                    .clip(MaterialTheme.shapes.medium)
+                                    .verticalScroll(
+                                        scrollState,
+                                        enabled = false
+                                    ),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+
+                                Text(
+                                    text = stringResource(id = R.string.app_name),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                )
+
+                                Text(
+                                    text = """
+                                        ${if (Main.isInitialized()) "Main.pagerState.currentPage: ${pagerState.currentPage}" else ""}
+                                    """.trimIndent(),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(
+                                            color = MaterialTheme.colorScheme.secondary
+                                                .copy(alpha = 0.2f)
+                                                .compositeOver(MaterialTheme.colorScheme.secondaryContainer),
+                                            shape = MaterialTheme.shapes.medium
+                                        )
+                                        .padding(getCornerSize(shape = MaterialTheme.shapes.medium))
+                                )
+
+                                val screenList = Screen.values()
+                                Button(
+                                    onClick = {
+                                        screen =
+                                            if (screenList.indexOf(screen) == -1 || screenList.indexOf(screen) + 1 >= screenList.size) screenList[0]
+                                            else screenList[screenList.indexOf(screen) + 1]
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.secondary,
+                                        contentColor = MaterialTheme.colorScheme.onSecondary
+                                    ),
+                                    shape = MaterialTheme.shapes.medium,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "screen: ${screen.name}",
+                                        overflow = TextOverflow.Ellipsis,
+                                        maxLines = 1
+                                    )
+                                }
+
+                                for(i in 0..10) {
+                                    Button(
+                                        onClick = {  },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.secondary,
+                                            contentColor = MaterialTheme.colorScheme.onSecondary
+                                        ),
+                                        shape = MaterialTheme.shapes.medium,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = "s"
+                                        )
+                                    }
+                                }
+
+                            }
                         } else {
                             Row(
                                 modifier = Modifier
@@ -129,7 +209,11 @@ object Tester {
                                     modifier = Modifier.size(24.dp)
                                 )
                                 AnimatedVisibility(visible = isTestMessageShowing) {
-
+                                    Text(
+                                        text = "테스터", // TODO,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
                                 }
                             }
                         }
@@ -173,6 +257,34 @@ object Tester {
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.ViewQuilt,
+                                    contentDescription = null // TODO
+                                )
+                            }
+                            IconButton(
+                                onClick = {
+                                    scope.launch {
+                                        scrollState.animateScrollTo(if (scrollState.value - 100 >= 0) scrollState.value - 100 else 0)
+                                    }
+                                },
+                                enabled = scrollState.value > 0,
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowUpward,
+                                    contentDescription = null // TODO
+                                )
+                            }
+                            IconButton(
+                                onClick = {
+                                    scope.launch {
+                                        scrollState.animateScrollTo(if (scrollState.value + 100 <= scrollState.maxValue) scrollState.value + 100 else scrollState.maxValue)
+                                    }
+                                },
+                                enabled = scrollState.value < scrollState.maxValue,
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowDownward,
                                     contentDescription = null // TODO
                                 )
                             }

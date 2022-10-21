@@ -53,7 +53,7 @@ object Tester {
         var y by remember { mutableStateOf(dp16) }
 
         Popup(
-            offset = IntOffset(x = x.toInt(), y = y.toInt())
+            offset = IntOffset(x = if (isAttached) 0 else x.toInt(), y = y.toInt())
         ) {
             Column(
                 modifier = Modifier
@@ -64,9 +64,9 @@ object Tester {
 
                 Surface(
                     shape = RoundedCornerShape(
-                        topStart = roundDp,
+                        topStart = animateDpAsState(targetValue = if (isAttached) 0.dp else roundDp).value,
                         topEnd = roundDp,
-                        bottomStart = roundDp,
+                        bottomStart = animateDpAsState(targetValue = if (isAttached) 0.dp else roundDp).value,
                         bottomEnd = animateDpAsState(targetValue = if (isExpanded && !isAttached) 0.dp else getCornerSize(shape = MaterialTheme.shapes.small)).value
                     ),
                     color = MaterialTheme.colorScheme.secondaryContainer,
@@ -79,7 +79,7 @@ object Tester {
                         .pointerInput(Unit) {
                             detectDragGestures { change, dragAmount ->
                                 change.consume()
-                                x += dragAmount.x
+                                if (!isAttached) x += dragAmount.x
                                 y += dragAmount.y
                             }
                         }
@@ -124,8 +124,12 @@ object Tester {
                                 contentAlignment = Alignment.Center
                             ) { attached ->
                                 if (attached) {
-                                    // TODO
-                                    IconButton(onClick = { isAttached = false }) {
+                                    IconButton(
+                                        onClick = { isAttached = false },
+                                        modifier = Modifier
+                                            .width(28.dp)
+                                            .height(56.dp)
+                                    ) {
                                         Icon(
                                             imageVector = Icons.Filled.KeyboardArrowRight,
                                             contentDescription = null // TODO

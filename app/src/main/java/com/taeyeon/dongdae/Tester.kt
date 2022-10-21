@@ -29,7 +29,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.core.Utils
 import com.taeyeon.dongdae.Main.pagerState

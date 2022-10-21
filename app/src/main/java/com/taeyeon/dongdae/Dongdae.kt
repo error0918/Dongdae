@@ -30,6 +30,7 @@ var dynamicColor by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.DynamicColor)
 var id by mutableStateOf(getAndroidId())
 var name by mutableStateOf(getName(id))
 var subName by mutableStateOf(getSubName(id))
+var uniqueColor by mutableStateOf(getUniqueColor(id))
 
 
 fun load() {
@@ -105,6 +106,7 @@ fun getCornerSize(shape: CornerBasedShape): Dp {
     return cornerRadius
 }
 
+@Suppress("DEPRECATION")
 @Composable
 fun SetStatusBarColor(
     color: Color = MaterialTheme.colorScheme.surface,
@@ -131,11 +133,15 @@ fun SetNavigationBarColor(
 @SuppressLint("HardwareIds")
 fun getAndroidId(): String = android.provider.Settings.Secure.getString(Core.getContext().contentResolver, android.provider.Settings.Secure.ANDROID_ID)
 
-fun getName(androidId: String = getAndroidId()): String {
+fun getName(androidId: String = id): String {
     val endangeredSpecies = Core.getContext().resources.getStringArray(R.array.endangered_species)
-    return endangeredSpecies[Integer.parseInt(androidId.substring(1..5), 16) % endangeredSpecies.size]
+    return endangeredSpecies[Integer.parseInt(androidId.substring(0..5), 16) % endangeredSpecies.size]
 }
 
-fun getSubName(androidId: String = getAndroidId()): String {
-    return androidId.substring(androidId.length - 6, androidId.length - 1)
+fun getSubName(androidId: String = id): String {
+    return androidId.substring(androidId.length - 7, androidId.length - 1)
+}
+
+fun getUniqueColor(androidId: String = id): Color {
+    return Color(android.graphics.Color.parseColor("#${getSubName(id)}"))
 }

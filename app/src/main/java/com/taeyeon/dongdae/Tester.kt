@@ -6,10 +6,8 @@ package com.taeyeon.dongdae
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
@@ -49,6 +47,7 @@ object Tester {
         val interactionSource = remember { MutableInteractionSource() }
 
         var isExpanded by rememberSaveable { mutableStateOf(false) }
+        var isAttached by rememberSaveable { mutableStateOf(false) }
         var isTestMessageShowing by rememberSaveable { mutableStateOf(true) }
         var x by remember { mutableStateOf(dp16) }
         var y by remember { mutableStateOf(dp16) }
@@ -60,7 +59,7 @@ object Tester {
                 modifier = Modifier
                     .height(IntrinsicSize.Min)
             ) {
-                val roundDp by animateDpAsState(targetValue = if (isExpanded) getCornerSize(shape = MaterialTheme.shapes.large) else getCornerSize(shape = MaterialTheme.shapes.small))
+                val roundDp by animateDpAsState(targetValue = if (isExpanded && !isAttached) getCornerSize(shape = MaterialTheme.shapes.large) else getCornerSize(shape = MaterialTheme.shapes.small))
                 val scrollState = rememberScrollState()
 
                 Surface(
@@ -68,7 +67,7 @@ object Tester {
                         topStart = roundDp,
                         topEnd = roundDp,
                         bottomStart = roundDp,
-                        bottomEnd = animateDpAsState(targetValue = if (isExpanded) 0.dp else getCornerSize(shape = MaterialTheme.shapes.small)).value
+                        bottomEnd = animateDpAsState(targetValue = if (isExpanded && !isAttached) 0.dp else getCornerSize(shape = MaterialTheme.shapes.small)).value
                     ),
                     color = MaterialTheme.colorScheme.secondaryContainer,
                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -119,88 +118,137 @@ object Tester {
                         contentAlignment = Alignment.Center
                     ) {
                         if (it) {
-                            Column(
-                                modifier = Modifier
-                                    .width(250.dp)
-                                    .height(300.dp)
-                                    .padding(16.dp)
-                                    .clip(MaterialTheme.shapes.medium)
-                                    .verticalScroll(
-                                        scrollState,
-                                        enabled = false
-                                    ),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-
-                                Text(
-                                    text = stringResource(id = R.string.app_name),
-                                    style = MaterialTheme.typography.labelLarge,
-                                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                                )
-
-                                Text(
-                                    text = """
-                                        ${if (Main.isInitialized()) "Main.pagerState.currentPage: ${pagerState.currentPage}" else ""}
-                                    """.trimIndent(),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(
-                                            color = MaterialTheme.colorScheme.secondary
-                                                .copy(alpha = 0.2f)
-                                                .compositeOver(MaterialTheme.colorScheme.secondaryContainer),
-                                            shape = MaterialTheme.shapes.medium
-                                        )
-                                        .padding(getCornerSize(shape = MaterialTheme.shapes.medium))
-                                )
-
-                                val screenList = Screen.values()
-                                Button(
-                                    onClick = {
-                                        screen =
-                                            if (screenList.indexOf(screen) == -1 || screenList.indexOf(screen) + 1 >= screenList.size) screenList[0]
-                                            else screenList[screenList.indexOf(screen) + 1]
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.secondary,
-                                        contentColor = MaterialTheme.colorScheme.onSecondary
-                                    ),
-                                    shape = MaterialTheme.shapes.medium,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                ) {
-                                    Text(
-                                        text = "screen: ${screen.name}",
-                                        overflow = TextOverflow.Ellipsis,
-                                        maxLines = 1
-                                    )
-                                }
-
-                                for(i in 0..10) {
-                                    Button(
-                                        onClick = {  },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.secondary,
-                                            contentColor = MaterialTheme.colorScheme.onSecondary
-                                        ),
-                                        shape = MaterialTheme.shapes.medium,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                    ) {
-                                        Text(
-                                            text = "s"
+                            AnimatedContent(
+                                targetState = isAttached,
+                                transitionSpec = { scaleIn() with scaleOut() },
+                                contentAlignment = Alignment.Center
+                            ) { attached ->
+                                if (attached) {
+                                    // TODO
+                                    IconButton(onClick = { isAttached = false }) {
+                                        Icon(
+                                            imageVector = Icons.Filled.KeyboardArrowRight,
+                                            contentDescription = null // TODO
                                         )
                                     }
-                                }
+                                } else {
+                                    Column(
+                                        modifier = Modifier
+                                            .width(250.dp)
+                                            .height(300.dp)
+                                            .padding(16.dp)
+                                            .clip(MaterialTheme.shapes.medium)
+                                            .verticalScroll(
+                                                scrollState,
+                                                enabled = false
+                                            ),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
 
+                                        Text(
+                                            text = stringResource(id = R.string.app_name),
+                                            style = MaterialTheme.typography.labelLarge,
+                                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                                        )
+
+                                        Text(
+                                            text = """
+                                                id: $id
+                                                name: $name
+                                                subName: $subName
+                                            """.trimIndent()
+                                                    + if (Main.isInitialized()) "\n" + "Main.pagerState.currentPage: ${pagerState.currentPage}" else "",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.secondary
+                                                        .copy(alpha = 0.2f)
+                                                        .compositeOver(MaterialTheme.colorScheme.secondaryContainer),
+                                                    shape = MaterialTheme.shapes.medium
+                                                )
+                                                .padding(getCornerSize(shape = MaterialTheme.shapes.medium))
+                                        )
+
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(IntrinsicSize.Min)
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.secondary
+                                                        .copy(alpha = 0.2f)
+                                                        .compositeOver(MaterialTheme.colorScheme.secondaryContainer),
+                                                    shape = MaterialTheme.shapes.medium
+                                                )
+                                        ) {
+                                            Text(
+                                                text = "uniqueColor",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                modifier = Modifier
+                                                    .padding(getCornerSize(shape = MaterialTheme.shapes.medium))
+                                            )
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .fillMaxHeight()
+                                                    .background(
+                                                        color = uniqueColor,
+                                                        shape = MaterialTheme.shapes.medium
+                                                    )
+                                            )
+                                        }
+
+                                        val screenList = Screen.values()
+                                        Button(
+                                            onClick = {
+                                                screen =
+                                                    if (screenList.indexOf(screen) == -1 || screenList.indexOf(
+                                                            screen
+                                                        ) + 1 >= screenList.size
+                                                    ) screenList[0]
+                                                    else screenList[screenList.indexOf(screen) + 1]
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = MaterialTheme.colorScheme.secondary,
+                                                contentColor = MaterialTheme.colorScheme.onSecondary
+                                            ),
+                                            shape = MaterialTheme.shapes.medium,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = "screen: ${screen.name}",
+                                                overflow = TextOverflow.Ellipsis,
+                                                maxLines = 1
+                                            )
+                                        }
+
+                                        for (i in 0..10) {
+                                            Button(
+                                                onClick = { },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = MaterialTheme.colorScheme.secondary,
+                                                    contentColor = MaterialTheme.colorScheme.onSecondary
+                                                ),
+                                                shape = MaterialTheme.shapes.medium,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                            ) {
+                                                Text(
+                                                    text = "s"
+                                                )
+                                            }
+                                        }
+
+                                    }
+                                }
                             }
                         } else {
                             Row(
                                 modifier = Modifier
                                     .height(56.dp)
                                     .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Bolt,
@@ -212,7 +260,8 @@ object Tester {
                                     Text(
                                         text = "테스터", // TODO,
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                        style = MaterialTheme.typography.labelLarge
+                                        style = MaterialTheme.typography.labelLarge,
+                                        modifier = Modifier.padding(start = 16.dp)
                                     )
                                 }
                             }
@@ -220,7 +269,7 @@ object Tester {
                     }
                 }
                 AnimatedVisibility(
-                    visible = isExpanded,
+                    visible = isExpanded && !isAttached,
                     enter = expandIn(),
                     exit = shrinkOut(),
                     modifier = Modifier
@@ -252,11 +301,11 @@ object Tester {
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             IconButton(
-                                onClick = { /*TODO*/ },
+                                onClick = { isAttached = true },
                                 modifier = Modifier.size(24.dp)
                             ) {
                                 Icon(
-                                    imageVector = Icons.Filled.ViewQuilt,
+                                    imageVector = Icons.Filled.KeyboardArrowLeft,
                                     contentDescription = null // TODO
                                 )
                             }

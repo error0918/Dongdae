@@ -1,41 +1,31 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class,
-    ExperimentalPagerApi::class
-)
-@file:Suppress("OPT_IN_IS_NOT_ENABLED")
+@file:OptIn(ExperimentalAnimationApi::class)
 
 package com.taeyeon.dongdae
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AnticipateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.dongdae.ui.theme.Theme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 var screen by mutableStateOf(Screen.Main)
 
@@ -125,131 +115,6 @@ class MainActivity : ComponentActivity() {
     override fun onRestart() {
         super.onRestart()
         Core.activityCreated(this)
-    }
-
-}
-
-object Main {
-    lateinit var pagerState: PagerState
-    fun isInitialized(): Boolean = ::pagerState.isInitialized
-
-    private val snackbarHostState = SnackbarHostState()
-    private val partitionList = listOf(
-        Chat.partition,
-        Community.partition,
-        Profile.partition
-    )
-    lateinit var scope: CoroutineScope
-
-    @Composable
-    fun Main() {
-        scope = rememberCoroutineScope()
-        pagerState = rememberPagerState()
-
-        Scaffold(
-            topBar = { Toolbar() },
-            floatingActionButton = { if (!pagerState.isScrollInProgress) partitionList[pagerState.currentPage].fab?.let { it() } },
-            bottomBar = { BottomBar() },
-            snackbarHost = { SnackbarHost(snackbarHostState) }
-        ) { paddingValues ->
-            MainContent(paddingValues = paddingValues)
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    @SuppressLint("FrequentlyChangedStateReadInComposition")
-    @Composable
-    fun Toolbar() {
-        val isScrolled = if (partitionList[pagerState.currentPage].lazyListState != null) partitionList[pagerState.currentPage].lazyListState!!.firstVisibleItemIndex != 0 || partitionList[pagerState.currentPage].lazyListState!!.firstVisibleItemScrollOffset != 0 else false
-        val toolbarColor by animateColorAsState(
-            targetValue =
-                if(isScrolled)
-                    MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-                else
-                    MaterialTheme.colorScheme.surface,
-            tween(durationMillis = 1000)
-        )
-        val toolbarContentColor by animateColorAsState(
-            targetValue =
-                contentColorFor(
-                    backgroundColor = if(isScrolled)
-                        MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-                    else
-                        MaterialTheme.colorScheme.surface
-                ),
-            tween(durationMillis = 1000)
-        )
-
-        CenterAlignedTopAppBar(
-            title = { Text(text = stringResource(id = R.string.app_name)) },
-            actions = {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = null
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = toolbarColor,
-                navigationIconContentColor = toolbarContentColor,
-                titleContentColor = toolbarContentColor,
-                actionIconContentColor = toolbarContentColor
-            )
-        )
-
-        SetStatusBarColor(
-            color = toolbarColor
-        )
-    }
-
-    @Composable
-    fun BottomBar() {
-        SetNavigationBarColor()
-
-        NavigationBar {
-            partitionList.forEachIndexed { index, partition ->
-                val selected = index == pagerState.currentPage
-                NavigationBarItem(
-                    selected = selected,
-                    onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = if (selected) partition.filledIcon else partition.outlinedIcon,
-                            contentDescription = partition.title
-                        )
-                    },
-                    label = {
-                        Text(text = partition.title)
-                    }
-                )
-            }
-        }
-    }
-
-    @Composable
-    fun MainContent(paddingValues: PaddingValues) {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            HorizontalPager(
-                count = partitionList.size,
-                state = pagerState,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                partitionList[it].composable()
-            }
-            LaunchedEffect(true) {
-                pagerState.scrollToPage(1)
-            }
-        }
     }
 
 }

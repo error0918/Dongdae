@@ -52,38 +52,45 @@ object Chat {
                 state = lazyListState,
                 contentPadding = PaddingValues(bottom = 100.dp + 8.dp * 2)
             ) {
-                items(100) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        ChatUnit(
-                            isMe = false,
-                            name = "안녕 나 애기 사람",
-                            subName = "abcde",
-                            message = "Message".repeat(100)
-                        )
+                for (i in 0 until 100) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            ChatUnit(
+                                isMe = false,
+                                name = "안녕 나 애기 사람",
+                                subName = "abcde",
+                                message = "Message".repeat(100)
+                            )
+                        }
                     }
 
-                    Box(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        ChatUnit(
-                            isMe = true,
-                            name = "안녕 나 애기 사람",
-                            subName = "abcde",
-                            message = "Message"
-                        )
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            ChatUnit(
+                                isMe = true,
+                                name = "안녕 나 애기 사람",
+                                subName = "abcde",
+                                message = "Message"
+                            )
+                        }
                     }
-                    Box(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        ChatUnit(
-                            isMe = true,
-                            name = "안녕 나 애기 사람",
-                            subName = "abcde",
-                            message = "Message",
-                            chatSequence = ChatSequence.SequenceLast
-                        )
+
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            ChatUnit(
+                                isMe = true,
+                                name = getName(),
+                                subName = getSubName(),
+                                message = "Message",
+                                chatSequence = ChatSequence.SequenceLast
+                            )
+                        }
                     }
                 }
             }
@@ -178,7 +185,7 @@ object Chat {
                         FilledIconButton(
                             onClick = {
                                 Main.scope.launch {
-                                    lazyListState.animateScrollToItem(99)
+                                    lazyListState.animateScrollToItem(299)
                                 }
                             }
                         ) {
@@ -193,7 +200,7 @@ object Chat {
         }
 
         LaunchedEffect(true) {
-            lazyListState.scrollToItem(99)
+            lazyListState.scrollToItem(299)
         }
     }
 

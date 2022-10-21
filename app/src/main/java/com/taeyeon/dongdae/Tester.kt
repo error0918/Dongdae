@@ -29,9 +29,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.core.Utils
 import com.taeyeon.dongdae.Main.pagerState
@@ -40,9 +38,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 object Tester {
-    private lateinit var scope: CoroutineScope
     var tester by mutableStateOf(true) // TODO
-    
+    var testDialog by mutableStateOf(false)
+
+    private lateinit var scope: CoroutineScope
+
     @Composable
     fun Tester() {
         scope = rememberCoroutineScope()
@@ -61,6 +61,8 @@ object Tester {
 
         var x by remember { mutableStateOf(dp16) }
         var y by remember { mutableStateOf(dp16) }
+
+        if (testDialog) TestDialog()
 
         Popup(
             offset =
@@ -329,6 +331,21 @@ object Tester {
                                                 )
                                             }
 
+                                            Button(
+                                                onClick = { testDialog = true },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = MaterialTheme.colorScheme.secondary,
+                                                    contentColor = MaterialTheme.colorScheme.onSecondary
+                                                ),
+                                                shape = MaterialTheme.shapes.medium,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                            ) {
+                                                Text(
+                                                    text = "테스트 다이얼로그"
+                                                )
+                                            }
+                                            
                                         }
 
                                     }
@@ -442,6 +459,12 @@ object Tester {
                 }
             }
         }
+    }
+
+
+    @Composable
+    fun TestDialog() {
+        //
     }
     
 }

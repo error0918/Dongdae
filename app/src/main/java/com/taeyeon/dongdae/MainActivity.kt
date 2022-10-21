@@ -131,6 +131,7 @@ class MainActivity : ComponentActivity() {
 
 object Main {
     lateinit var pagerState: PagerState
+    fun isInitialized(): Boolean = ::pagerState.isInitialized
 
     private val snackbarHostState = SnackbarHostState()
     private val partitionList = listOf(

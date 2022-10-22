@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -853,96 +854,6 @@ object MyView {
     }
 
 
-    object ShadowedTextDefaults {
-        val Modifier: Modifier = androidx.compose.ui.Modifier
-        val Shadow = 10.dp
-        val ShadowAlpha = 0.6f
-        val Color = androidx.compose.ui.graphics.Color.Unspecified
-        val FontSize = TextUnit.Unspecified
-        val FontStyle: FontStyle? = null
-        val fontWeight: FontWeight? = null
-        val fontFamily: FontFamily? = null
-        val LetterSpacing = TextUnit.Unspecified
-        val TextDecoration: TextDecoration? = null
-        val TextAlign: TextAlign? = null
-        val LineHeight = TextUnit.Unspecified
-        val Overflow = TextOverflow.Clip
-        const val SoftWrap = true
-        const val MaxLines = Int.MAX_VALUE
-        val onTextLayout = { _: TextLayoutResult -> }
-        @Composable fun getStyle(): TextStyle = LocalTextStyle.current
-    }
-
-    @SuppressLint("ModifierParameter")
-    @Composable
-    fun ShadowedText(
-        text: String,
-        modifier: Modifier = ShadowedTextDefaults.Modifier,
-        shadow: Dp = ShadowedTextDefaults.Shadow,
-        shadowAlpha: Float = ShadowedTextDefaults.ShadowAlpha,
-        color: Color = ShadowedTextDefaults.Color,
-        fontSize: TextUnit = ShadowedTextDefaults.FontSize,
-        fontStyle: FontStyle? = ShadowedTextDefaults.FontStyle,
-        fontWeight: FontWeight? = ShadowedTextDefaults.fontWeight,
-        fontFamily: FontFamily? = ShadowedTextDefaults.fontFamily,
-        letterSpacing: TextUnit = ShadowedTextDefaults.LetterSpacing,
-        textDecoration: TextDecoration? = ShadowedTextDefaults.TextDecoration,
-        textAlign: TextAlign? = ShadowedTextDefaults.TextAlign,
-        lineHeight: TextUnit = ShadowedTextDefaults.LineHeight,
-        overflow: TextOverflow = ShadowedTextDefaults.Overflow,
-        softWrap: Boolean = ShadowedTextDefaults.SoftWrap,
-        maxLines: Int = ShadowedTextDefaults.MaxLines,
-        onTextLayout: (TextLayoutResult) -> Unit = ShadowedTextDefaults.onTextLayout,
-        style: TextStyle = ShadowedTextDefaults.getStyle()
-    ) {
-        Box(
-            modifier = modifier
-        ) {
-            Popup(alignment = Alignment.Center) {
-                Text(
-                    text = text,
-                    color = color.copy(alpha = shadowAlpha),
-                    fontSize = fontSize,
-                    fontStyle = fontStyle,
-                    fontWeight = fontWeight,
-                    fontFamily = fontFamily,
-                    letterSpacing = letterSpacing,
-                    textDecoration = textDecoration,
-                    textAlign = textAlign,
-                    lineHeight = lineHeight,
-                    overflow = overflow,
-                    softWrap = softWrap,
-                    maxLines = maxLines,
-                    style = style,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .blur(shadow)
-                        .padding(shadow)
-                )
-            }
-            Text(
-                text = text,
-                color = color,
-                fontSize = fontSize,
-                fontStyle = fontStyle,
-                fontWeight = fontWeight,
-                fontFamily = fontFamily,
-                letterSpacing = letterSpacing,
-                textDecoration = textDecoration,
-                textAlign = textAlign,
-                lineHeight = lineHeight,
-                overflow = overflow,
-                softWrap = softWrap,
-                maxLines = maxLines,
-                onTextLayout = onTextLayout,
-                style = style,
-                modifier = Modifier
-                    .align(Alignment.Center)
-            )
-        }
-    }
-
-
     @Composable
     fun AppNameText(
         modifier: Modifier = Modifier,
@@ -965,21 +876,17 @@ object MyView {
                 }
 
                 Row {
-                    if (isShadowed) {
-                        MyView.ShadowedText(
-                            text = "동",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.displayLarge
+                    Text(
+                        text = "동",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.displayLarge.copy(
+                            shadow = if (isShadowed) Shadow(
+                                color = LocalContentColor.current,
+                                blurRadius = 20f
+                            ) else Shadow()
                         )
-                    } else {
-                        Text(
-                            text = "동",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.displayLarge
-                        )
-                    }
+                    )
                     AnimatedContent(
                         targetState = firstIndex,
                         transitionSpec = {
@@ -997,21 +904,17 @@ object MyView {
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    if (isShadowed) {
-                        MyView.ShadowedText(
-                            text = "대",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.displayLarge
+                    Text(
+                        text = "대",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.displayLarge.copy(
+                            shadow = if (isShadowed) Shadow(
+                                color = LocalContentColor.current,
+                                blurRadius = 20f
+                            ) else Shadow()
                         )
-                    } else {
-                        Text(
-                            text = "대",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.displayLarge
-                        )
-                    }
+                    )
                     AnimatedContent(
                         targetState = secondIndex,
                         transitionSpec = {
@@ -1028,11 +931,16 @@ object MyView {
                     }
                 }
             } else {
-                MyView.ShadowedText(
+                Text(
                     text = stringResource(id = R.string.app_name),
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.displayLarge
+                    style = MaterialTheme.typography.displayLarge.copy(
+                        shadow = if (isShadowed) Shadow(
+                            color = LocalContentColor.current,
+                            blurRadius = 20f
+                        ) else Shadow()
+                    )
                 )
             }
         }

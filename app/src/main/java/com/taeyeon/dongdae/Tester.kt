@@ -21,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
@@ -39,7 +40,8 @@ import kotlinx.coroutines.launch
 
 object Tester {
     var tester by mutableStateOf(true) // TODO
-    var testDialog by mutableStateOf(false)
+
+    private var testDialog by mutableStateOf(false)
 
     private lateinit var scope: CoroutineScope
 
@@ -332,6 +334,111 @@ object Tester {
                                             }
 
                                             Button(
+                                                onClick = { load() },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = MaterialTheme.colorScheme.secondary,
+                                                    contentColor = MaterialTheme.colorScheme.onSecondary
+                                                ),
+                                                shape = MaterialTheme.shapes.medium,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                            ) {
+                                                Text(
+                                                    text = "load()"
+                                                )
+                                            }
+
+                                            Button(
+                                                onClick = { save() },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = MaterialTheme.colorScheme.secondary,
+                                                    contentColor = MaterialTheme.colorScheme.onSecondary
+                                                ),
+                                                shape = MaterialTheme.shapes.medium,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                            ) {
+                                                Text(
+                                                    text = "save()"
+                                                )
+                                            }
+
+                                            Button(
+                                                onClick = { loadSettings() },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = MaterialTheme.colorScheme.secondary,
+                                                    contentColor = MaterialTheme.colorScheme.onSecondary
+                                                ),
+                                                shape = MaterialTheme.shapes.medium,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                            ) {
+                                                Text(
+                                                    text = "loadSettings()"
+                                                )
+                                            }
+
+                                            Button(
+                                                onClick = { saveSettings() },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = MaterialTheme.colorScheme.secondary,
+                                                    contentColor = MaterialTheme.colorScheme.onSecondary
+                                                ),
+                                                shape = MaterialTheme.shapes.medium,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                            ) {
+                                                Text(
+                                                    text = "loadSettings()"
+                                                )
+                                            }
+
+                                            Button(
+                                                onClick = { Utils.shutDownApp() },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = MaterialTheme.colorScheme.secondary,
+                                                    contentColor = MaterialTheme.colorScheme.onSecondary
+                                                ),
+                                                shape = MaterialTheme.shapes.medium,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                            ) {
+                                                Text(
+                                                    text = "Utils.shutDownApp()"
+                                                )
+                                            }
+
+                                            Button(
+                                                onClick = { Utils.restartApp() },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = MaterialTheme.colorScheme.secondary,
+                                                    contentColor = MaterialTheme.colorScheme.onSecondary
+                                                ),
+                                                shape = MaterialTheme.shapes.medium,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                            ) {
+                                                Text(
+                                                    text = "Utils.restartApp()"
+                                                )
+                                            }
+
+                                            Button(
+                                                onClick = { Utils.initializeData() },
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = MaterialTheme.colorScheme.secondary,
+                                                    contentColor = MaterialTheme.colorScheme.onSecondary
+                                                ),
+                                                shape = MaterialTheme.shapes.medium,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                            ) {
+                                                Text(
+                                                    text = "Utils.initializeData()"
+                                                )
+                                            }
+
+                                            Button(
                                                 onClick = { testDialog = true },
                                                 colors = ButtonDefaults.buttonColors(
                                                     containerColor = MaterialTheme.colorScheme.secondary,
@@ -342,7 +449,7 @@ object Tester {
                                                     .fillMaxWidth()
                                             ) {
                                                 Text(
-                                                    text = "테스트 다이얼로그"
+                                                    text = "테스트 다이얼로그" // TODO
                                                 )
                                             }
                                             
@@ -464,7 +571,41 @@ object Tester {
 
     @Composable
     fun TestDialog() {
-        //
+        MyView.BaseDialog(
+            onDismissRequest = { testDialog = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Bolt,
+                    contentDescription = null // TODO
+                )
+            },
+            title = {
+                Text(
+                    text = "테스트 다이얼로그" // TODO
+                )
+            },
+            content = {
+                Text(
+                    text = "Shadow",
+                    style = MaterialTheme.typography.displayLarge.copy(
+                        shadow = Shadow(
+                            color = LocalContentColor.current,
+                            blurRadius = 50f
+                        )
+                    )
+                )
+            },
+            button = {
+                MyView.DialogButtonRow {
+                    TextButton(onClick = { /*TODO*/ }) {
+                        Text(text = "신기한 일") // TODO
+                    }
+                    TextButton(onClick = { testDialog = false }) {
+                        Text(text = stringResource(id = R.string.close))
+                    }
+                }
+            }
+        )
     }
     
 }

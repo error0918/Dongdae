@@ -162,8 +162,7 @@ object Welcome {
                     .constrainAs(appNameText) {
                         top.linkTo(appIconImage.bottom, margin = 8.dp)
                         centerHorizontallyTo(parent)
-                    },
-                isShadowed = pagerState.currentPage == 0 && !pagerState.isScrollInProgress
+                    }
             )
 
             Text(

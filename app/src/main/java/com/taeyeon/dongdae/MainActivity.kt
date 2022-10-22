@@ -23,6 +23,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavController
+import androidx.navigation.NavHost
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.dongdae.ui.theme.Theme
@@ -61,6 +66,11 @@ class MainActivity : ComponentActivity() {
             loadSettings()
 
             Theme {
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = "TODO") {
+                    composable("TODO") { /*TODO*/ }
+                    composable("Main") { /*TODO*/ }
+                }
                 Surface {
                     AnimatedContent(
                         targetState = screen

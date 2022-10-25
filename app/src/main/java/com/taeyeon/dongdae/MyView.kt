@@ -15,27 +15,19 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.window.Popup
 import kotlinx.coroutines.delay
 import java.util.*
 
@@ -859,6 +851,13 @@ object MyView {
         modifier: Modifier = Modifier,
         isShadowed: Boolean = true
     ) {
+        val shadowStyle = MaterialTheme.typography.displayLarge.copy(
+            shadow = if (isShadowed) Shadow(
+                color = LocalContentColor.current.copy(alpha = 0.5f),
+                blurRadius = 10f
+            ) else Shadow()
+        )
+
         Box(modifier = modifier) {
             if (Locale.getDefault() == Locale.KOREA) {
                 val firstValues = rememberSaveable { listOf("산", "산중", "산고", "산학원", "산학교", "산학생", "산인").shuffled() }
@@ -880,12 +879,7 @@ object MyView {
                         text = "동",
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.displayLarge.copy(
-                            shadow = if (isShadowed) Shadow(
-                                color = LocalContentColor.current,
-                                blurRadius = 20f
-                            ) else Shadow()
-                        )
+                        style = shadowStyle
                     )
                     AnimatedContent(
                         targetState = firstIndex,
@@ -898,7 +892,7 @@ object MyView {
                             text = firstValues[it],
                             color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.displayLarge
+                            style = shadowStyle
                         )
                     }
 
@@ -908,12 +902,7 @@ object MyView {
                         text = "대",
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.displayLarge.copy(
-                            shadow = if (isShadowed) Shadow(
-                                color = LocalContentColor.current,
-                                blurRadius = 20f
-                            ) else Shadow()
-                        )
+                        style = shadowStyle
                     )
                     AnimatedContent(
                         targetState = secondIndex,
@@ -926,7 +915,7 @@ object MyView {
                             text = secondValues[it],
                             color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.displayLarge
+                            style = shadowStyle
                         )
                     }
                 }
@@ -935,12 +924,7 @@ object MyView {
                     text = stringResource(id = R.string.app_name),
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.displayLarge.copy(
-                        shadow = if (isShadowed) Shadow(
-                            color = LocalContentColor.current,
-                            blurRadius = 20f
-                        ) else Shadow()
-                    )
+                    style = shadowStyle
                 )
             }
         }

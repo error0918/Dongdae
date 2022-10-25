@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalAnimationApi::class)
+@file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
 package com.taeyeon.dongdae
 
@@ -23,11 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavController
-import androidx.navigation.NavHost
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.dongdae.ui.theme.Theme
@@ -35,8 +31,12 @@ import com.taeyeon.dongdae.ui.theme.Theme
 var screen by mutableStateOf(Screen.Main)
 
 class MainActivity : ComponentActivity() {
+    private var isSplashed by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            var isSplashScreen = false
+
             splashScreen.setSplashScreenTheme(R.style.Theme_Dongdae_Splash)
             splashScreen.setOnExitAnimationListener { splashScreenView ->
                 ObjectAnimator.ofPropertyValuesHolder(
@@ -45,16 +45,26 @@ class MainActivity : ComponentActivity() {
                     PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 2f, 1f),
                     PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 2f, 1f)
                 ).run {
+                    isSplashScreen = true
                     interpolator = AnticipateInterpolator()
                     duration = 100L
-                    doOnEnd { splashScreenView.remove() }
+                    doOnEnd {
+                        Core.initialize(applicationContext)
+                        splashScreenView.remove()
+                        isSplashed = true
+                    }
                     start()
                 }
             }
+            if (!isSplashScreen) {
+                Core.initialize(applicationContext)
+                isSplashed = true
+            }
+        } else {
+            installSplashScreen()
+            Core.initialize(applicationContext)
+            isSplashed = true
         }
-        installSplashScreen()
-
-        Core.initialize(applicationContext)
 
         super.onCreate(savedInstanceState)
 
@@ -66,52 +76,49 @@ class MainActivity : ComponentActivity() {
             loadSettings()
 
             Theme {
-                val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "TODO") {
-                    composable("TODO") { /*TODO*/ }
-                    composable("Main") { /*TODO*/ }
-                }
                 Surface {
-                    AnimatedContent(
-                        targetState = screen
-                    ) {
-                        when (it) {
-                            Screen.Main -> {
-                                load()
-                                Box(
-                                    modifier = Modifier.animateEnterExit(
-                                        enter = scaleIn(),
-                                        exit = scaleOut()
-                                    )
-                                ) {
-                                    Main.Main()
+                    if (isSplashed) {
+                        AnimatedContent(
+                            targetState = screen
+                        ) {
+                            when (it) {
+                                Screen.Main -> {
+                                    load()
+                                    Box(
+                                        modifier = Modifier.animateEnterExit(
+                                            enter = scaleIn(),
+                                            exit = scaleOut()
+                                        )
+                                    ) {
+                                        Main.Main()
+                                    }
                                 }
-                            }
-                            Screen.Welcome -> {
-                                Box(
-                                    modifier = Modifier.animateEnterExit(
-                                        enter = scaleIn(),
-                                        exit = scaleOut()
-                                    )
-                                ) {
-                                    Welcome.Welcome()
+                                Screen.Welcome -> {
+                                    Box(
+                                        modifier = Modifier.animateEnterExit(
+                                            enter = scaleIn(),
+                                            exit = scaleOut()
+                                        )
+                                    ) {
+                                        Welcome.Welcome()
+                                    }
                                 }
-                            }
-                            Screen.InternetDisconnected -> {
-                                Box(
-                                    modifier = Modifier.animateEnterExit(
-                                        enter = scaleIn(),
-                                        exit = scaleOut()
-                                    )
-                                ) {
-                                    InternetDisconnected.InternetDisconnected()
+                                Screen.InternetDisconnected -> {
+                                    Box(
+                                        modifier = Modifier.animateEnterExit(
+                                            enter = scaleIn(),
+                                            exit = scaleOut()
+                                        )
+                                    ) {
+                                        InternetDisconnected.InternetDisconnected()
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                if (Tester.tester) Tester.Tester()
+                    if (Tester.tester) Tester.Tester()
+                }
             }
         }
     }

@@ -27,14 +27,20 @@ var screenAlwaysOn by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.ScreenAlways
 var darkMode by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.DarkMode)
 var dynamicColor by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.DynamicColor)
 
-var id by mutableStateOf(getAndroidId())
-var name by mutableStateOf(getName(id))
-var subName by mutableStateOf(getSubName(id))
-var uniqueColor by mutableStateOf(getUniqueColor(id))
+var id by mutableStateOf("")
+var name by mutableStateOf("")
+var subName by mutableStateOf("")
+var uniqueColor by mutableStateOf(Color.Transparent)
 
 
 fun load() {
     loadSettings()
+
+    id = getAndroidId()
+    name = getName(id)
+    subName = getSubName(id)
+    uniqueColor = getUniqueColor(id)
+
     // TODO
 }
 

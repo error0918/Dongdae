@@ -5,6 +5,7 @@
 
 package com.taeyeon.dongdae
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -42,6 +44,7 @@ object Chat {
         composable = { Chat() }
     )
 
+    @SuppressLint("FrequentlyChangedStateReadInComposition")
     @Composable
     fun Chat() {
         Box(
@@ -251,7 +254,9 @@ object Chat {
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
-                Text(text = message)
+                SelectionContainer {
+                    Text(text = message)
+                }
             }
         }
     }

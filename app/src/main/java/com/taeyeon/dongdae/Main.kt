@@ -17,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -28,6 +29,8 @@ import kotlinx.coroutines.launch
 
 object Main {
     lateinit var pagerState: PagerState
+    var toolbarColor = Color.Transparent
+
     fun isInitialized(): Boolean = ::pagerState.isInitialized
 
     private val snackbarHostState = SnackbarHostState()
@@ -58,14 +61,14 @@ object Main {
     @Composable
     fun Toolbar() {
         val isScrolled = if (partitionList[pagerState.currentPage].lazyListState != null) partitionList[pagerState.currentPage].lazyListState!!.firstVisibleItemIndex != 0 || partitionList[pagerState.currentPage].lazyListState!!.firstVisibleItemScrollOffset != 0 else false
-        val toolbarColor by animateColorAsState(
+        toolbarColor = animateColorAsState(
             targetValue =
             if(isScrolled)
                 MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
             else
                 MaterialTheme.colorScheme.surface,
             tween(durationMillis = 1000)
-        )
+        ).value
         val toolbarContentColor by animateColorAsState(
             targetValue =
             contentColorFor(

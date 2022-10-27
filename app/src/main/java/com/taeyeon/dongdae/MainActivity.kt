@@ -94,6 +94,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                                 Screen.Welcome -> {
+                                    load()
                                     Box(
                                         modifier = Modifier.animateEnterExit(
                                             enter = scaleIn(),

@@ -1,9 +1,8 @@
-@file:OptIn(ExperimentalPagerApi::class, ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
 package com.taeyeon.dongdae
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -72,6 +71,7 @@ object Welcome {
                     onClick = {
                         screen = checkScreen()
                     },
+                    elevation = FloatingActionButtonDefaults.elevation(0.dp),
                     modifier = Modifier.align(Alignment.CenterStart)
                 ) {
                     Text(text = "건너뛰기")
@@ -94,7 +94,8 @@ object Welcome {
                             scope.launch {
                                 if (pagerState.currentPage - 1 >= 0) pagerState.animateScrollToPage(page = pagerState.currentPage - 1)
                             }
-                        }
+                        },
+                        elevation = FloatingActionButtonDefaults.elevation(0.dp),
                     ) {
                         Icon(
                             imageVector = Icons.Filled.ArrowLeft,
@@ -107,7 +108,8 @@ object Welcome {
                                 if (pagerState.currentPage + 2 < pagerState.pageCount) pagerState.animateScrollToPage(page = pagerState.currentPage + 1)
                                 else screen = checkScreen()
                             }
-                        }
+                        },
+                        elevation = FloatingActionButtonDefaults.elevation(0.dp),
                     ) {
                         Icon(
                             imageVector = Icons.Filled.ArrowRight,

@@ -168,7 +168,7 @@ object Tester {
                                     ) {
 
                                         Text(
-                                            text = stringResource(id = R.string.app_name) + "테스터", // TODO
+                                            text = stringResource(id = R.string.app_name) + " 테스터", // TODO
                                             style = MaterialTheme.typography.labelLarge,
                                             modifier = Modifier.align(Alignment.CenterHorizontally)
                                         )

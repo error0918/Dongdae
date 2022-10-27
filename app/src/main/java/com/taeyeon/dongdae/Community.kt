@@ -12,19 +12,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.PeopleOutline
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.taeyeon.core.Utils
 import kotlinx.coroutines.launch
@@ -82,17 +84,59 @@ object Community {
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
                 items(100) {
-                    Text(
-                        text = "TEST $name (${subName})",
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                shape = MaterialTheme.shapes.medium
+                            .height(IntrinsicSize.Min)
+                            .padding(horizontal = 16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+                            contentColor = contentColorFor(backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+                        )
+                    ) {
+                        ConstraintLayout(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp)
+                        ) {
+                            val (nameText, subNameText, colorView, heartIconButton, heartText, contentImage, contentText, commentColumn) = createRefs()
+                            var nameTextSize by remember { mutableStateOf(IntSize.Zero) }
+
+                            Text(
+                                text = "이름",
+                                modifier = Modifier
+                                    .onSizeChanged { intSize ->
+                                        nameTextSize = intSize
+                                    }
+                                    .constrainAs(nameText) {
+                                        top.linkTo(parent.top)
+                                        start.linkTo(parent.start)
+                                    }
                             )
-                            .padding(16.dp)
-                    )
+
+                            Text(
+                                text = "(${"서브네임"})",
+                                modifier = Modifier
+                                    .constrainAs(nameText) {
+                                        centerHorizontallyTo(nameText)
+                                        start.linkTo(nameText.start)
+                                    }
+                            )
+
+                            Spacer(
+                                modifier = Modifier
+                                    .background(
+                                        color = Color.Cyan,
+                                        shape = CircleShape
+                                    )
+                                    .constrainAs(colorView) {
+
+                                    }
+                            )
+
+
+                        }
+                    }
                 }
             }
         }

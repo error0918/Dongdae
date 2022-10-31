@@ -214,6 +214,68 @@ object Chat {
     }
 
     @Composable
+    fun NameUnit(
+        modifier: Modifier = Modifier,
+        name: String,
+        subName: String? = null,
+        uniqueColor: Color? = null,
+        surfaceColor: Color? = null
+    ) {
+        Box(
+            modifier = modifier
+        ) {
+            var nameTextSize by remember { mutableStateOf(IntSize.Zero) }
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(end = with(LocalDensity.current) { nameTextSize.height.toDp() } + 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = (if (surfaceColor != null) contentColorFor(backgroundColor = surfaceColor) else LocalContentColor.current).copy(0.8f),
+                    modifier = Modifier
+                        .onSizeChanged { intSize ->
+                            nameTextSize = intSize
+                        }
+                )
+
+                subName?.let {
+                    Text(
+                        text = "($subName)",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = (if (surfaceColor != null) contentColorFor(backgroundColor = surfaceColor) else LocalContentColor.current).copy(0.4f),
+                        modifier = Modifier
+                    )
+                }
+            }
+
+            uniqueColor?.let {
+                Spacer(
+                    modifier = Modifier
+                        .width(with(LocalDensity.current) { nameTextSize.height.toDp() })
+                        .height(with(LocalDensity.current) { nameTextSize.height.toDp() })
+                        .align(Alignment.CenterEnd)
+                        .background(
+                            color = uniqueColor,
+                            shape = CircleShape
+                        )
+                        .border(
+                            border = BorderStroke(
+                                width = 1.dp,
+                                color = LocalContentColor.current
+                            ),
+                            shape = CircleShape
+                        )
+                )
+            }
+        }
+    }
+
+    @Composable
     fun BoxScope.ChatUnit(
         isMe: Boolean,
         id: String,
@@ -250,60 +312,28 @@ object Chat {
             Column(
                 modifier = Modifier
                     .padding(16.dp)
+                    .run {
+                        if (isMessageSizeInitialized && isNameBoxSizeInitialized && nameBoxSize.width < messageSize.width) fillMaxWidth()
+                        else this
+                    }
             ) {
-                Box(
-                    modifier = Modifier.onSizeChanged { intSize ->
-                        if (!isNameBoxSizeInitialized) {
-                            nameBoxSize = intSize
-                            isNameBoxSizeInitialized = true
+                NameUnit(
+                    modifier = Modifier
+                        .onSizeChanged { intSize ->
+                            if (!isNameBoxSizeInitialized) {
+                                nameBoxSize = intSize
+                                isNameBoxSizeInitialized = true
+                            }
                         }
-                    }
-                ) {
-                    var nameTextSize by remember { mutableStateOf(IntSize.Zero) }
-
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .padding(end = with (LocalDensity.current) { nameTextSize.height.toDp() } + 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = name,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = contentColorFor(backgroundColor = surfaceColor).copy(0.8f),
-                            modifier = Modifier
-                                .onSizeChanged { intSize ->
-                                    nameTextSize = intSize
-                                }
-                        )
-
-                        Text(
-                            text = "($subName)",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = contentColorFor(backgroundColor = surfaceColor).copy(0.4f),
-                            modifier = Modifier
-                        )
-                    }
-
-                    Spacer(
-                        modifier = Modifier
-                            .width(with(LocalDensity.current) { nameTextSize.height.toDp() })
-                            .height(with(LocalDensity.current) { nameTextSize.height.toDp() })
-                            .align(Alignment.CenterEnd)
-                            .background(
-                                color = uniqueColor,
-                                shape = CircleShape
-                            )
-                            .border(
-                                border = BorderStroke(
-                                    width = 1.dp,
-                                    color = LocalContentColor.current
-                                ),
-                                shape = CircleShape
-                            )
-                    )
-                }
+                        .run {
+                            if (isMessageSizeInitialized && isNameBoxSizeInitialized && nameBoxSize.width < messageSize.width) fillMaxWidth()
+                            else this
+                        },
+                    name = name,
+                    subName = subName,
+                    uniqueColor = uniqueColor,
+                    surfaceColor = surfaceColor
+                )
                 SelectionContainer {
                     Text(
                         text = message,

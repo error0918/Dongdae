@@ -213,6 +213,111 @@ object Chat {
         Default, Sequence, SequenceLast
     }
 
+    data class ChatData(
+        val isMe: Boolean = false,
+        val id: String,
+        val message: String,
+        val chatSequence: ChatSequence = ChatSequence.Default
+    )
+
+    @Composable
+    fun BoxScope.ChatUnit(
+        chatData: ChatData
+    ) {
+        chatData.run {
+            ChatUnit(
+                isMe = isMe,
+                id = id,
+                message = message,
+                chatSequence = chatSequence
+            )
+        }
+    }
+
+    @Composable
+    fun BoxScope.ChatUnit(
+        isMe: Boolean = false,
+        id: String,
+        message: String,
+        chatSequence: ChatSequence = ChatSequence.Default
+    ) {
+        val surfaceColor = if (isMe) MaterialTheme.colorScheme.inverseSurface else MaterialTheme.colorScheme.surfaceVariant
+        Surface(
+            modifier = Modifier
+                .padding(
+                    top = if (chatSequence == ChatSequence.Default) 16.dp else 8.dp,
+                    bottom = 0.dp,
+                    start = if (isMe) 80.dp else 8.dp,
+                    end = if (isMe) 8.dp else 80.dp
+                )
+                .align(if (isMe) Alignment.CenterEnd else Alignment.CenterStart),
+            shape = RoundedCornerShape(
+                topStart = if (isMe) 16.dp else 0.dp,
+                topEnd = if (isMe) 0.dp else 16.dp,
+                bottomStart = 16.dp,
+                bottomEnd = 16.dp
+            ),
+            color = surfaceColor
+        ) {
+            var nameBoxSize by remember { mutableStateOf(IntSize.Zero) }
+            var isNameBoxSizeInitialized by remember { mutableStateOf(false) }
+            var messageSize by remember { mutableStateOf(IntSize.Zero) }
+            var isMessageSizeInitialized by remember { mutableStateOf(false) }
+
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .run {
+                        if (isMessageSizeInitialized && isNameBoxSizeInitialized && nameBoxSize.width < messageSize.width) fillMaxWidth()
+                        else this
+                    }
+            ) {
+                NameUnit(
+                    modifier = Modifier
+                        .onSizeChanged { intSize ->
+                            if (!isNameBoxSizeInitialized) {
+                                nameBoxSize = intSize
+                                isNameBoxSizeInitialized = true
+                            }
+                        }
+                        .run {
+                            if (isMessageSizeInitialized && isNameBoxSizeInitialized && nameBoxSize.width < messageSize.width) fillMaxWidth()
+                            else this
+                        },
+                    id = id,
+                    surfaceColor = surfaceColor
+                )
+                SelectionContainer {
+                    Text(
+                        text = message,
+                        modifier = Modifier
+                                .onSizeChanged { intSize ->
+                                   if (!isMessageSizeInitialized) {
+                                        messageSize = intSize
+                                        isMessageSizeInitialized = true
+                                    }
+                                }
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun NameUnit(
+        modifier: Modifier = Modifier,
+        id: String,
+        surfaceColor: Color? = null
+    ) {
+        NameUnit(
+            modifier = modifier,
+            name = getName(id),
+            subName = getSubName(id),
+            uniqueColor = getUniqueColor(id),
+            surfaceColor = surfaceColor
+        )
+    }
+
     @Composable
     fun NameUnit(
         modifier: Modifier = Modifier,
@@ -271,81 +376,6 @@ object Chat {
                             shape = CircleShape
                         )
                 )
-            }
-        }
-    }
-
-    @Composable
-    fun BoxScope.ChatUnit(
-        isMe: Boolean,
-        id: String,
-        message: String,
-        chatSequence: ChatSequence = ChatSequence.Default
-    ) {
-        val name = getName(id)
-        val subName = getSubName(id)
-        val uniqueColor = getUniqueColor(id)
-
-        val surfaceColor = if (isMe) MaterialTheme.colorScheme.inverseSurface else MaterialTheme.colorScheme.surfaceVariant
-        Surface(
-            modifier = Modifier
-                .padding(
-                    top = if (chatSequence == ChatSequence.Default) 16.dp else 8.dp,
-                    bottom = 0.dp,
-                    start = if (isMe) 80.dp else 8.dp,
-                    end = if (isMe) 8.dp else 80.dp
-                )
-                .align(if (isMe) Alignment.CenterEnd else Alignment.CenterStart),
-            shape = RoundedCornerShape(
-                topStart = if (isMe) 16.dp else 0.dp,
-                topEnd = if (isMe) 0.dp else 16.dp,
-                bottomStart = 16.dp,
-                bottomEnd = 16.dp
-            ),
-            color = surfaceColor
-        ) {
-            var nameBoxSize by remember { mutableStateOf(IntSize.Zero) }
-            var isNameBoxSizeInitialized by remember { mutableStateOf(false) }
-            var messageSize by remember { mutableStateOf(IntSize.Zero) }
-            var isMessageSizeInitialized by remember { mutableStateOf(false) }
-
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .run {
-                        if (isMessageSizeInitialized && isNameBoxSizeInitialized && nameBoxSize.width < messageSize.width) fillMaxWidth()
-                        else this
-                    }
-            ) {
-                NameUnit(
-                    modifier = Modifier
-                        .onSizeChanged { intSize ->
-                            if (!isNameBoxSizeInitialized) {
-                                nameBoxSize = intSize
-                                isNameBoxSizeInitialized = true
-                            }
-                        }
-                        .run {
-                            if (isMessageSizeInitialized && isNameBoxSizeInitialized && nameBoxSize.width < messageSize.width) fillMaxWidth()
-                            else this
-                        },
-                    name = name,
-                    subName = subName,
-                    uniqueColor = uniqueColor,
-                    surfaceColor = surfaceColor
-                )
-                SelectionContainer {
-                    Text(
-                        text = message,
-                        modifier = Modifier
-                                .onSizeChanged { intSize ->
-                                   if (!isMessageSizeInitialized) {
-                                        messageSize = intSize
-                                        isMessageSizeInitialized = true
-                                    }
-                                }
-                    )
-                }
             }
         }
     }

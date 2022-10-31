@@ -7,10 +7,9 @@ package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.*
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -28,9 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -61,7 +57,16 @@ object Community {
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Main.toolbarColor),
+                        .background(
+                            animateColorAsState(
+                                targetValue =
+                                if (lazyListState.firstVisibleItemIndex != 0 || lazyListState.firstVisibleItemScrollOffset != 0)
+                                    MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                                else
+                                    MaterialTheme.colorScheme.surface,
+                                tween(durationMillis = 1000)
+                            ).value
+                        ),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
@@ -87,14 +92,11 @@ object Community {
                     .fillMaxWidth()
                     .weight(1f),
                 state = lazyListState,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(vertical = 16.dp)
+                verticalArrangement = Arrangement.spacedBy(32.dp),
+                contentPadding = PaddingValues(vertical = 32.dp)
             ) {
                 items(100) {
                     val id = id
-                    val name = getName(id)
-                    val subName = getSubName(id)
-                    val uniqueColor = getUniqueColor(id)
 
                     val image: ImageBitmap? = null
 
@@ -109,132 +111,119 @@ object Community {
                         isHeart = checked
                     }
 
-                    Card(
+                    ElevatedCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(IntrinsicSize.Min)
-                            .padding(horizontal = 16.dp),
+                            .padding(horizontal = 32.dp),
+                        elevation = CardDefaults.elevatedCardElevation(
+                            defaultElevation = 10.dp,
+                            pressedElevation = 10.dp,
+                            focusedElevation = 10.dp,
+                            hoveredElevation = 10.dp,
+                            draggedElevation = 10.dp,
+                            disabledElevation = 10.dp,
+                        ),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-                            contentColor = contentColorFor(backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            contentColor = MaterialTheme.colorScheme.onSurface
                         )
                     ) {
-                        ConstraintLayout(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp)
+                        Column(
+                            modifier = Modifier.fillMaxSize()
                         ) {
-                            val (nameText, subNameText, colorView, contentImage, contentText, heart, commentColumn) = createRefs()
-                            var nameTextSize by remember { mutableStateOf(IntSize.Zero) }
 
-                            Text(
-                                text = name,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = LocalContentColor.current.copy(0.8f),
-                                modifier = Modifier
-                                    .onSizeChanged { intSize ->
-                                        nameTextSize = intSize
-                                    }
-                                    .constrainAs(nameText) {
-                                        top.linkTo(parent.top)
-                                        start.linkTo(parent.start)
-                                    }
-                            )
+                            Surface(
+                                shape = MaterialTheme.shapes.medium,
+                                color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+                                contentColor = contentColorFor(backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+                            ) {
 
-                            Text(
-                                text = "($subName)",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = LocalContentColor.current.copy(0.4f),
-                                modifier = Modifier
-                                    .constrainAs(subNameText) {
-                                        centerVerticallyTo(nameText)
-                                        start.linkTo(nameText.end, margin = 4.dp)
-                                    }
-                            )
-
-                            Spacer(
-                                modifier = Modifier
-                                    .width(with(LocalDensity.current) { nameTextSize.height.toDp() })
-                                    .height(with(LocalDensity.current) { nameTextSize.height.toDp() })
-                                    .background(
-                                        color = uniqueColor,
-                                        shape = CircleShape
-                                    )
-                                    .border(
-                                        border = BorderStroke(
-                                            width = 1.dp,
-                                            color = LocalContentColor.current
-                                        ),
-                                        shape = CircleShape
-                                    )
-                                    .constrainAs(colorView) {
-                                        top.linkTo(parent.top)
-                                        end.linkTo(parent.end)
-                                    }
-                            )
-
-                            image?.let {
-                                Surface(
+                                ConstraintLayout(
                                     modifier = Modifier
-                                        .constrainAs(contentImage) {
-                                            top.linkTo(nameText.bottom, margin = 8.dp)
-                                        }
+                                        .fillMaxWidth()
+                                        .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp)
                                 ) {
-                                    Image(
-                                        bitmap = image,
-                                        contentDescription = null
+                                    val (nameUnit, contentImage, contentText, heart, commentColumn) = createRefs()
+
+                                    Chat.NameUnit(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .constrainAs(nameUnit) {
+                                                top.linkTo(parent.top)
+                                            },
+                                        id = id
                                     )
-                                }
-                            }
 
-                            if (isSelectable) {
-                                SelectionContainer(
-                                    modifier = Modifier
-                                        .constrainAs(contentText) {
-                                            top.linkTo(if (image == null) nameText.bottom else contentImage.bottom, margin = 8.dp)
+                                    image?.let {
+                                        Surface(
+                                            modifier = Modifier
+                                                .constrainAs(contentImage) {
+                                                    top.linkTo(nameUnit.bottom, margin = 8.dp)
+                                                }
+                                        ) {
+                                            Image(
+                                                bitmap = image,
+                                                contentDescription = null
+                                            )
                                         }
-                                ) {
-                                    Text(text = content)
-                                }
-                            } else {
-                                Text(
-                                    text = content,
-                                    modifier = Modifier
-                                        .constrainAs(contentText) {
-                                            top.linkTo(if (image == null) nameText.bottom else contentImage.bottom, margin = 8.dp)
-                                        }
-                                )
-                            }
+                                    }
 
-                            if (isHeartAble) {
-                                Surface(
-                                    onClick = { onHeartClicked(!isHeart) },
-                                    color = Color.Transparent,
-                                    shape = CircleShape,
-                                    modifier = Modifier
-                                        .constrainAs(heart) {
-                                            top.linkTo(contentText.bottom, margin = 8.dp)
-                                            centerHorizontallyTo(parent)
+                                    if (isSelectable) {
+                                        SelectionContainer(
+                                            modifier = Modifier
+                                                .constrainAs(contentText) {
+                                                    top.linkTo(
+                                                        if (image == null) nameUnit.bottom else contentImage.bottom,
+                                                        margin = 8.dp
+                                                    )
+                                                }
+                                        ) {
+                                            Text(text = content)
                                         }
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.padding(8.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = if (isHeart) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                            tint = if (isHeart) Color.Red else LocalContentColor.current,
-                                            contentDescription = null // TODO
+                                    } else {
+                                        Text(
+                                            text = content,
+                                            modifier = Modifier
+                                                .constrainAs(contentText) {
+                                                    top.linkTo(
+                                                        if (image == null) nameUnit.bottom else contentImage.bottom,
+                                                        margin = 8.dp
+                                                    )
+                                                }
                                         )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(text = "$heartCount")
+                                    }
+
+                                    if (isHeartAble) {
+                                        Surface(
+                                            onClick = { onHeartClicked(!isHeart) },
+                                            color = Color.Transparent,
+                                            shape = CircleShape,
+                                            modifier = Modifier
+                                                .constrainAs(heart) {
+                                                    top.linkTo(contentText.bottom, margin = 8.dp)
+                                                    centerHorizontallyTo(parent)
+                                                }
+                                        ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier.padding(8.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = if (isHeart) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                                    tint = if (isHeart) Color.Red else LocalContentColor.current,
+                                                    contentDescription = null // TODO
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(text = "$heartCount")
+                                            }
+                                        }
                                     }
                                 }
-                            }
-
-                            Surface() {
 
                             }
+
+                            Text("adfajhklhgjhklhjhdsf".repeat(100))
 
                         }
                     }

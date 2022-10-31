@@ -7,10 +7,13 @@ package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -25,9 +28,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -62,8 +67,7 @@ object Chat {
                         ) {
                             ChatUnit(
                                 isMe = false,
-                                name = "안녕 나 애기 사람",
-                                subName = "abcde",
+                                id = id,
                                 message = "Message".repeat(100)
                             )
                         }
@@ -75,8 +79,7 @@ object Chat {
                         ) {
                             ChatUnit(
                                 isMe = true,
-                                name = "안녕 나 애기 사람",
-                                subName = "abcde",
+                                id = id,
                                 message = "Message"
                             )
                         }
@@ -88,8 +91,7 @@ object Chat {
                         ) {
                             ChatUnit(
                                 isMe = true,
-                                name = getName(),
-                                subName = getSubName(),
+                                id = id,
                                 message = "Message",
                                 chatSequence = ChatSequence.SequenceLast
                             )
@@ -211,15 +213,17 @@ object Chat {
         Default, Sequence, SequenceLast
     }
 
-    // TODO: IMAGE
     @Composable
     fun BoxScope.ChatUnit(
         isMe: Boolean,
-        name: String,
-        subName: String,
+        id: String,
         message: String,
         chatSequence: ChatSequence = ChatSequence.Default
     ) {
+        val name = getName(id)
+        val subName = getSubName(id)
+        val uniqueColor = getUniqueColor(id)
+
         val surfaceColor = if (isMe) MaterialTheme.colorScheme.inverseSurface else MaterialTheme.colorScheme.surfaceVariant
         Surface(
             modifier = Modifier
@@ -238,24 +242,79 @@ object Chat {
             ),
             color = surfaceColor
         ) {
+            var nameBoxSize by remember { mutableStateOf(IntSize.Zero) }
+            var isNameBoxSizeInitialized by remember { mutableStateOf(false) }
+            var messageSize by remember { mutableStateOf(IntSize.Zero) }
+            var isMessageSizeInitialized by remember { mutableStateOf(false) }
+
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .padding(16.dp)
             ) {
-                Row {
-                    Text(
-                        text = name,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = contentColorFor(backgroundColor = surfaceColor).copy(0.8f),
-                        modifier = Modifier.padding(end = 4.dp)
-                    )
-                    Text(
-                        text = "($subName)",
-                        color = contentColorFor(backgroundColor = surfaceColor).copy(0.4f),
-                        style = MaterialTheme.typography.labelSmall
+                Box(
+                    modifier = Modifier.onSizeChanged { intSize ->
+                        if (!isNameBoxSizeInitialized) {
+                            nameBoxSize = intSize
+                            isNameBoxSizeInitialized = true
+                        }
+                    }
+                ) {
+                    var nameTextSize by remember { mutableStateOf(IntSize.Zero) }
+
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(end = with (LocalDensity.current) { nameTextSize.height.toDp() } + 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = name,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = contentColorFor(backgroundColor = surfaceColor).copy(0.8f),
+                            modifier = Modifier
+                                .onSizeChanged { intSize ->
+                                    nameTextSize = intSize
+                                }
+                        )
+
+                        Text(
+                            text = "($subName)",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = contentColorFor(backgroundColor = surfaceColor).copy(0.4f),
+                            modifier = Modifier
+                        )
+                    }
+
+                    Spacer(
+                        modifier = Modifier
+                            .width(with(LocalDensity.current) { nameTextSize.height.toDp() })
+                            .height(with(LocalDensity.current) { nameTextSize.height.toDp() })
+                            .align(Alignment.CenterEnd)
+                            .background(
+                                color = uniqueColor,
+                                shape = CircleShape
+                            )
+                            .border(
+                                border = BorderStroke(
+                                    width = 1.dp,
+                                    color = LocalContentColor.current
+                                ),
+                                shape = CircleShape
+                            )
                     )
                 }
                 SelectionContainer {
-                    Text(text = message)
+                    Text(
+                        text = message,
+                        modifier = Modifier
+                                .onSizeChanged { intSize ->
+                                   if (!isMessageSizeInitialized) {
+                                        messageSize = intSize
+                                        isMessageSizeInitialized = true
+                                    }
+                                }
+                    )
                 }
             }
         }

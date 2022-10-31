@@ -71,8 +71,6 @@ class MainActivity : ComponentActivity() {
         Core.activityCreated(this)
 
         setContent {
-            screen = rememberSaveable { Screen.Welcome }
-
             loadSettings()
 
             Theme {

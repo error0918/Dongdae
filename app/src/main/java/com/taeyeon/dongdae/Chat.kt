@@ -7,16 +7,11 @@ package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.*
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -28,14 +23,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.taeyeon.dongdae.MyView.ChatUnit
 import kotlinx.coroutines.launch
 
 object Chat {
@@ -93,7 +87,7 @@ object Chat {
                                 isMe = true,
                                 id = id,
                                 message = "Message",
-                                chatSequence = ChatSequence.SequenceLast
+                                chatSequence = MyView.ChatSequence.SequenceLast
                             )
                         }
                     }
@@ -206,177 +200,6 @@ object Chat {
 
         LaunchedEffect(true) {
             lazyListState.scrollToItem(299)
-        }
-    }
-
-    enum class ChatSequence {
-        Default, Sequence, SequenceLast
-    }
-
-    data class ChatData(
-        val isMe: Boolean = false,
-        val id: String,
-        val message: String,
-        val chatSequence: ChatSequence = ChatSequence.Default
-    )
-
-    @Composable
-    fun BoxScope.ChatUnit(
-        chatData: ChatData
-    ) {
-        chatData.run {
-            ChatUnit(
-                isMe = isMe,
-                id = id,
-                message = message,
-                chatSequence = chatSequence
-            )
-        }
-    }
-
-    @Composable
-    fun BoxScope.ChatUnit(
-        isMe: Boolean = false,
-        id: String,
-        message: String,
-        chatSequence: ChatSequence = ChatSequence.Default
-    ) {
-        val surfaceColor = if (isMe) MaterialTheme.colorScheme.inverseSurface else MaterialTheme.colorScheme.surfaceVariant
-        Surface(
-            modifier = Modifier
-                .padding(
-                    top = if (chatSequence == ChatSequence.Default) 16.dp else 8.dp,
-                    bottom = 0.dp,
-                    start = if (isMe) 80.dp else 8.dp,
-                    end = if (isMe) 8.dp else 80.dp
-                )
-                .align(if (isMe) Alignment.CenterEnd else Alignment.CenterStart),
-            shape = RoundedCornerShape(
-                topStart = if (isMe) 16.dp else 0.dp,
-                topEnd = if (isMe) 0.dp else 16.dp,
-                bottomStart = 16.dp,
-                bottomEnd = 16.dp
-            ),
-            color = surfaceColor
-        ) {
-            var nameBoxSize by remember { mutableStateOf(IntSize.Zero) }
-            var isNameBoxSizeInitialized by remember { mutableStateOf(false) }
-            var messageSize by remember { mutableStateOf(IntSize.Zero) }
-            var isMessageSizeInitialized by remember { mutableStateOf(false) }
-
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .run {
-                        if (isMessageSizeInitialized && isNameBoxSizeInitialized && nameBoxSize.width < messageSize.width) fillMaxWidth()
-                        else this
-                    }
-            ) {
-                NameUnit(
-                    modifier = Modifier
-                        .onSizeChanged { intSize ->
-                            if (!isNameBoxSizeInitialized) {
-                                nameBoxSize = intSize
-                                isNameBoxSizeInitialized = true
-                            }
-                        }
-                        .run {
-                            if (isMessageSizeInitialized && isNameBoxSizeInitialized && nameBoxSize.width < messageSize.width) fillMaxWidth()
-                            else this
-                        },
-                    id = id,
-                    surfaceColor = surfaceColor
-                )
-                SelectionContainer {
-                    Text(
-                        text = message,
-                        modifier = Modifier
-                                .onSizeChanged { intSize ->
-                                   if (!isMessageSizeInitialized) {
-                                        messageSize = intSize
-                                        isMessageSizeInitialized = true
-                                    }
-                                }
-                    )
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun NameUnit(
-        modifier: Modifier = Modifier,
-        id: String,
-        surfaceColor: Color? = null
-    ) {
-        NameUnit(
-            modifier = modifier,
-            name = getName(id),
-            subName = getSubName(id),
-            uniqueColor = getUniqueColor(id),
-            surfaceColor = surfaceColor
-        )
-    }
-
-    @Composable
-    fun NameUnit(
-        modifier: Modifier = Modifier,
-        name: String,
-        subName: String? = null,
-        uniqueColor: Color? = null,
-        surfaceColor: Color? = null
-    ) {
-        Box(
-            modifier = modifier
-        ) {
-            var nameTextSize by remember { mutableStateOf(IntSize.Zero) }
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(end = with(LocalDensity.current) { nameTextSize.height.toDp() } + 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = (if (surfaceColor != null) contentColorFor(backgroundColor = surfaceColor) else LocalContentColor.current).copy(0.8f),
-                    modifier = Modifier
-                        .onSizeChanged { intSize ->
-                            nameTextSize = intSize
-                        }
-                )
-
-                subName?.let {
-                    Text(
-                        text = "($subName)",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = (if (surfaceColor != null) contentColorFor(backgroundColor = surfaceColor) else LocalContentColor.current).copy(0.4f),
-                        modifier = Modifier
-                    )
-                }
-            }
-
-            uniqueColor?.let {
-                Spacer(
-                    modifier = Modifier
-                        .width(with(LocalDensity.current) { nameTextSize.height.toDp() })
-                        .height(with(LocalDensity.current) { nameTextSize.height.toDp() })
-                        .align(Alignment.CenterEnd)
-                        .background(
-                            color = uniqueColor,
-                            shape = CircleShape
-                        )
-                        .border(
-                            border = BorderStroke(
-                                width = 1.dp,
-                                color = LocalContentColor.current
-                            ),
-                            shape = CircleShape
-                        )
-                )
-            }
         }
     }
 

@@ -1,5 +1,5 @@
 @file:OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class,
-    ExperimentalMaterial3Api::class
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class
 )
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -111,6 +112,19 @@ object Community {
                         isHeart = checked
                     }
 
+                    val commentChatDataList = listOf(
+                        MyView.ChatData(
+                            isMe = true,
+                            id = id,
+                            message = "댓글 테스트"
+                        ),
+                        MyView.ChatData(
+                            isMe = false,
+                            id = id,
+                            message = "댓글 테스트"
+                        )
+                    )
+
                     ElevatedCard(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -125,8 +139,8 @@ object Community {
                             disabledElevation = 10.dp,
                         ),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.onSurface
+                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f).compositeOver(background = MaterialTheme.colorScheme.surface),
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Column(
@@ -136,7 +150,7 @@ object Community {
                             Surface(
                                 shape = MaterialTheme.shapes.medium,
                                 color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-                                contentColor = contentColorFor(backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+                                contentColor = MaterialTheme.colorScheme.onSurface
                             ) {
 
                                 ConstraintLayout(
@@ -146,7 +160,7 @@ object Community {
                                 ) {
                                     val (nameUnit, contentImage, contentText, heart, commentColumn) = createRefs()
 
-                                    Chat.NameUnit(
+                                    MyView.NameUnit(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .constrainAs(nameUnit) {
@@ -223,7 +237,14 @@ object Community {
 
                             }
 
-                            Text("adfajhklhgjhklhjhdsf".repeat(100))
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text("adfajhklhgjhklhjhdsf".repeat(100))
+                            }
 
                         }
                     }

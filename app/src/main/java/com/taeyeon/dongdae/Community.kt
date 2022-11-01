@@ -7,6 +7,7 @@ package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
@@ -24,6 +26,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -33,6 +36,7 @@ import androidx.compose.ui.window.Popup
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.taeyeon.core.Utils
+import com.taeyeon.dongdae.MyView.ChatUnit
 import kotlinx.coroutines.launch
 
 object Community {
@@ -112,11 +116,12 @@ object Community {
                         isHeart = checked
                     }
 
-                    val commentChatDataList = listOf(
+                    val commentList = listOf(
                         MyView.ChatData(
                             isMe = true,
                             id = id,
-                            message = "댓글 테스트"
+                            message = "댓글 테스트",
+                            chatSequence = MyView.ChatSequence.Start
                         ),
                         MyView.ChatData(
                             isMe = false,
@@ -124,6 +129,9 @@ object Community {
                             message = "댓글 테스트"
                         )
                     )
+
+                    var isCommentShowing by rememberSaveable { mutableStateOf(false) }
+                    var isCommenting by rememberSaveable { mutableStateOf(false) }
 
                     ElevatedCard(
                         modifier = Modifier
@@ -240,10 +248,76 @@ object Community {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                    .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 8.dp)
                             ) {
-                                Text("adfajhklhgjhklhjhdsf".repeat(100))
+
+                                AnimatedVisibility(visible = isCommentShowing) {
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        commentList.forEach { comment ->
+                                            Box(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                ChatUnit(chatData = comment)
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
+                                }
+
+                                AnimatedContent(
+                                    targetState = isCommenting
+                                ) {
+                                    if (it) {
+                                        //
+                                    } else {
+                                        Box(
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Button(
+                                                onClick = { isCommentShowing = !isCommentShowing },
+                                                modifier =
+                                                Modifier
+                                                    .align(
+                                                        BiasAlignment(
+                                                            verticalBias = 0f,
+                                                            horizontalBias = animateFloatAsState(targetValue = if (isCommentShowing) -1f else 0f).value
+                                                        )
+                                                    )
+                                            ) {
+                                                Row {
+                                                    AnimatedVisibility(visible = !isCommentShowing) {
+                                                        Icon(
+                                                            imageVector = Icons.Filled.Chat,
+                                                            contentDescription = null, // TODO
+                                                            modifier = Modifier.padding(end = 8.dp)
+                                                        )
+                                                    }
+                                                    Icon(
+                                                        imageVector = if (isCommentShowing) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                                                        contentDescription = null // TODO
+                                                    )
+                                                }
+                                            }
+
+                                            androidx.compose.animation.AnimatedVisibility(
+                                                visible = isCommentShowing,
+                                                modifier = Modifier.align(Alignment.CenterEnd)
+                                            ) {
+                                                Button(
+                                                    onClick = { isCommenting = true }
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Filled.Chat,
+                                                        contentDescription = null // TODO
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
 
                         }

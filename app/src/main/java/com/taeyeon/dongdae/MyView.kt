@@ -941,7 +941,7 @@ object MyView {
 
 
     enum class ChatSequence {
-        Default, Sequence, SequenceLast
+        Default, Start, Sequence, SequenceLast
     }
 
     data class ChatData(

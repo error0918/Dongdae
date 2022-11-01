@@ -53,8 +53,8 @@ object Tester {
 
         val interactionSource = remember { MutableInteractionSource() }
 
-        var isExpanded by rememberSaveable { mutableStateOf(false) }
-        var isAttached by rememberSaveable { mutableStateOf(false) }
+        var isExpanded by rememberSaveable { mutableStateOf(true) }
+        var isAttached by rememberSaveable { mutableStateOf(true) }
         var isTestMessageShowing by rememberSaveable { mutableStateOf(true) }
 
         var size by remember { mutableStateOf(IntSize.Zero) }

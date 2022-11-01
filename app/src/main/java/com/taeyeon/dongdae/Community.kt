@@ -201,11 +201,15 @@ object Community {
                                                     )
                                                 }
                                         ) {
-                                            Text(text = content)
+                                            Text(
+                                                text = content,
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
                                         }
                                     } else {
                                         Text(
                                             text = content,
+                                            style = MaterialTheme.typography.bodySmall,
                                             modifier = Modifier
                                                 .constrainAs(contentText) {
                                                     top.linkTo(
@@ -271,7 +275,46 @@ object Community {
                                     targetState = isCommenting
                                 ) {
                                     if (it) {
-                                        //
+                                        Surface(
+                                            color = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                                            shape = CircleShape
+                                        ) {
+                                            OutlinedTextField(
+                                                value = "asdf",
+                                                onValueChange = { value ->
+
+                                                },
+                                                leadingIcon = {
+                                                    IconButton(
+                                                        onClick = { isCommenting = false }
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = Icons.Filled.KeyboardArrowLeft,
+                                                            contentDescription = null, // TODO
+                                                            tint = MaterialTheme.colorScheme.onPrimary
+                                                        )
+                                                    }
+                                                },
+                                                trailingIcon = {
+                                                    IconButton(
+                                                        onClick = { /*TODO*/ }
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = Icons.Filled.Send,
+                                                            contentDescription = null, // TODO
+                                                            tint = MaterialTheme.colorScheme.onPrimary
+                                                        )
+                                                    }
+                                                },
+                                                textStyle = MaterialTheme.typography.bodySmall,
+                                                shape = CircleShape,
+                                                modifier = Modifier
+                                                    .padding(4.dp)
+                                                    .fillMaxWidth()
+                                                    .height(40.dp)
+                                            )
+                                        }
                                     } else {
                                         Box(
                                             modifier = Modifier.fillMaxWidth()

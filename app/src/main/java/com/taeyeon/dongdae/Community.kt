@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -30,7 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -109,11 +114,17 @@ object Community {
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         var isDropDownMenuExpanded by remember { mutableStateOf(false) }
+                        var buttonSize by remember { mutableStateOf(IntSize.Zero) }
 
                         Text(text = "정렬 기준")
                         OutlinedButton(
                             onClick = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
-                            modifier = Modifier.weight(1f)
+                            shape = RoundedCornerShape(percent = 20),
+                            modifier = Modifier
+                                .weight(1f)
+                                .onSizeChanged { intSize ->
+                                    buttonSize = intSize
+                                }
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -132,7 +143,9 @@ object Community {
 
                             DropdownMenu(
                                 expanded = isDropDownMenuExpanded,
-                                onDismissRequest = { isDropDownMenuExpanded = false }
+                                onDismissRequest = { isDropDownMenuExpanded = false },
+                                modifier = Modifier.width(with(LocalDensity.current) { buttonSize.width.toDp() }),
+                                offset = DpOffset(x = (-24).dp, y = 8.dp)
                             ) {
                                 for (i in 1..10) {
                                     DropdownMenuItem(
@@ -212,7 +225,7 @@ object Community {
                                         .fillMaxWidth()
                                         .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp)
                                 ) {
-                                    val (nameUnit, contentImage, contentText, heart, commentColumn) = createRefs()
+                                    val (nameUnit, contentImage, contentText, heart, dropDownMenuButton, dropDownMenu) = createRefs()
 
                                     MyView.NameUnit(
                                         modifier = Modifier
@@ -295,7 +308,7 @@ object Community {
                                     IconButton(
                                         onClick = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
                                         modifier = Modifier
-                                            .constrainAs(heart) {
+                                            .constrainAs(dropDownMenuButton) {
                                                 top.linkTo(contentText.bottom, margin = 8.dp)
                                                 end.linkTo(parent.end)
                                             }
@@ -304,15 +317,18 @@ object Community {
                                             imageVector = Icons.Filled.MoreVert, 
                                             contentDescription = null // TODO
                                         )
-                                        
+
                                         DropdownMenu(
                                             expanded = isDropDownMenuExpanded,
-                                            onDismissRequest = { isDropDownMenuExpanded = false }) {
+                                            onDismissRequest = { isDropDownMenuExpanded = false }
+                                        ) {
                                             DropdownMenuItem(
-                                                text = { Text(text = "TODO") }, // TODO,
-                                                onClick = { /*TODO*/ })
+                                                text = { Text(text = "TODO") }, // TODO
+                                                onClick = { /*TODO*/ }
+                                            )
                                         }
                                     }
+
                                 }
 
                             }

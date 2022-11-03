@@ -324,7 +324,10 @@ object Community {
                                         ) {
                                             DropdownMenuItem(
                                                 text = { Text(text = "TODO") }, // TODO
-                                                onClick = { /*TODO*/ }
+                                                onClick = {
+                                                    /*TODO*/
+                                                    isDropDownMenuExpanded = false
+                                                }
                                             )
                                         }
                                     }

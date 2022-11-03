@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
@@ -31,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -98,8 +98,53 @@ object Community {
                     .weight(1f),
                 state = lazyListState,
                 verticalArrangement = Arrangement.spacedBy(32.dp),
-                contentPadding = PaddingValues(vertical = 32.dp)
+                contentPadding = PaddingValues(bottom = 32.dp)
             ) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        var isDropDownMenuExpanded by remember { mutableStateOf(false) }
+
+                        Text(text = "정렬 기준")
+                        OutlinedButton(
+                            onClick = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = ("TODO"),
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Icon(
+                                    imageVector = Icons.Filled.KeyboardArrowDown,
+                                    contentDescription = null // TODO
+                                )
+                            }
+
+                            DropdownMenu(
+                                expanded = isDropDownMenuExpanded,
+                                onDismissRequest = { isDropDownMenuExpanded = false }
+                            ) {
+                                for (i in 1..10) {
+                                    DropdownMenuItem(
+                                        text = { Text(text = "TODO $i") },
+                                        onClick = { /*TODO*/ }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
                 items(100) {
                     val id = id
 
@@ -132,6 +177,7 @@ object Community {
 
                     var isCommentShowing by rememberSaveable { mutableStateOf(false) }
                     var isCommenting by rememberSaveable { mutableStateOf(false) }
+                    var isDropDownMenuExpanded by remember { mutableStateOf(false) }
 
                     ElevatedCard(
                         modifier = Modifier
@@ -243,6 +289,28 @@ object Community {
                                                 Spacer(modifier = Modifier.width(8.dp))
                                                 Text(text = "$heartCount")
                                             }
+                                        }
+                                    }
+                                    
+                                    IconButton(
+                                        onClick = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
+                                        modifier = Modifier
+                                            .constrainAs(heart) {
+                                                top.linkTo(contentText.bottom, margin = 8.dp)
+                                                end.linkTo(parent.end)
+                                            }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.MoreVert, 
+                                            contentDescription = null // TODO
+                                        )
+                                        
+                                        DropdownMenu(
+                                            expanded = isDropDownMenuExpanded,
+                                            onDismissRequest = { isDropDownMenuExpanded = false }) {
+                                            DropdownMenuItem(
+                                                text = { Text(text = "TODO") }, // TODO,
+                                                onClick = { /*TODO*/ })
                                         }
                                     }
                                 }

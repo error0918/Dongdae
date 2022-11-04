@@ -67,16 +67,7 @@ object Community {
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            animateColorAsState(
-                                targetValue =
-                                if (lazyListState.firstVisibleItemIndex != 0 || lazyListState.firstVisibleItemScrollOffset != 0)
-                                    MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-                                else
-                                    MaterialTheme.colorScheme.surface,
-                                tween(durationMillis = 1000)
-                            ).value
-                        ),
+                        .background(Main.toolbarColor),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
@@ -304,7 +295,7 @@ object Community {
                                             }
                                         }
                                     }
-                                    
+
                                     IconButton(
                                         onClick = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
                                         modifier = Modifier
@@ -314,7 +305,7 @@ object Community {
                                             }
                                     ) {
                                         Icon(
-                                            imageVector = Icons.Filled.MoreVert, 
+                                            imageVector = Icons.Filled.MoreVert,
                                             contentDescription = null // TODO
                                         )
 

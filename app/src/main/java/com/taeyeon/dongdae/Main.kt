@@ -12,10 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -29,12 +26,13 @@ import kotlinx.coroutines.launch
 
 object Main {
     lateinit var pagerState: PagerState
-    var toolbarColor = Color.Transparent
+    var toolbarColor by mutableStateOf(Color.Transparent)
 
     fun isInitialized(): Boolean = ::pagerState.isInitialized
 
     private val snackbarHostState = SnackbarHostState()
     private val partitionList = listOf(
+        Notification.partition,
         Chat.partition,
         Community.partition,
         Profile.partition

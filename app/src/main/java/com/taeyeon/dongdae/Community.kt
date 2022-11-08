@@ -28,9 +28,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
@@ -76,8 +78,7 @@ object Community {
                     LazyRow(
                         modifier = Modifier
                             .weight(2f)
-                            .background(Main.toolbarColor)
-                            .blur(radiusX = 1.dp, radiusY = 1.dp),
+                            .background(Main.toolbarColor),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
@@ -112,7 +113,7 @@ object Community {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = ("TODO"),
+                                text = ("최신 순"),
                                 textAlign = TextAlign.Center,
                                 maxLines = 1,
                                 modifier = Modifier.weight(1f)
@@ -150,13 +151,15 @@ object Community {
                 verticalArrangement = Arrangement.spacedBy(32.dp),
                 contentPadding = PaddingValues(bottom = 32.dp)
             ) {
-                items(100) {
-                    val id = id
+
+                item {
+
+                    /*val id = id
 
                     val image: ImageBitmap? = null
 
                     val isSelectable = true
-                    val content = "게시물 테스트 ".repeat(30)
+                    val content = "게시 "
 
                     val isHeartAble = true
                     var isHeart by rememberSaveable { mutableStateOf(false) }
@@ -178,273 +181,56 @@ object Community {
                             id = id,
                             message = "댓글 테스트"
                         )
+                    )*/
+
+                    A(
+                        id = id,
+                        content = "얘들아 오늘 급식 어떤 거 나와? 🤤",
+                        commentList = listOf(
+                            MyView.ChatData(
+                                isMe = false,
+                                id = id,
+                                message = "오늘은 탕수육 나온대!",
+                                chatSequence = MyView.ChatSequence.Start
+                            ),
+                            MyView.ChatData(
+                                isMe = true,
+                                id = id,
+                                message = "와 정말? 맛있겠다!!",
+                                chatSequence = MyView.ChatSequence.Start
+                            ),
+                            MyView.ChatData(
+                                isMe = false,
+                                id = id,
+                                message = "응! 나도 기대하고 있어",
+                                chatSequence = MyView.ChatSequence.Start
+                            )
+                        )
                     )
 
-                    var isCommentShowing by rememberSaveable { mutableStateOf(false) }
-                    var isCommenting by rememberSaveable { mutableStateOf(false) }
-                    var isDropDownMenuExpanded by remember { mutableStateOf(false) }
-
-                    ElevatedCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(IntrinsicSize.Min)
-                            .padding(horizontal = 32.dp),
-                        elevation = CardDefaults.elevatedCardElevation(
-                            defaultElevation = 10.dp,
-                            pressedElevation = 10.dp,
-                            focusedElevation = 10.dp,
-                            hoveredElevation = 10.dp,
-                            draggedElevation = 10.dp,
-                            disabledElevation = 10.dp,
-                        ),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f).compositeOver(background = MaterialTheme.colorScheme.surface),
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-
-                            Surface(
-                                shape = MaterialTheme.shapes.medium,
-                                color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-                                contentColor = MaterialTheme.colorScheme.onSurface
-                            ) {
-
-                                ConstraintLayout(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp)
-                                ) {
-                                    val (nameUnit, contentImage, contentText, heart, dropDownMenuButton) = createRefs()
-
-                                    MyView.NameUnit(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .constrainAs(nameUnit) {
-                                                top.linkTo(parent.top)
-                                            },
-                                        id = id
-                                    )
-
-                                    image?.let {
-                                        Surface(
-                                            modifier = Modifier
-                                                .constrainAs(contentImage) {
-                                                    top.linkTo(nameUnit.bottom, margin = 8.dp)
-                                                }
-                                        ) {
-                                            Image(
-                                                bitmap = image,
-                                                contentDescription = null
-                                            )
-                                        }
-                                    }
-
-                                    if (isSelectable) {
-                                        SelectionContainer(
-                                            modifier = Modifier
-                                                .constrainAs(contentText) {
-                                                    top.linkTo(
-                                                        if (image == null) nameUnit.bottom else contentImage.bottom,
-                                                        margin = 8.dp
-                                                    )
-                                                }
-                                        ) {
-                                            Text(
-                                                text = content,
-                                                style = MaterialTheme.typography.bodySmall
-                                            )
-                                        }
-                                    } else {
-                                        Text(
-                                            text = content,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            modifier = Modifier
-                                                .constrainAs(contentText) {
-                                                    top.linkTo(
-                                                        if (image == null) nameUnit.bottom else contentImage.bottom,
-                                                        margin = 8.dp
-                                                    )
-                                                }
-                                        )
-                                    }
-
-                                    if (isHeartAble) {
-                                        Surface(
-                                            onClick = { onHeartClicked(!isHeart) },
-                                            color = Color.Transparent,
-                                            shape = CircleShape,
-                                            modifier = Modifier
-                                                .constrainAs(heart) {
-                                                    top.linkTo(contentText.bottom, margin = 8.dp)
-                                                    centerHorizontallyTo(parent)
-                                                }
-                                        ) {
-                                            Row(
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                modifier = Modifier.padding(8.dp)
-                                            ) {
-                                                Icon(
-                                                    imageVector = if (isHeart) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                                    tint = if (isHeart) Color.Red else LocalContentColor.current,
-                                                    contentDescription = null // TODO
-                                                )
-                                                Spacer(modifier = Modifier.width(8.dp))
-                                                Text(text = "$heartCount")
-                                            }
-                                        }
-                                    }
-
-                                    IconButton(
-                                        onClick = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
-                                        modifier = Modifier
-                                            .constrainAs(dropDownMenuButton) {
-                                                top.linkTo(contentText.bottom, margin = 8.dp)
-                                                end.linkTo(parent.end)
-                                            }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Filled.MoreVert,
-                                            contentDescription = null // TODO
-                                        )
-
-                                        DropdownMenu(
-                                            expanded = isDropDownMenuExpanded,
-                                            onDismissRequest = { isDropDownMenuExpanded = false }
-                                        ) {
-                                            DropdownMenuItem(
-                                                text = { Text(text = "TODO") }, // TODO
-                                                onClick = {
-                                                    /*TODO*/
-                                                    isDropDownMenuExpanded = false
-                                                }
-                                            )
-                                        }
-                                    }
-
-                                }
-
-                            }
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 8.dp)
-                            ) {
-
-                                AnimatedVisibility(visible = isCommentShowing) {
-                                    Column(
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        commentList.forEach { comment ->
-                                            Box(
-                                                modifier = Modifier.fillMaxWidth()
-                                            ) {
-                                                ChatUnit(chatData = comment)
-                                            }
-                                        }
-
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                    }
-                                }
-
-                                AnimatedContent(
-                                    targetState = isCommenting
-                                ) {
-                                    if (it) {
-                                        Surface(
-                                            color = MaterialTheme.colorScheme.primary,
-                                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                                            shape = CircleShape
-                                        ) {
-                                            OutlinedTextField(
-                                                value = "asdf",
-                                                onValueChange = { value ->
-
-                                                },
-                                                leadingIcon = {
-                                                    IconButton(
-                                                        onClick = { isCommenting = false }
-                                                    ) {
-                                                        Icon(
-                                                            imageVector = Icons.Filled.KeyboardArrowLeft,
-                                                            contentDescription = null, // TODO
-                                                            tint = MaterialTheme.colorScheme.onPrimary
-                                                        )
-                                                    }
-                                                },
-                                                trailingIcon = {
-                                                    IconButton(
-                                                        onClick = { /*TODO*/ }
-                                                    ) {
-                                                        Icon(
-                                                            imageVector = Icons.Filled.Send,
-                                                            contentDescription = null, // TODO
-                                                            tint = MaterialTheme.colorScheme.onPrimary
-                                                        )
-                                                    }
-                                                },
-                                                textStyle = MaterialTheme.typography.bodySmall,
-                                                shape = CircleShape,
-                                                modifier = Modifier
-                                                    .padding(4.dp)
-                                                    .fillMaxWidth()
-                                                    .height(40.dp)
-                                            )
-                                        }
-                                    } else {
-                                        Box(
-                                            modifier = Modifier.fillMaxWidth()
-                                        ) {
-                                            Button(
-                                                onClick = { isCommentShowing = !isCommentShowing },
-                                                modifier =
-                                                Modifier
-                                                    .align(
-                                                        BiasAlignment(
-                                                            verticalBias = 0f,
-                                                            horizontalBias = animateFloatAsState(targetValue = if (isCommentShowing) -1f else 0f).value
-                                                        )
-                                                    )
-                                            ) {
-                                                Row {
-                                                    AnimatedVisibility(visible = !isCommentShowing) {
-                                                        Icon(
-                                                            imageVector = Icons.Filled.Chat,
-                                                            contentDescription = null, // TODO
-                                                            modifier = Modifier.padding(end = 8.dp)
-                                                        )
-                                                    }
-                                                    Icon(
-                                                        imageVector = if (isCommentShowing) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                                                        contentDescription = null // TODO
-                                                    )
-                                                }
-                                            }
-
-                                            androidx.compose.animation.AnimatedVisibility(
-                                                visible = isCommentShowing,
-                                                modifier = Modifier.align(Alignment.CenterEnd)
-                                            ) {
-                                                Button(
-                                                    onClick = { isCommenting = true }
-                                                ) {
-                                                    Icon(
-                                                        imageVector = Icons.Filled.Chat,
-                                                        contentDescription = null // TODO
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
-                    }
                 }
+
+                item {
+                    A(
+                        id = id,
+                        content = "한국사 수행평가 범위 어디야?",
+                        commentList = listOf(
+                            MyView.ChatData(
+                                isMe = false,
+                                id = id,
+                                message = "아마 우리가 2학기 때 배우는 거 전체일걸?",
+                                chatSequence = MyView.ChatSequence.Start
+                            ),
+                            MyView.ChatData(
+                                isMe = true,
+                                id = id,
+                                message = "고마워~",
+                                chatSequence = MyView.ChatSequence.Start
+                            )
+                        )
+                    )
+                }
+
             }
         }
 
@@ -503,6 +289,289 @@ object Community {
                     text = "글쓰기",
                     modifier = Modifier.padding(start = 8.dp)
                 )
+            }
+        }
+    }
+
+
+    @Composable
+    fun A(
+        id: String,
+        image: ImageBitmap? = null,
+        isSelectable: Boolean = true,
+        content: String,
+        isHeartAble: Boolean = true,
+        commentList: List<MyView.ChatData> = listOf()
+    ) {
+        var isHeart by rememberSaveable { mutableStateOf(false) }
+        var heartCount by rememberSaveable { mutableStateOf(12) }
+        val onHeartClicked = { checked: Boolean ->
+            heartCount += if (checked) 1 else -1
+            isHeart = checked
+        }
+
+        var isCommentShowing by rememberSaveable { mutableStateOf(false) }
+        var isCommenting by rememberSaveable { mutableStateOf(false) }
+        var isDropDownMenuExpanded by remember { mutableStateOf(false) }
+
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .padding(horizontal = 32.dp),
+            elevation = CardDefaults.elevatedCardElevation(
+                defaultElevation = 10.dp,
+                pressedElevation = 10.dp,
+                focusedElevation = 10.dp,
+                hoveredElevation = 10.dp,
+                draggedElevation = 10.dp,
+                disabledElevation = 10.dp,
+            ),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f).compositeOver(background = MaterialTheme.colorScheme.surface),
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+
+                Surface(
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                ) {
+
+                    ConstraintLayout(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp)
+                    ) {
+                        val (nameUnit, contentImage, contentText, heart, dropDownMenuButton) = createRefs()
+
+                        MyView.NameUnit(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .constrainAs(nameUnit) {
+                                    top.linkTo(parent.top)
+                                },
+                            id = id
+                        )
+
+                        image?.let {
+                            Surface(
+                                modifier = Modifier
+                                    .constrainAs(contentImage) {
+                                        top.linkTo(nameUnit.bottom, margin = 8.dp)
+                                    }
+                            ) {
+                                Image(
+                                    bitmap = image,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+
+                        if (isSelectable) {
+                            SelectionContainer(
+                                modifier = Modifier
+                                    .constrainAs(contentText) {
+                                        top.linkTo(
+                                            if (image == null) nameUnit.bottom else contentImage.bottom,
+                                            margin = 8.dp
+                                        )
+                                    }
+                            ) {
+                                Text(
+                                    text = content,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        } else {
+                            Text(
+                                text = content,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier
+                                    .constrainAs(contentText) {
+                                        top.linkTo(
+                                            if (image == null) nameUnit.bottom else contentImage.bottom,
+                                            margin = 8.dp
+                                        )
+                                    }
+                            )
+                        }
+
+                        if (isHeartAble) {
+                            Surface(
+                                onClick = { onHeartClicked(!isHeart) },
+                                color = Color.Transparent,
+                                shape = CircleShape,
+                                modifier = Modifier
+                                    .constrainAs(heart) {
+                                        top.linkTo(contentText.bottom, margin = 8.dp)
+                                        centerHorizontallyTo(parent)
+                                    }
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = if (isHeart) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                        tint = if (isHeart) Color.Red else LocalContentColor.current,
+                                        contentDescription = null // TODO
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(text = "$heartCount")
+                                }
+                            }
+                        }
+
+                        IconButton(
+                            onClick = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
+                            modifier = Modifier
+                                .constrainAs(dropDownMenuButton) {
+                                    top.linkTo(contentText.bottom, margin = 8.dp)
+                                    end.linkTo(parent.end)
+                                }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.MoreVert,
+                                contentDescription = null // TODO
+                            )
+
+                            DropdownMenu(
+                                expanded = isDropDownMenuExpanded,
+                                onDismissRequest = { isDropDownMenuExpanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(text = "TODO") }, // TODO
+                                    onClick = {
+                                        /*TODO*/
+                                        isDropDownMenuExpanded = false
+                                    }
+                                )
+                            }
+                        }
+
+                    }
+
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 8.dp)
+                ) {
+
+                    AnimatedVisibility(visible = isCommentShowing) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            commentList.forEach { comment ->
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    ChatUnit(chatData = comment)
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+
+                    AnimatedContent(
+                        targetState = isCommenting
+                    ) {
+                        if (it) {
+                            Surface(
+                                color = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                shape = CircleShape
+                            ) {
+                                OutlinedTextField(
+                                    value = "asdf",
+                                    onValueChange = { value ->
+
+                                    },
+                                    leadingIcon = {
+                                        IconButton(
+                                            onClick = { isCommenting = false }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Filled.KeyboardArrowLeft,
+                                                contentDescription = null, // TODO
+                                                tint = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        }
+                                    },
+                                    trailingIcon = {
+                                        IconButton(
+                                            onClick = { /*TODO*/ }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Filled.Send,
+                                                contentDescription = null, // TODO
+                                                tint = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        }
+                                    },
+                                    textStyle = MaterialTheme.typography.bodySmall,
+                                    shape = CircleShape,
+                                    modifier = Modifier
+                                        .padding(4.dp)
+                                        .fillMaxWidth()
+                                        .height(40.dp)
+                                )
+                            }
+                        } else {
+                            Box(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Button(
+                                    onClick = { isCommentShowing = !isCommentShowing },
+                                    modifier =
+                                    Modifier
+                                        .align(
+                                            BiasAlignment(
+                                                verticalBias = 0f,
+                                                horizontalBias = animateFloatAsState(targetValue = if (isCommentShowing) -1f else 0f).value
+                                            )
+                                        )
+                                ) {
+                                    Row {
+                                        AnimatedVisibility(visible = !isCommentShowing) {
+                                            Icon(
+                                                imageVector = Icons.Filled.Chat,
+                                                contentDescription = null, // TODO
+                                                modifier = Modifier.padding(end = 8.dp)
+                                            )
+                                        }
+                                        Icon(
+                                            imageVector = if (isCommentShowing) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                                            contentDescription = null // TODO
+                                        )
+                                    }
+                                }
+
+                                androidx.compose.animation.AnimatedVisibility(
+                                    visible = isCommentShowing,
+                                    modifier = Modifier.align(Alignment.CenterEnd)
+                                ) {
+                                    Button(
+                                        onClick = { isCommenting = true }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Chat,
+                                            contentDescription = null // TODO
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
         }
     }

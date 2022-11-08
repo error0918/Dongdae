@@ -145,7 +145,7 @@ object Main {
                 partitionList[it].composable()
             }
             LaunchedEffect(true) {
-                pagerState.scrollToPage(1)
+                pagerState.scrollToPage(2)
             }
         }
     }

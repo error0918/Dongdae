@@ -8,7 +8,6 @@ package com.taeyeon.dongdae
 import android.annotation.SuppressLint
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -28,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.compositeOver
@@ -62,30 +62,84 @@ object Community {
             modifier = Modifier.fillMaxSize()
         ) {
             var selectedIndex by rememberSaveable { mutableStateOf(0) }
+            var isDropDownMenuExpanded by remember { mutableStateOf(false) }
+            var buttonSize by remember { mutableStateOf(IntSize.Zero) }
 
             AnimatedVisibility(visible = !lazyListState.isScrollInProgress || (lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0)) {
-                LazyRow(
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Main.toolbarColor),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(100) { index ->
-                        val selected = index == selectedIndex
-                        FilterChip(
-                            selected = selected,
-                            onClick = { selectedIndex = index },
-                            label = { Text(text = "TODO") },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = if (selected) Icons.Default.CheckCircle else Icons.Default.CheckCircleOutline,
-                                    contentDescription = null // TODO
+
+                    LazyRow(
+                        modifier = Modifier
+                            .weight(2f)
+                            .background(Main.toolbarColor)
+                            .blur(radiusX = 1.dp, radiusY = 1.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp)
+                    ) {
+                        items(100) { index ->
+                            val selected = index == selectedIndex
+                            FilterChip(
+                                selected = selected,
+                                onClick = { selectedIndex = index },
+                                label = { Text(text = "TODO") },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = if (selected) Icons.Default.CheckCircle else Icons.Default.CheckCircleOutline,
+                                        contentDescription = null // TODO
+                                    )
+                                }
+                            )
+                        }
+                    }
+
+                    OutlinedButton(
+                        onClick = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
+                        shape = RoundedCornerShape(percent = 20),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 8.dp)
+                            .onSizeChanged { intSize ->
+                                buttonSize = intSize
+                            }
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = ("TODO"),
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Icon(
+                                imageVector = Icons.Filled.KeyboardArrowDown,
+                                contentDescription = null // TODO
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = isDropDownMenuExpanded,
+                            onDismissRequest = { isDropDownMenuExpanded = false },
+                            modifier = Modifier.width(with(LocalDensity.current) { buttonSize.width.toDp() }),
+                            offset = DpOffset(x = (-24).dp, y = 8.dp)
+                        ) {
+                            for (i in 1..10) {
+                                DropdownMenuItem(
+                                    text = { Text(text = "TODO $i") },
+                                    onClick = { /*TODO*/ }
                                 )
                             }
-                        )
+                        }
                     }
+
                 }
+
             }
 
             LazyColumn(
@@ -96,59 +150,6 @@ object Community {
                 verticalArrangement = Arrangement.spacedBy(32.dp),
                 contentPadding = PaddingValues(bottom = 32.dp)
             ) {
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        var isDropDownMenuExpanded by remember { mutableStateOf(false) }
-                        var buttonSize by remember { mutableStateOf(IntSize.Zero) }
-
-                        Text(text = "정렬 기준")
-                        OutlinedButton(
-                            onClick = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
-                            shape = RoundedCornerShape(percent = 20),
-                            modifier = Modifier
-                                .weight(1f)
-                                .onSizeChanged { intSize ->
-                                    buttonSize = intSize
-                                }
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = ("TODO"),
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                Icon(
-                                    imageVector = Icons.Filled.KeyboardArrowDown,
-                                    contentDescription = null // TODO
-                                )
-                            }
-
-                            DropdownMenu(
-                                expanded = isDropDownMenuExpanded,
-                                onDismissRequest = { isDropDownMenuExpanded = false },
-                                modifier = Modifier.width(with(LocalDensity.current) { buttonSize.width.toDp() }),
-                                offset = DpOffset(x = (-24).dp, y = 8.dp)
-                            ) {
-                                for (i in 1..10) {
-                                    DropdownMenuItem(
-                                        text = { Text(text = "TODO $i") },
-                                        onClick = { /*TODO*/ }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
                 items(100) {
                     val id = id
 
@@ -216,7 +217,7 @@ object Community {
                                         .fillMaxWidth()
                                         .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp)
                                 ) {
-                                    val (nameUnit, contentImage, contentText, heart, dropDownMenuButton, dropDownMenu) = createRefs()
+                                    val (nameUnit, contentImage, contentText, heart, dropDownMenuButton) = createRefs()
 
                                     MyView.NameUnit(
                                         modifier = Modifier

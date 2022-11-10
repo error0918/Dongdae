@@ -1118,7 +1118,7 @@ object MyView {
 
 
     enum class PostCategory {
-        Unspecified, Study, SchoolLife, Tip, Game, QandA
+        Unspecified, Study, SchoolLife, Tip, Game, QA
     }
 
     data class PostData(
@@ -1127,8 +1127,9 @@ object MyView {
         val isSelectable: Boolean = true,
         val content: String,
         val isHeartAble: Boolean = true,
-        var commentList: List<MyView.ChatData> = listOf(),
-        var postCategory: PostCategory = PostCategory.Unspecified
+        var postCategory: PostCategory = PostCategory.Unspecified,
+        var password: String = "0000",
+        var commentList: List<MyView.ChatData> = listOf()
     )
 
     @Composable
@@ -1142,6 +1143,7 @@ object MyView {
                 isSelectable = isSelectable,
                 content = content,
                 isHeartAble = isHeartAble,
+                password = password,
                 commentList = commentList
             )
         }
@@ -1154,6 +1156,7 @@ object MyView {
         isSelectable: Boolean = true,
         content: String,
         isHeartAble: Boolean = true,
+        password: String = "0000",
         commentList: List<MyView.ChatData> = listOf()
     ) {
         var isHeart by rememberSaveable { mutableStateOf(false) }

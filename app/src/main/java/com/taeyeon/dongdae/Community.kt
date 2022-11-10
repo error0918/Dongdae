@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.taeyeon.core.SharedPreferencesManager
 import com.taeyeon.core.Utils
 import kotlinx.coroutines.launch
 
@@ -293,7 +294,7 @@ object Community {
         }
 
         if (isWritingPost) {
-            WritePostDialog()
+            Write.WritePostDialog()
         }
     }
 
@@ -322,50 +323,110 @@ object Community {
         }
     }
 
-    @Composable
-    fun WritePostDialog() {
-        var image by rememberSaveable { mutableStateOf<ImageBitmap?>(null) }
-        var isSelectable by rememberSaveable { mutableStateOf(true) }
-        var content by rememberSaveable { mutableStateOf("") }
-        var isHeartAble by rememberSaveable { mutableStateOf(false) }
-        var postCategory by rememberSaveable { mutableStateOf(MyView.PostCategory.Unspecified) }
-        
-        LaunchedEffect(true) {
-            // TODO
-        }
-        
-        MyView.BaseDialog(
-            onDismissRequest = { isWritingPost = false },
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize(),
-            icon = {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = null // TODO
-                )
-            },
-            title = { Text(text = "글 작성하기") },
-            content = {
-                Column(modifier = Modifier.fillMaxSize()) {
+    object Write {
+        private lateinit var sharedPreferencesManager: SharedPreferencesManager
 
+        private const val TEMPORARY_SAVING_KEY = "TEMPORARY_SAVING"
+
+        private const val imageKey = "image"
+        private const val isSelectableKey = "isSelectable"
+        private const val contentKey = "content"
+        private const val isHeartAbleKey = "isHeartAble"
+        private const val postCategoryKey = "postCategory"
+        private const val passwordKey = "password"
+
+        enum class WritingPostPage {
+            TemporarySaving, Writing, CheckBeforeUploading, NoticeSuccess
+        }
+
+        @Composable
+        fun WritePostDialog() {
+            var writingPostPage by rememberSaveable { mutableStateOf(WritingPostPage.Writing) }
+
+            var image by rememberSaveable { mutableStateOf<ImageBitmap?>(null) }
+            var isSelectable by rememberSaveable { mutableStateOf(true) }
+            var content by rememberSaveable { mutableStateOf("") }
+            var isHeartAble by rememberSaveable { mutableStateOf(false) }
+            var postCategory by rememberSaveable { mutableStateOf(MyView.PostCategory.Unspecified) }
+            var password by rememberSaveable { mutableStateOf("0000") }
+
+            LaunchedEffect(true) {
+                if (!::sharedPreferencesManager.isInitialized) {
+                    sharedPreferencesManager = SharedPreferencesManager(TEMPORARY_SAVING_KEY)
                 }
-            },
-            button = {
-                MyView.DialogButtonRow {
-                    TextButton(
-                        onClick = { isWritingPost = false }
-                    ) {
-                        Text(text = "닫기") // TODO
-                    }
-                    TextButton(
-                            onClick = { /* TODO */ }
-                            ) {
-                        Text(text = "개시하기") // TODO
-                    }
+
+                if (false) {
+                    writingPostPage = WritingPostPage.TemporarySaving
                 }
             }
-        )
+
+            when (writingPostPage) {
+
+                WritingPostPage.TemporarySaving -> {
+
+                }
+
+                WritingPostPage.Writing -> {
+                    MyView.BaseDialog(
+                        onDismissRequest = { isWritingPost = false },
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxSize(),
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Filled.Edit,
+                                contentDescription = null // TODO
+                            )
+                        },
+                        title = { Text(text = "글 작성하기") },
+                        content = {
+                            Column(modifier = Modifier.fillMaxSize()) {
+
+                            }
+                        },
+                        button = {
+                            MyView.DialogButtonRow {
+                                TextButton(
+                                    onClick = { isWritingPost = false }
+                                ) {
+                                    Text(text = "닫기") // TODO
+                                }
+                                TextButton(
+                                    onClick = { /* TODO */ }
+                                ) {
+                                    Text(text = "개시하기") // TODO
+                                }
+                            }
+                        }
+                    )
+
+                    LaunchedEffect(image, isSelectable, content, isHeartAble, postCategory, password) {
+                        sharedPreferencesManager.putAny(imageKey, image ?: Any())
+                        sharedPreferencesManager.putBoolean(isSelectableKey, isSelectable)
+                        sharedPreferencesManager.putString(contentKey, content)
+                        sharedPreferencesManager.putBoolean(isHeartAbleKey, isHeartAble)
+                        sharedPreferencesManager.putAny(postCategoryKey, postCategory)
+                        sharedPreferencesManager.putString(passwordKey, password)
+                    }
+                }
+
+                WritingPostPage.CheckBeforeUploading -> {
+
+                }
+
+                WritingPostPage.NoticeSuccess -> {
+
+                }
+
+            }
+        }
+
+        suspend fun writePost(
+            postData: MyView.PostData
+        ) {
+            // TODO
+        }
+
     }
 
 }

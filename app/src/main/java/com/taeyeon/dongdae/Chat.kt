@@ -172,7 +172,7 @@ object Chat {
                 modifier = Modifier.size(48.dp)
             ) {
                 AnimatedVisibility(
-                    visible = Main.pagerState.currentPage == 0,
+                    visible = Main.pagerState.currentPage == 1,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {

@@ -1117,13 +1117,18 @@ object MyView {
     }
 
 
+    enum class PostCategory {
+        Unspecified, Study, SchoolLife, Tip, Game, QandA
+    }
+
     data class PostData(
         val id: String,
         val image: ImageBitmap? = null,
         val isSelectable: Boolean = true,
         val content: String,
         val isHeartAble: Boolean = true,
-        var commentList: List<MyView.ChatData> = listOf()
+        var commentList: List<MyView.ChatData> = listOf(),
+        var postCategory: PostCategory = PostCategory.Unspecified
     )
 
     @Composable

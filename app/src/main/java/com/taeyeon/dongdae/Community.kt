@@ -21,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
@@ -33,6 +34,8 @@ import com.taeyeon.core.Utils
 import kotlinx.coroutines.launch
 
 object Community {
+    private var isWritingPost by mutableStateOf(false)
+
     private val lazyListState = LazyListState()
     val partition = Partition(
         title = "TEST",
@@ -263,7 +266,7 @@ object Community {
                 modifier = Modifier.size(48.dp)
             ) {
                 AnimatedVisibility(
-                    visible = Main.pagerState.currentPage == 1,
+                    visible = Main.pagerState.currentPage == 2,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
@@ -288,6 +291,10 @@ object Community {
                 }
             }
         }
+
+        if (isWritingPost) {
+            WritePostDialog()
+        }
     }
 
     @SuppressLint("FrequentlyChangedStateReadInComposition")
@@ -295,8 +302,8 @@ object Community {
     fun Fab() {
         ExtendedFloatingActionButton(
             onClick = {
-            /*TODO*/
                 Utils.vibrate(10)
+                isWritingPost = true
             }
         ) {
             animateColorAsState(
@@ -313,6 +320,52 @@ object Community {
                 )
             }
         }
+    }
+
+    @Composable
+    fun WritePostDialog() {
+        var image by rememberSaveable { mutableStateOf<ImageBitmap?>(null) }
+        var isSelectable by rememberSaveable { mutableStateOf(true) }
+        var content by rememberSaveable { mutableStateOf("") }
+        var isHeartAble by rememberSaveable { mutableStateOf(false) }
+        var postCategory by rememberSaveable { mutableStateOf(MyView.PostCategory.Unspecified) }
+        
+        LaunchedEffect(true) {
+            // TODO
+        }
+        
+        MyView.BaseDialog(
+            onDismissRequest = { isWritingPost = false },
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = null // TODO
+                )
+            },
+            title = { Text(text = "글 작성하기") },
+            content = {
+                Column(modifier = Modifier.fillMaxSize()) {
+
+                }
+            },
+            button = {
+                MyView.DialogButtonRow {
+                    TextButton(
+                        onClick = { isWritingPost = false }
+                    ) {
+                        Text(text = "닫기") // TODO
+                    }
+                    TextButton(
+                            onClick = { /* TODO */ }
+                            ) {
+                        Text(text = "개시하기") // TODO
+                    }
+                }
+            }
+        )
     }
 
 }

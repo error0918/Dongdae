@@ -355,7 +355,7 @@ object Community {
                     sharedPreferencesManager = SharedPreferencesManager(TEMPORARY_SAVING_KEY)
                 }
 
-                if (false) {
+                if (sharedPreferencesManager.contains(contentKey)) {
                     writingPostPage = WritingPostPage.TemporarySaving
                 }
             }
@@ -363,7 +363,9 @@ object Community {
             when (writingPostPage) {
 
                 WritingPostPage.TemporarySaving -> {
-
+                    MyView.MessageDialog(
+                        onDismissRequest = { /*TODO*/ }
+                    )
                 }
 
                 WritingPostPage.Writing -> {

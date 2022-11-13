@@ -48,6 +48,7 @@ import com.taeyeon.core.Utils
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.random.Random
 
 object Community {
     private var isWritingPost by mutableStateOf(false)
@@ -724,6 +725,16 @@ object Community {
                                                                 password = value.replace(".", "")
                                                                     .replace("-", "")
                                                         },
+                                                        trailingIcon = {
+                                                            IconButton(
+                                                                onClick = { password = getDigitNumber(Random.nextInt(10000), 4) }
+                                                            ) {
+                                                                Icon(
+                                                                    imageVector = Icons.Filled.Refresh,
+                                                                    contentDescription = null // TODO
+                                                                )
+                                                            }
+                                                        },
                                                         keyboardOptions = KeyboardOptions(
                                                             keyboardType = KeyboardType.Number
                                                         ),
@@ -810,7 +821,7 @@ object Community {
                                     modifier = Modifier.align(Alignment.CenterEnd),
                                     onClick = { /* TODO */ }
                                 ) {
-                                    Text(text = "개시하기") // TODO
+                                    Text(text = "게시하기") // TODO
                                 }
                             }
                         },

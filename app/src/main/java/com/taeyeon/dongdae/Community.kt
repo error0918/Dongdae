@@ -496,6 +496,7 @@ object Community {
                                     contentColor = MaterialTheme.colorScheme.onSurface,
                                     tonalElevation = 5.dp
                                 ) {
+                                    var isExpanded by rememberSaveable { mutableStateOf(true) }
 
                                     Column(
                                         modifier = Modifier
@@ -504,146 +505,218 @@ object Community {
                                         verticalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
 
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(50.dp)
-                                        ) {
-                                            Text(
-                                                text = "내용 복사 가능", // TODO
-                                                style = MaterialTheme.typography.labelLarge,
-                                                modifier = Modifier
-                                                    .align(Alignment.CenterStart)
-                                            )
-                                            Switch(
-                                                checked = isSelectable,
-                                                onCheckedChange = { selected ->
-                                                    isSelectable = selected
-                                                },
-                                                modifier = Modifier
-                                                    .align(Alignment.CenterEnd)
-                                            )
-                                        }
+                                        AnimatedVisibility(visible = isExpanded) {
 
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(50.dp)
-                                        ) {
-                                            Text(
-                                                text = "좋아요 기능", // TODO
-                                                style = MaterialTheme.typography.labelLarge,
+                                            Column(
                                                 modifier = Modifier
-                                                    .align(Alignment.CenterStart)
-                                            )
-                                            Switch(
-                                                checked = isHeartAble,
-                                                onCheckedChange = { selected ->
-                                                    isHeartAble = selected
-                                                },
-                                                modifier = Modifier
-                                                    .align(Alignment.CenterEnd)
-                                            )
-                                        }
-
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(50.dp)
-                                        ) {
-                                            var isDropDownMenuExpanded by remember {
-                                                mutableStateOf(
-                                                    false
-                                                )
-                                            }
-
-                                            Text(
-                                                text = "카테고리", // TODO
-                                                style = MaterialTheme.typography.labelLarge,
-                                                modifier = Modifier
-                                                    .align(Alignment.CenterStart)
-                                            )
-
-                                            OutlinedButton(
-                                                onClick = {
-                                                    isDropDownMenuExpanded = !isDropDownMenuExpanded
-                                                },
-                                                shape = RoundedCornerShape(percent = 20),
-                                                contentPadding = PaddingValues(),
-                                                modifier = Modifier
-                                                    .width(100.dp)
-                                                    .align(Alignment.CenterEnd)
+                                                    .fillMaxWidth()
+                                                    .padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
+                                                verticalArrangement = Arrangement.spacedBy(8.dp)
                                             ) {
-                                                Row(
+
+                                                Box(
                                                     modifier = Modifier
                                                         .fillMaxWidth()
-                                                        .padding(horizontal = 8.dp),
-                                                    verticalAlignment = Alignment.CenterVertically
+                                                        .height(50.dp)
                                                 ) {
                                                     Text(
-                                                        text = (MyView.postCategoryNameList[MyView.PostCategory.values()
-                                                            .indexOf(postCategory)]),
-                                                        textAlign = TextAlign.Center,
-                                                        maxLines = 1,
-                                                        modifier = Modifier.weight(1f)
+                                                        text = "내용 복사 가능", // TODO
+                                                        style = MaterialTheme.typography.labelLarge,
+                                                        modifier = Modifier
+                                                            .align(Alignment.CenterStart)
                                                     )
-                                                    Icon(
-                                                        imageVector = Icons.Filled.KeyboardArrowDown,
-                                                        contentDescription = null // TODO
+                                                    Switch(
+                                                        checked = isSelectable,
+                                                        onCheckedChange = { selected ->
+                                                            isSelectable = selected
+                                                        },
+                                                        modifier = Modifier
+                                                            .align(Alignment.CenterEnd)
                                                     )
                                                 }
 
-                                                DropdownMenu(
-                                                    expanded = isDropDownMenuExpanded,
-                                                    onDismissRequest = {
-                                                        isDropDownMenuExpanded = false
-                                                    },
-                                                    modifier = Modifier.width(100.dp)
+                                                Box(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .height(50.dp)
                                                 ) {
-                                                    MyView.postCategoryNameList.forEachIndexed { index, item ->
-                                                        DropdownMenuItem(
-                                                            text = { Text(text = item) },
-                                                            onClick = {
-                                                                postCategory =
-                                                                    MyView.PostCategory.values()[index]
-                                                                isDropDownMenuExpanded = false
-                                                            }
+                                                    Text(
+                                                        text = "좋아요 기능", // TODO
+                                                        style = MaterialTheme.typography.labelLarge,
+                                                        modifier = Modifier
+                                                            .align(Alignment.CenterStart)
+                                                    )
+                                                    Switch(
+                                                        checked = isHeartAble,
+                                                        onCheckedChange = { selected ->
+                                                            isHeartAble = selected
+                                                        },
+                                                        modifier = Modifier
+                                                            .align(Alignment.CenterEnd)
+                                                    )
+                                                }
+
+                                                Box(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .height(50.dp)
+                                                ) {
+                                                    var isDropDownMenuExpanded by remember {
+                                                        mutableStateOf(
+                                                            false
                                                         )
                                                     }
+
+                                                    Text(
+                                                        text = "카테고리", // TODO
+                                                        style = MaterialTheme.typography.labelLarge,
+                                                        modifier = Modifier
+                                                            .align(Alignment.CenterStart)
+                                                    )
+
+                                                    OutlinedButton(
+                                                        onClick = {
+                                                            isDropDownMenuExpanded =
+                                                                !isDropDownMenuExpanded
+                                                        },
+                                                        shape = RoundedCornerShape(percent = 20),
+                                                        contentPadding = PaddingValues(),
+                                                        modifier = Modifier
+                                                            .width(100.dp)
+                                                            .align(Alignment.CenterEnd)
+                                                    ) {
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .padding(horizontal = 8.dp),
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Text(
+                                                                text = (MyView.postCategoryNameList[MyView.PostCategory.values()
+                                                                    .indexOf(postCategory)]),
+                                                                textAlign = TextAlign.Center,
+                                                                maxLines = 1,
+                                                                modifier = Modifier.weight(1f)
+                                                            )
+                                                            Icon(
+                                                                imageVector = Icons.Filled.KeyboardArrowDown,
+                                                                contentDescription = null // TODO
+                                                            )
+                                                        }
+
+                                                        DropdownMenu(
+                                                            expanded = isDropDownMenuExpanded,
+                                                            onDismissRequest = {
+                                                                isDropDownMenuExpanded = false
+                                                            },
+                                                            modifier = Modifier.width(100.dp)
+                                                        ) {
+                                                            MyView.postCategoryNameList.forEachIndexed { index, item ->
+                                                                DropdownMenuItem(
+                                                                    text = { Text(text = item) },
+                                                                    onClick = {
+                                                                        postCategory =
+                                                                            MyView.PostCategory.values()[index]
+                                                                        isDropDownMenuExpanded =
+                                                                            false
+                                                                    }
+                                                                )
+                                                            }
+                                                        }
+                                                    }
+
                                                 }
+
+                                                Box(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .height(50.dp)
+                                                ) {
+                                                    var helpPopup by rememberSaveable {
+                                                        mutableStateOf(
+                                                            false
+                                                        )
+                                                    }
+
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .align(Alignment.CenterStart)
+                                                    ) {
+                                                        Text(
+                                                            text = "비밀번호", // TODO
+                                                            style = MaterialTheme.typography.labelLarge
+                                                        )
+                                                        IconButton(
+                                                            onClick = { helpPopup = !helpPopup },
+                                                            modifier = Modifier
+                                                                .padding(start = 8.dp)
+                                                                .size(10.dp)
+                                                        ) {
+                                                            Icon(
+                                                                imageVector = Icons.Filled.QuestionMark,
+                                                                contentDescription = null // TODO
+                                                            )
+                                                        }
+                                                    }
+
+                                                    if (helpPopup) {
+                                                        Popup() {
+                                                            Row(
+                                                                modifier = Modifier
+                                                                    .background(
+                                                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                                                        shape = RoundedCornerShape(8.dp)
+                                                                    )
+                                                                    .padding(8.dp),
+                                                                verticalAlignment = Alignment.CenterVertically
+                                                            ) {
+                                                                Text(
+                                                                    text = "글 수정, 글 삭제 등에 필요합니다.", // TODO
+                                                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                                                )
+
+                                                                IconButton(
+                                                                    onClick = { helpPopup = false },
+                                                                    modifier = Modifier
+                                                                        .padding(start = 8.dp)
+                                                                        .size(15.dp)
+                                                                ) {
+                                                                    Icon(
+                                                                        imageVector = Icons.Filled.Close,
+                                                                        contentDescription = null, // TODO
+                                                                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                                                    )
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    OutlinedTextField(
+                                                        value = password,
+                                                        onValueChange = { value ->
+                                                            if (value.length <= 4)
+                                                                password = value.replace(".", "")
+                                                                    .replace("-", "")
+                                                        },
+                                                        keyboardOptions = KeyboardOptions(
+                                                            keyboardType = KeyboardType.Number
+                                                        ),
+                                                        textStyle = MaterialTheme.typography.labelMedium.copy(
+                                                            textAlign = TextAlign.Center
+                                                        ),
+                                                        maxLines = 1,
+                                                        modifier = Modifier
+                                                            .width(100.dp)
+                                                            .align(Alignment.CenterEnd)
+                                                    )
+
+                                                }
+
                                             }
 
                                         }
 
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(50.dp)
-                                        ) {
-                                            Text(
-                                                text  = "비밀번호", // TODO
-                                                style = MaterialTheme.typography.labelLarge,
-                                                modifier = Modifier
-                                                    .align(Alignment.CenterStart)
-                                            )
-
-                                            OutlinedTextField(
-                                                value = password,
-                                                onValueChange = { value ->
-                                                    if (value.length <= 4)
-                                                        password = value.replace(".", "").replace("-", "")
-                                                },
-                                                keyboardOptions = KeyboardOptions(
-                                                    keyboardType = KeyboardType.Number
-                                                ),
-                                                textStyle = MaterialTheme.typography.labelMedium.copy(textAlign = TextAlign.Center),
-                                                maxLines = 1,
-                                                modifier = Modifier
-                                                    .width(100.dp)
-                                                    .align(Alignment.CenterEnd)
-                                            )
-
-                                        }
+                                        //Sur
 
                                     }
 
@@ -776,11 +849,11 @@ object Community {
             }
         }
 
-        suspend fun writePost(
+        /*suspend fun writePost(
             postData: MyView.PostData
         ) {
             // TODO
-        }
+        }*/
 
     }
 

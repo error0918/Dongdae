@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -39,6 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.Popup
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.taeyeon.core.SharedPreferencesManager
 import com.taeyeon.core.Utils
 import kotlinx.coroutines.launch
@@ -64,31 +68,30 @@ object Community {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            var selectedIndex by rememberSaveable { mutableStateOf(0) }
-            var isDropDownMenuExpanded by remember { mutableStateOf(false) }
-            var buttonSize by remember { mutableStateOf(IntSize.Zero) }
+            var categoryIndex by rememberSaveable { mutableStateOf(0) }
+            var sortingIndex by rememberSaveable { mutableStateOf(0) }
 
             AnimatedVisibility(visible = !lazyListState.isScrollInProgress || (lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0)) {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .background(Main.toolbarColor),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
 
                     LazyRow(
                         modifier = Modifier
-                            .weight(2f)
-                            .background(Main.toolbarColor),
+                            .weight(2f),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
-                        items(100) { index ->
-                            val selected = index == selectedIndex
+                        items(MyView.postCategoryNameList.size) { index ->
+                            val selected = index == categoryIndex
                             FilterChip(
                                 selected = selected,
-                                onClick = { selectedIndex = index },
-                                label = { Text(text = "TODO") },
+                                onClick = { categoryIndex = index },
+                                label = { Text(text = if (index == 0) "전체" else MyView.postCategoryNameList[index]) }, // TODO
                                 leadingIcon = {
                                     Icon(
                                         imageVector = if (selected) Icons.Default.CheckCircle else Icons.Default.CheckCircleOutline,
@@ -98,6 +101,10 @@ object Community {
                             )
                         }
                     }
+
+                    val sortingList = listOf("최신순", "추천순", "랜덤")
+                    var isDropDownMenuExpanded by remember { mutableStateOf(false) }
+                    var buttonSize by remember { mutableStateOf(IntSize.Zero) }
 
                     OutlinedButton(
                         onClick = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
@@ -114,7 +121,7 @@ object Community {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = ("최신 순"),
+                                text = (sortingList[sortingIndex]),
                                 textAlign = TextAlign.Center,
                                 maxLines = 1,
                                 modifier = Modifier.weight(1f)
@@ -131,10 +138,13 @@ object Community {
                             modifier = Modifier.width(with(LocalDensity.current) { buttonSize.width.toDp() }),
                             offset = DpOffset(x = (-24).dp, y = 8.dp)
                         ) {
-                            for (i in 1..10) {
+                            sortingList.forEachIndexed { index, item ->
                                 DropdownMenuItem(
-                                    text = { Text(text = "TODO $i") },
-                                    onClick = { /*TODO*/ }
+                                    text = { Text(text = item) },
+                                    onClick = {
+                                        sortingIndex = index
+                                        isDropDownMenuExpanded = false
+                                    }
                                 )
                             }
                         }
@@ -144,102 +154,118 @@ object Community {
 
             }
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                state = lazyListState,
-                verticalArrangement = Arrangement.spacedBy(32.dp),
-                contentPadding = PaddingValues(
-                    top = 16.dp,
-                    bottom = 32.dp + 16.dp
-                )
+            SwipeRefresh(
+                state = rememberSwipeRefreshState(isRefreshing = false),
+                onRefresh = { /*TODO*/ },
+                indicator = { state, trigger ->
+                    SwipeRefreshIndicator(
+                        state = state,
+                        refreshTriggerDistance = trigger,
+                        scale = true,
+                        backgroundColor = MaterialTheme.colorScheme.primary
+                    )
+                }
             ) {
 
-                item {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    state = lazyListState,
+                    verticalArrangement = Arrangement.spacedBy(32.dp),
+                    contentPadding = PaddingValues(
+                        top = 16.dp,
+                        bottom = 32.dp + 16.dp
+                    )
+                ) {
 
-                    MyView.PostUnit(
-                        id = id,
-                        content = "얘들아 오늘 급식 어떤 거 나와? 🤤",
-                        commentList = listOf(
-                            MyView.ChatData(
-                                isMe = false,
-                                id = id,
-                                message = "오늘은 탕수육 나온대!",
-                                chatSequence = MyView.ChatSequence.Start
-                            ),
-                            MyView.ChatData(
-                                isMe = true,
-                                id = id,
-                                message = "와 정말? 맛있겠다!!",
-                                chatSequence = MyView.ChatSequence.Start
-                            ),
-                            MyView.ChatData(
-                                isMe = false,
-                                id = id,
-                                message = "응! 나도 기대하고 있어",
-                                chatSequence = MyView.ChatSequence.Start
+                    item {
+
+                        MyView.PostUnit(
+                            id = id,
+                            content = "얘들아 오늘 급식 어떤 거 나와? 🤤",
+                            commentList = listOf(
+                                MyView.ChatData(
+                                    isMe = false,
+                                    id = id,
+                                    message = "오늘은 탕수육 나온대!",
+                                    chatSequence = MyView.ChatSequence.Start
+                                ),
+                                MyView.ChatData(
+                                    isMe = true,
+                                    id = id,
+                                    message = "와 정말? 맛있겠다!!",
+                                    chatSequence = MyView.ChatSequence.Start
+                                ),
+                                MyView.ChatData(
+                                    isMe = false,
+                                    id = id,
+                                    message = "응! 나도 기대하고 있어",
+                                    chatSequence = MyView.ChatSequence.Start
+                                )
                             )
                         )
-                    )
 
-                }
+                    }
 
-                item {
-                    MyView.PostUnit(
-                        id = id,
-                        content = "한국사 수행평가 범위 어디야?",
-                        commentList = listOf(
-                            MyView.ChatData(
-                                isMe = false,
-                                id = id,
-                                message = "아마 우리가 2학기 때 배우는 거 전체일걸?",
-                                chatSequence = MyView.ChatSequence.Start
-                            ),
-                            MyView.ChatData(
-                                isMe = true,
-                                id = id,
-                                message = "고마워~",
-                                chatSequence = MyView.ChatSequence.Start
+                    item {
+                        MyView.PostUnit(
+                            id = id,
+                            content = "한국사 수행평가 범위 어디야?",
+                            commentList = listOf(
+                                MyView.ChatData(
+                                    isMe = false,
+                                    id = id,
+                                    message = "아마 우리가 2학기 때 배우는 거 전체일걸?",
+                                    chatSequence = MyView.ChatSequence.Start
+                                ),
+                                MyView.ChatData(
+                                    isMe = true,
+                                    id = id,
+                                    message = "고마워~",
+                                    chatSequence = MyView.ChatSequence.Start
+                                )
                             )
                         )
-                    )
-                }
+                    }
 
-                item {
-                    ElevatedCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(IntrinsicSize.Min)
-                            .padding(horizontal = 32.dp),
-                        elevation = CardDefaults.elevatedCardElevation(
-                            defaultElevation = 10.dp,
-                            pressedElevation = 10.dp,
-                            focusedElevation = 10.dp,
-                            hoveredElevation = 10.dp,
-                            draggedElevation = 10.dp,
-                            disabledElevation = 10.dp,
-                        ),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-                            contentColor =  MaterialTheme.colorScheme.onSurface
-                        )
-                    ) {
-                        Box(
+                    item {
+                        ElevatedCard(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp)
-                        ) {
-                            Text(
-                                text = "개시물을 모두 다 보셨습니다. 😄",
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.align(Alignment.Center)
+                                .fillMaxWidth()
+                                .height(IntrinsicSize.Min)
+                                .padding(horizontal = 32.dp),
+                            elevation = CardDefaults.elevatedCardElevation(
+                                defaultElevation = 10.dp,
+                                pressedElevation = 10.dp,
+                                focusedElevation = 10.dp,
+                                hoveredElevation = 10.dp,
+                                draggedElevation = 10.dp,
+                                disabledElevation = 10.dp,
+                            ),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+                                contentColor = MaterialTheme.colorScheme.onSurface
                             )
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp)
+                            ) {
+                                Text(
+                                    text = "개시물을 모두 다 보셨습니다. 😄",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
                         }
                     }
+
                 }
 
             }
+
         }
 
         Popup(
@@ -716,10 +742,41 @@ object Community {
 
                                         }
 
-                                        //Sur
+                                        Surface(
+                                            modifier =  Modifier.fillMaxWidth(),
+                                            shape = MaterialTheme.shapes.medium,
+                                            color =  Color.Transparent,
+                                            contentColor = MaterialTheme.colorScheme.primary,
+                                            onClick = {
+                                                isExpanded = !isExpanded
+                                            }
+                                        ) {
+                                            Icon(
+                                                imageVector = if (isExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                                                contentDescription = null, // TODO
+                                                modifier = Modifier.padding(getCornerSize(MaterialTheme.shapes.medium))
+                                            )
+                                        }
 
                                     }
 
+                                }
+
+                                var isImageDialog by rememberSaveable { mutableStateOf(false) }
+
+                                if (!isImageDialog) {
+                                    /*MyView.ListDialog(
+                                        onDismissRequest = { isImageDialog = false },
+                                        items = ,
+                                        onItemClick =
+                                    )*/
+                                }
+
+                                OutlinedButton(
+                                    onClick = { isImageDialog = !isImageDialog },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(text = "이미지: 업로드되지 않음") // TODO
                                 }
 
                                 OutlinedTextField(

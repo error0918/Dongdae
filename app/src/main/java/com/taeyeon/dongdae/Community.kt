@@ -28,11 +28,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.Popup
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.taeyeon.core.SharedPreferencesManager
 import com.taeyeon.core.Utils
 import kotlinx.coroutines.launch
+import java.lang.reflect.Type
+import java.time.LocalDateTime
 
 object Community {
     private var isWritingPost by mutableStateOf(false)
@@ -328,6 +331,7 @@ object Community {
 
         private const val TEMPORARY_SAVING_KEY = "TEMPORARY_SAVING"
 
+        private const val timeKey = "temporarySavingTime"
         private const val imageKey = "image"
         private const val isSelectableKey = "isSelectable"
         private const val contentKey = "content"
@@ -336,17 +340,19 @@ object Community {
         private const val passwordKey = "password"
 
         enum class WritingPostPage {
-            TemporarySaving, Writing, CheckBeforeUploading, NoticeSuccess
+            TemporarySaving, Writing, CheckBeforeUploading, NoticeSuccess, Wait
         }
 
+        @SuppressLint("NewApi")
         @Composable
         fun WritePostDialog() {
-            var writingPostPage by rememberSaveable { mutableStateOf(WritingPostPage.Writing) }
+            var writingPostPage by rememberSaveable { mutableStateOf(WritingPostPage.Wait) }
 
+            var time by rememberSaveable { mutableStateOf(LocalDateTime.now()) }
             var image by rememberSaveable { mutableStateOf<ImageBitmap?>(null) }
             var isSelectable by rememberSaveable { mutableStateOf(true) }
             var content by rememberSaveable { mutableStateOf("") }
-            var isHeartAble by rememberSaveable { mutableStateOf(false) }
+            var isHeartAble by rememberSaveable { mutableStateOf(true) }
             var postCategory by rememberSaveable { mutableStateOf(MyView.PostCategory.Unspecified) }
             var password by rememberSaveable { mutableStateOf("0000") }
 
@@ -355,8 +361,10 @@ object Community {
                     sharedPreferencesManager = SharedPreferencesManager(TEMPORARY_SAVING_KEY)
                 }
 
-                if (sharedPreferencesManager.contains(contentKey)) {
+                if (sharedPreferencesManager.contains(timeKey)) {// && sharedPreferencesManager.getString(contentKey).isNotBlank()) {
                     writingPostPage = WritingPostPage.TemporarySaving
+                } else {
+                    writingPostPage = WritingPostPage.Writing
                 }
             }
 
@@ -364,7 +372,66 @@ object Community {
 
                 WritingPostPage.TemporarySaving -> {
                     MyView.MessageDialog(
-                        onDismissRequest = { /*TODO*/ }
+                        onDismissRequest = { isWritingPost = false },
+                        modifier = Modifier.padding(16.dp),
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Filled.QuestionMark,
+                                contentDescription = null // TODO
+                            )
+                        },
+                        title = { Text(text = "임시 저장") }, // TODO
+                        text = { Text(text = "~렗나일허;ㄴㄹㅇ헌;ㅣㅏㅇㄹ") }, // TODO
+                        button = {
+                            Box(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                TextButton(
+                                    modifier = Modifier.align(Alignment.CenterStart),
+                                    onClick = { isWritingPost = false }
+                                ) {
+                                    Text(text = "닫기") // TODO
+                                }
+                                MyView.DialogButtonRow(
+                                    modifier = Modifier.align(Alignment.CenterEnd)
+                                ) {
+                                    TextButton(
+                                        onClick = {
+                                            time = LocalDateTime.now()
+                                            image = null
+                                            isSelectable = true
+                                            content = ""
+                                            isHeartAble = true
+                                            postCategory = MyView.PostCategory.Unspecified
+                                            password = "0000"
+
+                                            writingPostPage = WritingPostPage.Writing
+                                        }
+                                    ) {
+                                        Text(text = "새로 작성하기") // TODO
+                                    }
+                                    TextButton(
+                                        onClick = {
+                                            time = sharedPreferencesManager.getAny(timeKey, LocalDateTime::class.java, LocalDateTime.now())
+                                            image = sharedPreferencesManager.getAny<ImageBitmap?>(imageKey, ImageBitmap::class.java, null)
+                                            isSelectable = sharedPreferencesManager.getBoolean(isSelectableKey, true)
+                                            content = sharedPreferencesManager.getString(contentKey, "")
+                                            isHeartAble = sharedPreferencesManager.getBoolean(isHeartAbleKey, true)
+                                            postCategory = sharedPreferencesManager.getAny(postCategoryKey, MyView.PostCategory::class.java, MyView.PostCategory.Unspecified)
+                                            password = sharedPreferencesManager.getString(passwordKey, "0000")
+
+                                            writingPostPage = WritingPostPage.Writing
+                                        }
+                                    ) {
+                                        Text(text = "불러오기") // TODO
+                                    }
+                                }
+                            }
+                        },
+                        properties = DialogProperties(
+                            dismissOnBackPress = false,
+                            dismissOnClickOutside = false
+                        )
                     )
                 }
 
@@ -387,22 +454,33 @@ object Community {
                             }
                         },
                         button = {
-                            MyView.DialogButtonRow {
+                            Box(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
                                 TextButton(
+                                    modifier = Modifier.align(Alignment.CenterStart),
                                     onClick = { isWritingPost = false }
                                 ) {
                                     Text(text = "닫기") // TODO
                                 }
                                 TextButton(
+                                    modifier = Modifier.align(Alignment.CenterEnd),
                                     onClick = { /* TODO */ }
                                 ) {
                                     Text(text = "개시하기") // TODO
                                 }
                             }
-                        }
+                        },
+                        properties = DialogProperties(
+                            dismissOnBackPress = false,
+                            dismissOnClickOutside = false
+                        )
                     )
 
                     LaunchedEffect(image, isSelectable, content, isHeartAble, postCategory, password) {
+                        time = LocalDateTime.now()
+
+                        sharedPreferencesManager.putAny(timeKey, time)
                         sharedPreferencesManager.putAny(imageKey, image ?: Any())
                         sharedPreferencesManager.putBoolean(isSelectableKey, isSelectable)
                         sharedPreferencesManager.putString(contentKey, content)

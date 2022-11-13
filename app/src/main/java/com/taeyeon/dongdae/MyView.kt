@@ -42,6 +42,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import kotlinx.coroutines.delay
+import java.time.LocalDateTime
 import java.util.*
 
 object MyView {
@@ -1122,6 +1123,7 @@ object MyView {
     }
 
     data class PostData(
+        @SuppressLint("NewApi") val time: LocalDateTime = LocalDateTime.now(),
         val id: String,
         val image: ImageBitmap? = null,
         val isSelectable: Boolean = true,
@@ -1138,6 +1140,7 @@ object MyView {
     ) {
         postData.run {
             PostUnit(
+                time = time,
                 id = id,
                 image = image,
                 isSelectable = isSelectable,
@@ -1149,8 +1152,10 @@ object MyView {
         }
     }
 
+    @SuppressLint("NewApi")
     @Composable
     fun PostUnit(
+        time: LocalDateTime = LocalDateTime.now(),
         id: String,
         image: ImageBitmap? = null,
         isSelectable: Boolean = true,

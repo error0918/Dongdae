@@ -103,7 +103,7 @@ object Community {
                         }
                     }
 
-                    val sortingList = listOf("최신순", "추천순", "랜덤")
+                    val sortingList = listOf("최신순", "좋아요 순", "랜덤")
                     var isDropDownMenuExpanded by remember { mutableStateOf(false) }
                     var buttonSize by remember { mutableStateOf(IntSize.Zero) }
 

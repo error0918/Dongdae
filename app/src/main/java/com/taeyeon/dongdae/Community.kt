@@ -34,8 +34,8 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.taeyeon.core.SharedPreferencesManager
 import com.taeyeon.core.Utils
 import kotlinx.coroutines.launch
-import java.lang.reflect.Type
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 object Community {
     private var isWritingPost by mutableStateOf(false)
@@ -149,35 +149,6 @@ object Community {
             ) {
 
                 item {
-
-                    /*val id = id
-
-                    val image: ImageBitmap? = null
-
-                    val isSelectable = true
-                    val content = "게시 "
-
-                    val isHeartAble = true
-                    var isHeart by rememberSaveable { mutableStateOf(false) }
-                    var heartCount by rememberSaveable { mutableStateOf(12) }
-                    val onHeartClicked = { checked: Boolean ->
-                        heartCount += if (checked) 1 else -1
-                        isHeart = checked
-                    }
-
-                    val commentList = listOf(
-                        MyView.ChatData(
-                            isMe = true,
-                            id = id,
-                            message = "댓글 테스트",
-                            chatSequence = MyView.ChatSequence.Start
-                        ),
-                        MyView.ChatData(
-                            isMe = false,
-                            id = id,
-                            message = "댓글 테스트"
-                        )
-                    )*/
 
                     MyView.PostUnit(
                         id = id,
@@ -331,7 +302,7 @@ object Community {
 
         private const val TEMPORARY_SAVING_KEY = "TEMPORARY_SAVING"
 
-        private const val timeKey = "temporarySavingTime"
+        private const val timeKey = "time"
         private const val imageKey = "image"
         private const val isSelectableKey = "isSelectable"
         private const val contentKey = "content"
@@ -348,7 +319,7 @@ object Community {
         fun WritePostDialog() {
             var writingPostPage by rememberSaveable { mutableStateOf(WritingPostPage.Wait) }
 
-            var time by rememberSaveable { mutableStateOf(LocalDateTime.now()) }
+            var time by rememberSaveable { mutableStateOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm"))) }
             var image by rememberSaveable { mutableStateOf<ImageBitmap?>(null) }
             var isSelectable by rememberSaveable { mutableStateOf(true) }
             var content by rememberSaveable { mutableStateOf("") }
@@ -361,14 +332,16 @@ object Community {
                     sharedPreferencesManager = SharedPreferencesManager(TEMPORARY_SAVING_KEY)
                 }
 
-                if (sharedPreferencesManager.contains(timeKey)) {// && sharedPreferencesManager.getString(contentKey).isNotBlank()) {
-                    writingPostPage = WritingPostPage.TemporarySaving
+                writingPostPage = if (sharedPreferencesManager.contains(timeKey) && sharedPreferencesManager.getString(contentKey).isNotBlank()) {
+                    WritingPostPage.TemporarySaving
                 } else {
-                    writingPostPage = WritingPostPage.Writing
+                    WritingPostPage.Writing
                 }
             }
 
             when (writingPostPage) {
+
+                WritingPostPage.Wait -> {}
 
                 WritingPostPage.TemporarySaving -> {
                     MyView.MessageDialog(
@@ -381,7 +354,12 @@ object Community {
                             )
                         },
                         title = { Text(text = "임시 저장") }, // TODO
-                        text = { Text(text = "~렗나일허;ㄴㄹㅇ헌;ㅣㅏㅇㄹ") }, // TODO
+                        text = {
+                            Text(
+                                text = "${sharedPreferencesManager.getString(timeKey, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")))}에 저장한 글이 있습니다.\n" +
+                                        "불러오시겠습니까?"
+                            )
+                        }, // TODO
                         button = {
                             Box(
                                 modifier = Modifier.fillMaxWidth()
@@ -397,7 +375,7 @@ object Community {
                                 ) {
                                     TextButton(
                                         onClick = {
-                                            time = LocalDateTime.now()
+                                            time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm"))
                                             image = null
                                             isSelectable = true
                                             content = ""
@@ -412,7 +390,7 @@ object Community {
                                     }
                                     TextButton(
                                         onClick = {
-                                            time = sharedPreferencesManager.getAny(timeKey, LocalDateTime::class.java, LocalDateTime.now())
+                                            time = sharedPreferencesManager.getString(timeKey, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")))
                                             image = sharedPreferencesManager.getAny<ImageBitmap?>(imageKey, ImageBitmap::class.java, null)
                                             isSelectable = sharedPreferencesManager.getBoolean(isSelectableKey, true)
                                             content = sharedPreferencesManager.getString(contentKey, "")
@@ -451,6 +429,16 @@ object Community {
                         content = {
                             Column(modifier = Modifier.fillMaxSize()) {
 
+                                OutlinedTextField(
+                                    value = content,
+                                    onValueChange = { value -> content = value },
+                                    label = { Text(text = "내용") },
+                                    supportingText = { Text(text = "asf") },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f)
+                                )
+
                             }
                         },
                         button = {
@@ -478,9 +466,9 @@ object Community {
                     )
 
                     LaunchedEffect(image, isSelectable, content, isHeartAble, postCategory, password) {
-                        time = LocalDateTime.now()
+                        time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm"))
 
-                        sharedPreferencesManager.putAny(timeKey, time)
+                        sharedPreferencesManager.putString(timeKey, time)
                         sharedPreferencesManager.putAny(imageKey, image ?: Any())
                         sharedPreferencesManager.putBoolean(isSelectableKey, isSelectable)
                         sharedPreferencesManager.putString(contentKey, content)

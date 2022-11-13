@@ -42,7 +42,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import kotlinx.coroutines.delay
+import java.text.DateFormat
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 object MyView {
@@ -1123,7 +1125,7 @@ object MyView {
     }
 
     data class PostData(
-        @SuppressLint("NewApi") val time: LocalDateTime = LocalDateTime.now(),
+        val time: String,
         val id: String,
         val image: ImageBitmap? = null,
         val isSelectable: Boolean = true,
@@ -1155,7 +1157,7 @@ object MyView {
     @SuppressLint("NewApi")
     @Composable
     fun PostUnit(
-        time: LocalDateTime = LocalDateTime.now(),
+        time: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")),
         id: String,
         image: ImageBitmap? = null,
         isSelectable: Boolean = true,
@@ -1208,7 +1210,7 @@ object MyView {
                             .fillMaxWidth()
                             .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp)
                     ) {
-                        val (nameUnit, contentImage, contentText, heart, dropDownMenuButton) = createRefs()
+                        val (nameUnit, contentImage, contentText, timeText, heart, dropDownMenuButton) = createRefs()
 
                         NameUnit(
                             modifier = Modifier
@@ -1262,6 +1264,17 @@ object MyView {
                             )
                         }
 
+                        Text(
+                            text = time,
+                            color = LocalContentColor.current.copy(alpha = 0.4f),
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier
+                                .constrainAs(timeText) {
+                                    top.linkTo(contentText.bottom, margin = 8.dp)
+                                    end.linkTo(parent.end)
+                                }
+                        )
+
                         if (isHeartAble) {
                             Surface(
                                 onClick = { onHeartClicked(!isHeart) },
@@ -1269,7 +1282,7 @@ object MyView {
                                 shape = CircleShape,
                                 modifier = Modifier
                                     .constrainAs(heart) {
-                                        top.linkTo(contentText.bottom, margin = 8.dp)
+                                        top.linkTo(timeText.bottom, margin = 8.dp)
                                         centerHorizontallyTo(parent)
                                     }
                             ) {
@@ -1292,7 +1305,7 @@ object MyView {
                             onClick = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
                             modifier = Modifier
                                 .constrainAs(dropDownMenuButton) {
-                                    top.linkTo(contentText.bottom, margin = 8.dp)
+                                    top.linkTo(timeText.bottom, margin = 8.dp)
                                     end.linkTo(parent.end)
                                 }
                         ) {

@@ -1123,6 +1123,10 @@ object MyView {
         Unspecified, Study, SchoolLife, Tip, Game, QA
     }
 
+    val postCategoryNameList by lazy {
+        listOf("없음", "공부", "학교 생활", "팁", "게임", "Q&A")
+    } // TODO
+
     data class PostData(
         val time: String,
         val id: String,

@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.PeopleOutline
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
@@ -338,11 +340,11 @@ object Community {
                     sharedPreferencesManager = SharedPreferencesManager(TEMPORARY_SAVING_KEY)
                 }
 
-                /*writingPostPage = if (sharedPreferencesManager.contains(timeKey) && sharedPreferencesManager.getString(contentKey).isNotBlank()) {
+                writingPostPage = if (sharedPreferencesManager.contains(timeKey) && sharedPreferencesManager.getString(contentKey).isNotBlank()) {
                     WritingPostPage.TemporarySaving
                 } else {
                     WritingPostPage.Writing
-                }*/
+                }
             }
 
             when (writingPostPage) {
@@ -388,7 +390,10 @@ object Community {
                                 sweepAngle = sweepAngle,
                                 useCenter = false,
                                 size = Size(90.dp.toPx(), 90.dp.toPx()),
-                                style = Stroke(width = 15.dp.toPx(), cap = StrokeCap.Round)
+                                style = Stroke(
+                                    width = 15.dp.toPx(),
+                                    cap = StrokeCap.Round
+                                )
                             )
 
                         }
@@ -479,16 +484,154 @@ object Community {
                         },
                         title = { Text(text = "글 작성하기") },
                         content = {
-                            Column(modifier = Modifier.fillMaxSize()) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "내용 복사 가능", // TODO
+                                        style = MaterialTheme.typography.labelLarge,
+                                        modifier = Modifier
+                                            .align(Alignment.CenterStart)
+                                    )
+                                    Switch(
+                                        checked = isSelectable,
+                                        onCheckedChange = { selected ->
+                                            isSelectable = selected
+                                        },
+                                        modifier = Modifier
+                                            .align(Alignment.CenterEnd)
+                                    )
+                                }
+
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "좋아요 기능", // TODO
+                                        style = MaterialTheme.typography.labelLarge,
+                                        modifier = Modifier
+                                            .align(Alignment.CenterStart)
+                                    )
+                                    Switch(
+                                        checked = isHeartAble,
+                                        onCheckedChange = { selected ->
+                                            isHeartAble = selected
+                                        },
+                                        modifier = Modifier
+                                            .align(Alignment.CenterEnd)
+                                    )
+                                }
+
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    var isDropDownMenuExpanded by remember { mutableStateOf(false) }
+
+                                    Text(
+                                        text = "카테고리", // TODO
+                                        style = MaterialTheme.typography.labelLarge,
+                                        modifier = Modifier
+                                            .align(Alignment.CenterStart)
+                                    )
+
+                                    OutlinedButton(
+                                        onClick = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
+                                        shape = RoundedCornerShape(percent = 20),
+                                        contentPadding = PaddingValues(),
+                                        modifier = Modifier
+                                            .width(100.dp)
+                                            .align(Alignment.CenterEnd)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = (MyView.postCategoryNameList[MyView.PostCategory.values().indexOf(postCategory)]),
+                                                textAlign = TextAlign.Center,
+                                                maxLines = 1,
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                            Icon(
+                                                imageVector = Icons.Filled.KeyboardArrowDown,
+                                                contentDescription = null // TODO
+                                            )
+                                        }
+
+                                        DropdownMenu(
+                                            expanded = isDropDownMenuExpanded,
+                                            onDismissRequest = { isDropDownMenuExpanded = false },
+                                            modifier = Modifier.width(100.dp)
+                                        ) {
+                                            MyView.postCategoryNameList.forEachIndexed { index, item ->
+                                                DropdownMenuItem(
+                                                    text = { Text(text = item) },
+                                                    onClick = {
+                                                        postCategory = MyView.PostCategory.values()[index]
+                                                        isDropDownMenuExpanded = false
+                                                    }
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                }
+
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text  = "비밀번호", // TODO
+                                        style = MaterialTheme.typography.labelLarge,
+                                        modifier = Modifier
+                                            .align(Alignment.CenterStart)
+                                    )
+
+                                    OutlinedTextField(
+                                        value = password,
+                                        onValueChange = { value ->
+                                            if (value.length <= 4)
+                                                password = value.replace(".", "").replace("-", "")
+                                        },
+                                        keyboardOptions = KeyboardOptions(
+                                            keyboardType = KeyboardType.Number
+                                        ),
+                                        textStyle = MaterialTheme.typography.labelMedium.copy(textAlign = TextAlign.Center),
+                                        maxLines = 1,
+                                        supportingText = {
+                                            Text(
+                                                text = "만족합니다.",
+                                                textAlign = TextAlign.Center,
+                                                modifier = Modifier.fillMaxWidth()
+                                            )
+                                        },
+                                        modifier = Modifier
+                                            .width(100.dp)
+                                            .align(Alignment.CenterEnd)
+                                    )
+
+                                }
 
                                 OutlinedTextField(
                                     value = content,
                                     onValueChange = { value -> content = value },
                                     label = { Text(text = "내용") },
-                                    supportingText = { Text(text = "asf") },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .weight(1f)
+                                )
+
+                                Text(
+                                    text = "$time: 임시 저장되었습니다.",
+                                    textAlign = TextAlign.End,
+                                    modifier = Modifier.fillMaxWidth()
                                 )
 
                             }
@@ -531,11 +674,73 @@ object Community {
                 }
 
                 WritingPostPage.CheckBeforeUploading -> {
-
+                    MyView.MessageDialog(
+                        onDismissRequest = { isWritingPost = false },
+                        modifier = Modifier.padding(16.dp),
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null // TODO
+                            )
+                        },
+                        title = { Text(text = "업로드") }, // TODO
+                        text = {
+                            Text(
+                                text = "TODO",
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }, // TODO
+                        button = {
+                            Box(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                TextButton(
+                                    modifier = Modifier.align(Alignment.CenterStart),
+                                    onClick = { isWritingPost = false }
+                                ) {
+                                    Text(text = "취소하기") // TODO
+                                }
+                                TextButton(
+                                    modifier = Modifier.align(Alignment.CenterEnd),
+                                    onClick = {
+                                        /* TODO */
+                                    }
+                                ) {
+                                    Text(text = "업로드하기") // TODO
+                                }
+                            }
+                        },
+                        properties = DialogProperties(
+                            dismissOnBackPress = false,
+                            dismissOnClickOutside = false
+                        )
+                    )
                 }
 
                 WritingPostPage.NoticeSuccess -> {
-
+                    MyView.MessageDialog(
+                        onDismissRequest = { isWritingPost = false },
+                        modifier = Modifier.padding(16.dp),
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null // TODO
+                            )
+                        },
+                        title = { Text(text = "업로드 성공") }, // TODO
+                        button = {
+                            Box(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                TextButton(
+                                    modifier = Modifier.align(Alignment.CenterStart),
+                                    onClick = { isWritingPost = false }
+                                ) {
+                                    Text(text = "닫기") // TODO
+                                }
+                            }
+                        }
+                    )
                 }
 
             }

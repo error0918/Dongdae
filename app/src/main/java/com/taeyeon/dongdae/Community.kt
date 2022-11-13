@@ -7,6 +7,8 @@ package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,7 +23,11 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
@@ -332,16 +338,62 @@ object Community {
                     sharedPreferencesManager = SharedPreferencesManager(TEMPORARY_SAVING_KEY)
                 }
 
-                writingPostPage = if (sharedPreferencesManager.contains(timeKey) && sharedPreferencesManager.getString(contentKey).isNotBlank()) {
+                /*writingPostPage = if (sharedPreferencesManager.contains(timeKey) && sharedPreferencesManager.getString(contentKey).isNotBlank()) {
                     WritingPostPage.TemporarySaving
                 } else {
                     WritingPostPage.Writing
-                }
+                }*/
             }
 
             when (writingPostPage) {
 
-                WritingPostPage.Wait -> {}
+                WritingPostPage.Wait -> {
+                    Popup(alignment = Alignment.Center) {
+                        val primaryColor = MaterialTheme.colorScheme.primary
+
+                        val startAngle by rememberInfiniteTransition().animateFloat(
+                            initialValue = 0f,
+                            targetValue = 360f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(1000, easing = LinearEasing),
+                                repeatMode = RepeatMode.Restart
+                            )
+                        )
+                        val sweepAngle by rememberInfiniteTransition().animateFloat(
+                            initialValue = 60f,
+                            targetValue = 300f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(1500, easing = LinearEasing),
+                                repeatMode = RepeatMode.Reverse
+                            )
+                        )
+
+                        Canvas(
+                            modifier = Modifier
+                                .shadow(
+                                    elevation = 10.dp,
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .background(
+                                    color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .size(150.dp)
+                                .padding(30.dp)
+                        ) {
+
+                            drawArc(
+                                color = primaryColor,
+                                startAngle = startAngle,
+                                sweepAngle = sweepAngle,
+                                useCenter = false,
+                                size = Size(90.dp.toPx(), 90.dp.toPx()),
+                                style = Stroke(width = 15.dp.toPx(), cap = StrokeCap.Round)
+                            )
+
+                        }
+                    }
+                }
 
                 WritingPostPage.TemporarySaving -> {
                     MyView.MessageDialog(
@@ -356,8 +408,8 @@ object Community {
                         title = { Text(text = "임시 저장") }, // TODO
                         text = {
                             Text(
-                                text = "${sharedPreferencesManager.getString(timeKey, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")))}에 저장한 글이 있습니다.\n" +
-                                        "불러오시겠습니까?"
+                                text = "${sharedPreferencesManager.getString(timeKey, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")))}에 저장한 글이 있습니다. 불러오시겠습니까?",
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }, // TODO
                         button = {

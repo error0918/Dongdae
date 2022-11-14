@@ -17,6 +17,8 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.core.SharedPreferencesManager

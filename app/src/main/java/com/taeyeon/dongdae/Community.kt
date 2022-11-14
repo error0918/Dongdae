@@ -67,7 +67,7 @@ object Community {
     @Composable
     fun Community() {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxWidth()
         ) {
             var categoryIndex by rememberSaveable { mutableStateOf(0) }
             var sortingIndex by rememberSaveable { mutableStateOf(0) }
@@ -173,10 +173,9 @@ object Community {
                         .fillMaxWidth()
                         .weight(1f),
                     state = lazyListState,
-                    verticalArrangement = Arrangement.spacedBy(32.dp),
                     contentPadding = PaddingValues(
-                        top = 16.dp,
-                        bottom = 32.dp + 16.dp
+                        top = 8.dp,
+                        bottom = 8.dp
                     )
                 ) {
 
@@ -235,7 +234,10 @@ object Community {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(IntrinsicSize.Min)
-                                .padding(horizontal = 32.dp),
+                                .padding(
+                                    vertical = 8.dp,
+                                    horizontal = 16.dp
+                                ),
                             elevation = CardDefaults.elevatedCardElevation(
                                 defaultElevation = 10.dp,
                                 pressedElevation = 10.dp,

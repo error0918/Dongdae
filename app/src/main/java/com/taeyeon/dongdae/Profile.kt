@@ -3,25 +3,31 @@
 package com.taeyeon.dongdae
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CopyAll
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.taeyeon.core.Core
 import com.taeyeon.core.Utils
-import kotlinx.coroutines.launch
 
 object Profile {
     private val lazyListState = LazyListState()
@@ -85,27 +91,28 @@ object Profile {
                 title = "개발자 기능", // TODO
                 unitList = listOf(
                     {
-                        Unit.TextUnit(title = "앱 재시작") { // TODO
-                            Utils.restartApp()
+                        Unit.TextUnit(title = "TextUnit")
+                    },
+                    {
+                        Unit.CopyableTextUnit(title = "CopyableTextUnit")
+                    },
+                    {
+                        Unit.TextButtonUnit(title = "TextButtonUnit") { // TODO
+                            // TODO
                         }
                     },
                     {
-                        Unit.TextUnit(title = "앱 초기화") { // TODO
-                            Utils.initializeData()
-                            Main.scope.launch {
-                                /*if (snackbarHostState.currentSnackbarData == null) {
-                                    val snackbarResult =
-                                        snackbarHostState.showSnackbar(
-                                            message = Core.getContext().resources.getString(R.string.settings_restart_message),
-                                            actionLabel = Core.getContext().resources.getString(R.string.settings_title_initialize_app_restart),
-                                            duration = SnackbarDuration.Short
-                                        )
-                                    if (snackbarResult == SnackbarResult.ActionPerformed) {
-                                        Utils.restartApp()
-                                    }
-                                }*/
-                            }
-                        }
+                        Unit.SwitchUnit(title = "SwitchUnit", checked = Tester.tester, onCheckedChange =  { checked -> Tester.tester = checked })
+                    },
+                    {
+                        var value by rememberSaveable { mutableStateOf(0f) }
+
+                        Unit.SliderUnit(
+                            title = "SliderUnit",
+                            value = value,
+                            onValueChange = { value_ -> value = value_},
+                            valueRange = 0f .. 10f
+                        )
                     }
                 )
             ),
@@ -124,7 +131,7 @@ object Profile {
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(vertical = 16.dp)
+            contentPadding = PaddingValues(vertical = 8.dp)
         ) {
             items(blockList) { blockData ->
                 Unit.Block(blockData)
@@ -140,14 +147,16 @@ object Profile {
         )
 
         @Composable
-        fun Block(blockData: BlockData) {
+        fun Block(
+            blockData: BlockData
+        ) {
             blockData.run {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
-                            vertical = 16.dp,
-                            horizontal = 32.dp
+                            vertical = 8.dp,
+                            horizontal = 16.dp
                         )
                 ) {
                     Text(
@@ -166,7 +175,7 @@ object Profile {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp)
+                                .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 6.dp)
                         ) {
                             unitList.forEachIndexed { index, unit ->
                                 unit()
@@ -175,7 +184,7 @@ object Profile {
                                     Canvas(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(3.5.dp)
+                                            .padding(vertical = 5.5.dp)
                                             .height(1.dp)
                                     ) {
                                         drawLine(
@@ -194,10 +203,76 @@ object Profile {
         }
 
         @Composable
-        fun TextUnit(title: String, onClick: () -> kotlin.Unit) {
+        fun TextUnit(
+            title: String
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .padding(horizontal = 12.dp)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.labelLarge,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+            }
+        }
+
+        @Composable
+        fun CopyableTextUnit(
+            title: String,
+            copyText: String = title
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .padding(horizontal = 12.dp)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onLongPress = {
+                                Utils.copy(text = copyText)
+                            }
+                        )
+                    }
+            ) {
+
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.labelLarge,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+
+                IconButton(
+                    onClick = {
+                        Utils.copy(text = copyText)
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.CopyAll,
+                        contentDescription = null // TODO
+                    )
+                }
+
+            }
+        }
+
+        @Composable
+        fun TextButtonUnit(
+            title: String,
+            onClick: () -> kotlin.Unit
+        ) {
             TextButton(
                 onClick = onClick,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
             ) {
                 Text(
                     text = title,
@@ -217,17 +292,21 @@ object Profile {
         ) {
             TextButton(
                 onClick = { onCheckedChange(!checked) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
             ) {
                 Box(
                     modifier = Modifier.fillMaxWidth()
                 ) {
+
                     Text(
                         text = title,
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier.align(Alignment.CenterStart)
                     )
+
                     Switch(
                         checked = checked,
                         onCheckedChange = { onCheckedChange(!checked) },
@@ -236,6 +315,70 @@ object Profile {
                             .align(Alignment.CenterEnd)
                     )
                 }
+
+            }
+        }
+
+        @Composable
+        fun SliderUnit(
+            title: String,
+            value: Float,
+            onValueChange: (Float) -> kotlin.Unit,
+            valueRange: ClosedFloatingPointRange<Float> = MyView.FullBackgroundSliderDefaults.valueRange,
+            steps: Int = MyView.FullBackgroundSliderDefaults.steps,
+            isShowingPopup: Boolean = MyView.FullBackgroundSliderDefaults.isShowingPopup,
+            roundingDigits: Int = MyView.FullBackgroundSliderDefaults.roundingDigits
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp)
+                    .padding(horizontal = 12.dp)
+            ) {
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp)
+                ) {
+                    Text(
+                        text = title,
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelLarge,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    )
+
+                    Text(
+                        text = String.format("%.${roundingDigits}f", value),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(vertical = 4.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = CircleShape
+                            )
+                            .padding(
+                                vertical = 4.dp,
+                                horizontal = 12.dp
+                            )
+                    )
+                }
+
+                MyView.FullBackgroundSlider(
+                    value = value,
+                    onValueChange = onValueChange,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp),
+                    valueRange = valueRange,
+                    steps = steps,
+                    isShowingPopup = isShowingPopup,
+                    roundingDigits = roundingDigits
+                )
+
             }
         }
 

@@ -1,8 +1,10 @@
+@file:OptIn(ExperimentalAnimationApi::class)
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
-@file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.taeyeon.dongdae
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -96,176 +98,7 @@ object Profile {
                 title = "개발자 기능", // TODO
                 unitList = listOf(
                     {
-                        Theme(
-                            darkTheme = !isSystemInDarkTheme(),
-                            dynamicColor = false
-                        ) {
-                            Surface(
-                                color = MaterialTheme.colorScheme.surface,
-                                shape = MaterialTheme.shapes.medium,
-                                modifier = Modifier
-                                    .width(150.dp)
-                                    .height(100.dp)
-                            ) {
-                                CompositionLocalProvider(LocalDensity provides Density(density = LocalDensity.current.density / 2f)) {
-                                    /*Row(
-                                        modifier = Modifier.fillMaxSize()
-                                    ) {
-                                        listOf(
-                                            MaterialTheme.colorScheme.primary,
-                                            MaterialTheme.colorScheme.secondary,
-                                            MaterialTheme.colorScheme.tertiary,
-                                            MaterialTheme.colorScheme.surface,
-                                            MaterialTheme.colorScheme.surfaceVariant
-                                        ).forEach {
-                                            Spacer(
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .fillMaxHeight()
-                                                    .background(it)
-                                            )
-                                        }
-                                    }*/
-                                    /*LazyColumn(
-                                        modifier = Modifier.fillMaxSize()
-                                    ) {
-                                        item {
-                                            Box(
-                                                modifier = Modifier.fillMaxWidth()
-                                            ) {
-                                                this.ChatUnit(
-                                                    isMe = true,
-                                                    id = id,
-                                                    message = "테마 미리보기", // TODO
-                                                    chatSequence = MyView.ChatSequence.Default
-                                                )
-                                            }
-                                        }
-                                        item {
-                                            Box(
-                                                modifier = Modifier.fillMaxWidth()
-                                            ) {
-                                                this.ChatUnit(
-                                                    isMe = false,
-                                                    id = id,
-                                                    message = "테마 미리보기", // TODO
-                                                    chatSequence = MyView.ChatSequence.Default
-                                                )
-                                            }
-                                        }
-                                        item {
-                                            Box(
-                                                modifier = Modifier.fillMaxWidth()
-                                            ) {
-                                                this.ChatUnit(
-                                                    isMe = true,
-                                                    id = id,
-                                                    message = "테마 미리보기", // TODO
-                                                    chatSequence = MyView.ChatSequence.Default
-                                                )
-                                            }
-                                        }
-                                        item {
-                                            Box(
-                                                modifier = Modifier.fillMaxWidth()
-                                            ) {
-                                                this.ChatUnit(
-                                                    isMe = true,
-                                                    id = id,
-                                                    message = "테마 미리보기", // TODO
-                                                    chatSequence = MyView.ChatSequence.Sequence
-                                                )
-                                            }
-                                        }
-                                    }*/
-                                    Scaffold(
-                                        topBar = {
-                                            Box(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .height(40.dp)
-                                                    .background(MaterialTheme.colorScheme.surface)
-                                                    .padding(horizontal = 10.dp)
-                                            ) {
-                                                Box(
-                                                    modifier = Modifier
-                                                        .width(40.dp)
-                                                        .height(10.dp)
-                                                        .align(Alignment.CenterStart)
-                                                        .background(MaterialTheme.colorScheme.primary)
-                                                )
-                                            }
-                                        },
-                                        bottomBar = {
-                                            Row(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .height(40.dp)
-                                                    .background(
-                                                        MaterialTheme.colorScheme.surfaceColorAtElevation(
-                                                            3.dp
-                                                        )
-                                                    )
-                                            ) {
-                                                listOf(
-                                                    Icons.Filled.Chat,
-                                                    Icons.Filled.People,
-                                                    Icons.Filled.Person,
-                                                ).forEach {
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .weight(1f)
-                                                            .fillMaxHeight()
-                                                            .padding(10.dp),
-                                                        contentAlignment = Alignment.Center
-                                                    ) {
-                                                        Icon(
-                                                            imageVector = it,
-                                                            contentDescription = null, // TODO
-                                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        floatingActionButton = {
-                                            Box(
-                                                modifier = Modifier
-                                                    .width(40.dp)
-                                                    .height(40.dp)
-                                                    .background(
-                                                        color = MaterialTheme.colorScheme.primaryContainer,
-                                                        shape = MaterialTheme.shapes.small
-                                                    ),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Filled.Edit,
-                                                    contentDescription = null, // TODO
-                                                    tint = MaterialTheme.colorScheme.onPrimaryContainer
-                                                )
-                                            }
-                                        }
-                                    ) { paddingValues ->
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .padding(paddingValues = paddingValues)
-                                        ) {
-                                            listOf(80, 160, 100, 80, 30).forEach { width ->
-                                                Box(
-                                                    modifier = Modifier
-                                                        .padding(5.dp)
-                                                        .width(width.dp)
-                                                        .height(10.dp)
-                                                        .background(MaterialTheme.colorScheme.onSurface)
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        // TODO
                     },
                     {
                         Unit.TextUnit(title = "TextUnit")
@@ -561,6 +394,203 @@ object Profile {
                     roundingDigits = roundingDigits
                 )
 
+            }
+        }
+
+        enum class ThemePreview {
+            Palette, Chat, Screen
+        }
+
+        val themePreviewMap = mapOf(
+            ThemePreview.Palette to "팔레트",
+            ThemePreview.Chat to "체팅",
+            ThemePreview.Screen to "화면",
+        ) // TODO
+
+        @Composable
+        fun ThemePreviewUnit(
+            themePreview: ThemePreview = ThemePreview.Palette
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.surface,
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier
+                    .width(150.dp)
+                    .height(100.dp)
+            ) {
+                CompositionLocalProvider(LocalDensity provides Density(density = LocalDensity.current.density / 2f)) {
+                    AnimatedContent(
+                        targetState = themePreview,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        /*Row(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.secondary,
+                            MaterialTheme.colorScheme.tertiary,
+                            MaterialTheme.colorScheme.surface,
+                            MaterialTheme.colorScheme.surfaceVariant
+                        ).forEach {
+                            Spacer(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()
+                                    .background(it)
+                            )
+                        }
+                    }*/
+                        /*LazyColumn(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    this.ChatUnit(
+                                        isMe = true,
+                                        id = id,
+                                        message = "테마 미리보기", // TODO
+                                        chatSequence = MyView.ChatSequence.Default
+                                    )
+                                }
+                            }
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    this.ChatUnit(
+                                        isMe = false,
+                                        id = id,
+                                        message = "테마 미리보기", // TODO
+                                        chatSequence = MyView.ChatSequence.Default
+                                    )
+                                }
+                            }
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    this.ChatUnit(
+                                        isMe = true,
+                                        id = id,
+                                        message = "테마 미리보기", // TODO
+                                        chatSequence = MyView.ChatSequence.Default
+                                    )
+                                }
+                            }
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    this.ChatUnit(
+                                        isMe = true,
+                                        id = id,
+                                        message = "테마 미리보기", // TODO
+                                        chatSequence = MyView.ChatSequence.Sequence
+                                    )
+                                }
+                            }
+                        }*/
+                        /*Scaffold(
+                            topBar = {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(40.dp)
+                                        .background(MaterialTheme.colorScheme.surface)
+                                        .padding(horizontal = 10.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .width(40.dp)
+                                            .height(10.dp)
+                                            .align(Alignment.CenterStart)
+                                            .background(MaterialTheme.colorScheme.primary)
+                                    )
+                                }
+                            },
+                            bottomBar = {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(40.dp)
+                                        .background(
+                                            MaterialTheme.colorScheme.surfaceColorAtElevation(
+                                                3.dp
+                                            )
+                                        )
+                                ) {
+                                    listOf(
+                                        Icons.Filled.Chat,
+                                        Icons.Filled.People,
+                                        Icons.Filled.Person,
+                                    ).forEachIndexed { index, item ->
+                                        Box(
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .fillMaxHeight()
+                                                .let {
+                                                    if (index == 1) {
+                                                        it
+                                                            .padding(vertical = 7.5.dp, horizontal = 20.dp)
+                                                            .background(
+                                                                color = MaterialTheme.colorScheme.secondary,
+                                                                shape = CircleShape
+                                                            )
+                                                    } else {
+                                                        it.padding(10.dp)
+                                                    }
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = item,
+                                                contentDescription = null, // TODO
+                                                tint = if (index == 1) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            floatingActionButton = {
+                                Box(
+                                    modifier = Modifier
+                                        .width(40.dp)
+                                        .height(40.dp)
+                                        .background(
+                                            color = MaterialTheme.colorScheme.primaryContainer,
+                                            shape = MaterialTheme.shapes.small
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        contentDescription = null, // TODO
+                                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                }
+                            }
+                        ) { paddingValues ->
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(paddingValues = paddingValues)
+                            ) {
+                                listOf(80, 160, 100, 80, 30).forEach { width ->
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(5.dp)
+                                            .width(width.dp)
+                                            .height(10.dp)
+                                            .background(MaterialTheme.colorScheme.onSurface)
+                                    )
+                                }
+                            }
+                        }*/
+                    }
+                }
             }
         }
 

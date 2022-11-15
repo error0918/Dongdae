@@ -5,13 +5,10 @@ package com.taeyeon.dongdae
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -93,7 +90,22 @@ object Profile {
                 title = "개발자 기능", // TODO
                 unitList = listOf(
                     {
-                        // TODO
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(
+                                    state = rememberScrollState()
+                                ),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Unit.ThemePreview.values().forEach { themePreview ->
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Unit.ThemePreviewUnit(
+                                    themePreview = themePreview
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                            }
+                        }
                     },
                     {
                         Unit.TextUnit(title = "TextUnit")
@@ -110,7 +122,7 @@ object Profile {
                         Unit.SwitchUnit(title = "SwitchUnit", checked = Tester.tester, onCheckedChange =  { checked -> Tester.tester = checked })
                     },
                     {
-                        var value by rememberSaveable { mutableStateOf(0f) }
+                        var value by rememberSaveable { mutableStateOf(5f) }
 
                         Unit.SliderUnit(
                             title = "SliderUnit",
@@ -409,6 +421,10 @@ object Profile {
             Surface(
                 color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.medium,
+                border = BorderStroke(
+                    width = 3.dp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
                 modifier = Modifier
                     .width(150.dp)
                     .height(100.dp)
@@ -443,7 +459,8 @@ object Profile {
 
                             ThemePreview.Chat -> {
                                 LazyColumn(
-                                    modifier = Modifier.fillMaxSize()
+                                    modifier = Modifier.fillMaxSize(),
+                                    userScrollEnabled = false
                                 ) {
                                     item {
                                         Box(
@@ -538,7 +555,10 @@ object Profile {
                                                         .let {
                                                             if (index == 1) {
                                                                 it
-                                                                    .padding(vertical = 7.5.dp, horizontal = 20.dp)
+                                                                    .padding(
+                                                                        vertical = 7.5.dp,
+                                                                        horizontal = 20.dp
+                                                                    )
                                                                     .background(
                                                                         color = MaterialTheme.colorScheme.secondary,
                                                                         shape = CircleShape

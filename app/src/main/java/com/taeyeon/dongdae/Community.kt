@@ -180,7 +180,7 @@ object Community {
                     state = lazyListState,
                     contentPadding = PaddingValues(
                         top = 8.dp,
-                        bottom = 8.dp + with (LocalDensity.current) { subTopBarHeight.toDp() }
+                        bottom = 8.dp + with(LocalDensity.current) { subTopBarHeight.toDp() }
                     )
                 ) {
 

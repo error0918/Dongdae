@@ -17,19 +17,22 @@ import androidx.compose.material.icons.filled.CopyAll
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import com.taeyeon.core.Core
 import com.taeyeon.core.Utils
+import com.taeyeon.dongdae.MyView.ChatUnit
 import com.taeyeon.dongdae.ui.theme.Theme
 
 object Profile {
@@ -104,9 +107,62 @@ object Profile {
                                 tonalElevation = 1.dp,
                                 modifier = Modifier
                                     .width(150.dp)
-                                    .height(200.dp)
+                                    .height(100.dp)
                             ) {
-                                Scaffold(
+                                CompositionLocalProvider(LocalDensity provides Density(density = LocalDensity.current.density / 2f)) {
+                                    LazyColumn(
+                                        modifier = Modifier.fillMaxSize()
+                                    ) {
+                                        item {
+                                            Box(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                this.ChatUnit(
+                                                    isMe = true,
+                                                    id = id,
+                                                    message = "테마 미리보기", // TODO
+                                                    chatSequence = MyView.ChatSequence.Default
+                                                )
+                                            }
+                                        }
+                                        item {
+                                            Box(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                this.ChatUnit(
+                                                    isMe = false,
+                                                    id = id,
+                                                    message = "테마 미리보기", // TODO
+                                                    chatSequence = MyView.ChatSequence.Default
+                                                )
+                                            }
+                                        }
+                                        item {
+                                            Box(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                this.ChatUnit(
+                                                    isMe = true,
+                                                    id = id,
+                                                    message = "테마 미리보기", // TODO
+                                                    chatSequence = MyView.ChatSequence.Default
+                                                )
+                                            }
+                                        }
+                                        item {
+                                            Box(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                this.ChatUnit(
+                                                    isMe = true,
+                                                    id = id,
+                                                    message = "테마 미리보기", // TODO
+                                                    chatSequence = MyView.ChatSequence.Sequence
+                                                )
+                                            }
+                                        }
+                                    }
+                                    /*Scaffold(
                                     topBar = {
                                         Box(
                                             modifier = Modifier
@@ -126,6 +182,7 @@ object Profile {
                                     }
                                 ) {
 
+                                }*/
                                 }
                             }
                         }

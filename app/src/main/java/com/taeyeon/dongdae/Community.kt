@@ -67,8 +67,10 @@ object Community {
     @Composable
     fun Community() {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxSize()
         ) {
+            var subTopBarHeight by remember { mutableStateOf(0) }
+
             var categoryIndex by rememberSaveable { mutableStateOf(0) }
             var sortingIndex by rememberSaveable { mutableStateOf(0) }
 
@@ -76,7 +78,10 @@ object Community {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Main.toolbarColor),
+                        .background(Main.toolbarColor)
+                        .onSizeChanged {
+                            subTopBarHeight = it.height
+                        },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -175,7 +180,7 @@ object Community {
                     state = lazyListState,
                     contentPadding = PaddingValues(
                         top = 8.dp,
-                        bottom = 8.dp
+                        bottom = 8.dp + with (LocalDensity.current) { subTopBarHeight.toDp() }
                     )
                 ) {
 

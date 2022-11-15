@@ -109,6 +109,9 @@ object Profile {
                             onCheckedChange = { checked -> Tester.tester = checked })
                     },
                     {
+                        // TODO: DropDownUnit
+                    },
+                    {
                         var value by rememberSaveable { mutableStateOf(5f) }
 
                         Unit.SliderUnit(
@@ -119,129 +122,34 @@ object Profile {
                         )
                     },
                     {
-                        var themePreview by rememberSaveable { mutableStateOf(Unit.ThemePreview.Palette) }
+                        var value by rememberSaveable { mutableStateOf(0) }
 
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(40.dp)
-                                    .padding(horizontal = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "테마",
-                                    color = MaterialTheme.colorScheme.primary,
-                                    style = MaterialTheme.typography.labelLarge
-                                )
-                                Row(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.End
-                                ) {
-                                    Unit.ThemePreview.values().forEach { themePreview_ ->
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Surface(
-                                            color = Color.Transparent,
-                                            shape = MaterialTheme.shapes.medium,
-                                            onClick = { themePreview = themePreview_ }
-                                        ) {
-                                            Row(
-                                                modifier = Modifier.padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                            ) {
-                                                RadioButton(
-                                                    selected = themePreview == themePreview_,
-                                                    onClick = null
-                                                )
-                                                Text(
-                                                    text = Unit.themePreviewMap[themePreview_]!!,
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                    style = MaterialTheme.typography.labelLarge
-                                                )
-                                            }
-                                        }
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                    }
-                                }
-                            }
-                            Surface(
-                                color = Color.Transparent,
-                                shape = MaterialTheme.shapes.medium
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .horizontalScroll(
-                                            state = rememberScrollState()
-                                        ),
-                                    horizontalArrangement = Arrangement.SpaceEvenly
-                                ) {
-                                    val themeDataList: Map<@Composable (@Composable () -> kotlin.Unit) -> kotlin.Unit, String> =
-                                        mapOf(
-                                            @Composable { content: @Composable () -> kotlin.Unit ->
-                                                Theme(
-                                                    darkTheme = false,
-                                                    content = content
-                                                )
-                                            } to "라이트 모드",
-                                            @Composable { content: @Composable () -> kotlin.Unit ->
-                                                Theme(
-                                                    darkTheme = true,
-                                                    content = content
-                                                )
-                                            } to "다크 모드",
-                                            @Composable { content: @Composable () -> kotlin.Unit ->
-                                                Theme(
-                                                    darkTheme = isSystemInDarkTheme(),
-                                                    content = content
-                                                )
-                                            } to "시스템 설정"
-                                        )
-
-                                    themeDataList.forEach { pair ->
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Surface(
-                                            color = Color.Transparent,
-                                            shape = MaterialTheme.shapes.medium,
-                                            onClick = { /* TODO */ }
-                                        ) {
-                                            Column(
-                                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                                                horizontalAlignment = Alignment.CenterHorizontally
-                                            ) {
-                                                Unit.ThemePreviewUnit(
-                                                    theme = pair.key,
-                                                    themePreview = themePreview
-                                                )
-                                                Row(
-                                                    verticalAlignment = Alignment.CenterVertically,
-                                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                                ) {
-                                                    RadioButton(
-                                                        selected = true,
-                                                        onClick = null
-                                                    )
-                                                    Text(
-                                                        text = pair.value,
-                                                        color = MaterialTheme.colorScheme.primary,
-                                                        style = MaterialTheme.typography.labelLarge
-                                                    )
-                                                }
-                                            }
-                                        }
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                    }
-                                }
-                            }
-                        }
+                        Unit.ThemeSelectUnit(
+                            selected = value,
+                            onSelected = { selected ->
+                                value = selected
+                            },
+                            themeDataMap = mapOf(
+                                @Composable { content: @Composable () -> kotlin.Unit ->
+                                    Theme(
+                                        darkTheme = false,
+                                        content = content
+                                    )
+                                } to "라이트 모드",
+                                @Composable { content: @Composable () -> kotlin.Unit ->
+                                    Theme(
+                                        darkTheme = true,
+                                        content = content
+                                    )
+                                } to "다크 모드",
+                                @Composable { content: @Composable () -> kotlin.Unit ->
+                                    Theme(
+                                        darkTheme = isSystemInDarkTheme(),
+                                        content = content
+                                    )
+                                } to "시스템 설정"
+                            )
+                        )
                     }
                 )
             ),
@@ -753,6 +661,115 @@ object Profile {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        @Composable
+        fun ThemeSelectUnit(
+            selected: Int,
+            onSelected: (selected: Int) -> kotlin.Unit,
+            themeDataMap: Map<@Composable (@Composable () -> kotlin.Unit) -> kotlin.Unit, String>
+        ) {
+            var themePreview by rememberSaveable { mutableStateOf(ThemePreview.Palette) }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp)
+                        .padding(horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "테마",
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                    Row(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        ThemePreview.values().forEach { themePreview_ ->
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Surface(
+                                color = Color.Transparent,
+                                shape = MaterialTheme.shapes.medium,
+                                onClick = { themePreview = themePreview_ }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    RadioButton(
+                                        selected = themePreview == themePreview_,
+                                        onClick = null
+                                    )
+                                    Text(
+                                        text = themePreviewMap[themePreview_]!!,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.width(4.dp))
+                        }
+                    }
+                }
+                Surface(
+                    color = Color.Transparent,
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(
+                                state = rememberScrollState()
+                            ),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        themeDataMap.entries.forEachIndexed { index, pair ->
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Surface(
+                                color = Color.Transparent,
+                                shape = MaterialTheme.shapes.medium,
+                                onClick = { onSelected(index) }
+                            ) {
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    ThemePreviewUnit(
+                                        theme = pair.key,
+                                        themePreview = themePreview
+                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        RadioButton(
+                                            selected = selected == index,
+                                            onClick = null
+                                        )
+                                        Text(
+                                            text = pair.value,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            style = MaterialTheme.typography.labelLarge
+                                        )
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.width(4.dp))
                         }
                     }
                 }

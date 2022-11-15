@@ -13,8 +13,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CopyAll
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -104,13 +103,30 @@ object Profile {
                             Surface(
                                 color = MaterialTheme.colorScheme.surface,
                                 shape = MaterialTheme.shapes.medium,
-                                tonalElevation = 1.dp,
                                 modifier = Modifier
                                     .width(150.dp)
                                     .height(100.dp)
                             ) {
                                 CompositionLocalProvider(LocalDensity provides Density(density = LocalDensity.current.density / 2f)) {
-                                    LazyColumn(
+                                    /*Row(
+                                        modifier = Modifier.fillMaxSize()
+                                    ) {
+                                        listOf(
+                                            MaterialTheme.colorScheme.primary,
+                                            MaterialTheme.colorScheme.secondary,
+                                            MaterialTheme.colorScheme.tertiary,
+                                            MaterialTheme.colorScheme.surface,
+                                            MaterialTheme.colorScheme.surfaceVariant
+                                        ).forEach {
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .fillMaxHeight()
+                                                    .background(it)
+                                            )
+                                        }
+                                    }*/
+                                    /*LazyColumn(
                                         modifier = Modifier.fillMaxSize()
                                     ) {
                                         item {
@@ -161,28 +177,92 @@ object Profile {
                                                 )
                                             }
                                         }
-                                    }
-                                    /*Scaffold(
-                                    topBar = {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(30.dp)
-                                                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
-                                                .padding(horizontal = 8.dp)
-                                        ) {
+                                    }*/
+                                    Scaffold(
+                                        topBar = {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(40.dp)
+                                                    .background(MaterialTheme.colorScheme.surface)
+                                                    .padding(horizontal = 10.dp)
+                                            ) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .width(40.dp)
+                                                        .height(10.dp)
+                                                        .align(Alignment.CenterStart)
+                                                        .background(MaterialTheme.colorScheme.primary)
+                                                )
+                                            }
+                                        },
+                                        bottomBar = {
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(40.dp)
+                                                    .background(
+                                                        MaterialTheme.colorScheme.surfaceColorAtElevation(
+                                                            3.dp
+                                                        )
+                                                    )
+                                            ) {
+                                                listOf(
+                                                    Icons.Filled.Chat,
+                                                    Icons.Filled.People,
+                                                    Icons.Filled.Person,
+                                                ).forEach {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .weight(1f)
+                                                            .fillMaxHeight()
+                                                            .padding(10.dp),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = it,
+                                                            contentDescription = null, // TODO
+                                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        floatingActionButton = {
                                             Box(
                                                 modifier = Modifier
                                                     .width(40.dp)
-                                                    .height(10.dp)
-                                                    .align(Alignment.CenterStart)
-                                                    .background(MaterialTheme.colorScheme.primary)
-                                            )
+                                                    .height(40.dp)
+                                                    .background(
+                                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                                        shape = MaterialTheme.shapes.small
+                                                    ),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.Edit,
+                                                    contentDescription = null, // TODO
+                                                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                                )
+                                            }
+                                        }
+                                    ) { paddingValues ->
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(paddingValues = paddingValues)
+                                        ) {
+                                            listOf(80, 160, 100, 80, 30).forEach { width ->
+                                                Box(
+                                                    modifier = Modifier
+                                                        .padding(5.dp)
+                                                        .width(width.dp)
+                                                        .height(10.dp)
+                                                        .background(MaterialTheme.colorScheme.onSurface)
+                                                )
+                                            }
                                         }
                                     }
-                                ) {
-
-                                }*/
                                 }
                             }
                         }

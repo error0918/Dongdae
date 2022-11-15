@@ -19,6 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -90,24 +91,6 @@ object Profile {
                 title = "개발자 기능", // TODO
                 unitList = listOf(
                     {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .horizontalScroll(
-                                    state = rememberScrollState()
-                                ),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            Unit.ThemePreview.values().forEach { themePreview ->
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Unit.ThemePreviewUnit(
-                                    themePreview = themePreview
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                            }
-                        }
-                    },
-                    {
                         Unit.TextUnit(title = "TextUnit")
                     },
                     {
@@ -130,6 +113,108 @@ object Profile {
                             onValueChange = { value_ -> value = value_},
                             valueRange = 0f .. 10f
                         )
+                    },
+                    {
+                        var themePreview by rememberSaveable { mutableStateOf(Unit.ThemePreview.Palette) }
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(40.dp)
+                                    .padding(horizontal = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "테마",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+                                Row(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    Unit.ThemePreview.values().forEach { themePreview_ ->
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Surface(
+                                            color = Color.Transparent,
+                                            shape = MaterialTheme.shapes.medium,
+                                            onClick = { themePreview = themePreview_ }
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                            ) {
+                                                RadioButton(
+                                                    selected = themePreview == themePreview_,
+                                                    onClick = null
+                                                )
+                                                Text(
+                                                    text = Unit.themePreviewMap[themePreview_]!!,
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    style = MaterialTheme.typography.labelLarge
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                    }
+                                }
+                            }
+                            Surface(
+                                color = Color.Transparent,
+                                shape = MaterialTheme.shapes.medium
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .horizontalScroll(
+                                            state = rememberScrollState()
+                                        ),
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    for (i in 1..10) {
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Surface(
+                                            color = Color.Transparent,
+                                            shape = MaterialTheme.shapes.medium,
+                                            onClick = { /* TODO */ }
+                                        ) {
+                                            Column(
+                                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            ) {
+                                                Unit.ThemePreviewUnit(
+                                                    themePreview = themePreview
+                                                )
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                                ) {
+                                                    RadioButton(
+                                                        selected = true,
+                                                        onClick = null
+                                                    )
+                                                    Text(
+                                                        text = "TODO",
+                                                        color = MaterialTheme.colorScheme.primary,
+                                                        style = MaterialTheme.typography.labelLarge
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                    }
+                                }
+                            }
+                        }
                     }
                 )
             ),
@@ -410,7 +495,7 @@ object Profile {
 
         val themePreviewMap = mapOf(
             ThemePreview.Palette to "팔레트",
-            ThemePreview.Chat to "체팅",
+            ThemePreview.Chat to "채팅",
             ThemePreview.Screen to "화면",
         ) // TODO
 
@@ -429,192 +514,199 @@ object Profile {
                     .width(150.dp)
                     .height(100.dp)
             ) {
-                CompositionLocalProvider(LocalDensity provides Density(density = LocalDensity.current.density / 2f)) {
-                    AnimatedContent(
-                        targetState = themePreview,
-                        modifier = Modifier.fillMaxSize()
-                    ) { themePreview ->
-                        when(themePreview) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(1.5.dp)
+                ) {
+                    CompositionLocalProvider(LocalDensity provides Density(density = LocalDensity.current.density / 2f)) {
+                        AnimatedContent(
+                            targetState = themePreview,
+                            modifier = Modifier.fillMaxSize()
+                        ) { themePreview ->
+                            when (themePreview) {
 
-                            ThemePreview.Palette -> {
-                                Row(
-                                    modifier = Modifier.fillMaxSize()
-                                ) {
-                                    listOf(
-                                        MaterialTheme.colorScheme.primary,
-                                        MaterialTheme.colorScheme.secondary,
-                                        MaterialTheme.colorScheme.tertiary,
-                                        MaterialTheme.colorScheme.surface,
-                                        MaterialTheme.colorScheme.surfaceVariant
-                                    ).forEach {
-                                        Spacer(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .fillMaxHeight()
-                                                .background(it)
-                                        )
-                                    }
-                                }
-                            }
-
-                            ThemePreview.Chat -> {
-                                LazyColumn(
-                                    modifier = Modifier.fillMaxSize(),
-                                    userScrollEnabled = false
-                                ) {
-                                    item {
-                                        Box(
-                                            modifier = Modifier.fillMaxWidth()
-                                        ) {
-                                            this.ChatUnit(
-                                                isMe = true,
-                                                id = id,
-                                                message = "테마 미리보기", // TODO
-                                                chatSequence = MyView.ChatSequence.Default
-                                            )
-                                        }
-                                    }
-                                    item {
-                                        Box(
-                                            modifier = Modifier.fillMaxWidth()
-                                        ) {
-                                            this.ChatUnit(
-                                                isMe = false,
-                                                id = id,
-                                                message = "테마 미리보기", // TODO
-                                                chatSequence = MyView.ChatSequence.Default
-                                            )
-                                        }
-                                    }
-                                    item {
-                                        Box(
-                                            modifier = Modifier.fillMaxWidth()
-                                        ) {
-                                            this.ChatUnit(
-                                                isMe = true,
-                                                id = id,
-                                                message = "테마 미리보기", // TODO
-                                                chatSequence = MyView.ChatSequence.Default
-                                            )
-                                        }
-                                    }
-                                    item {
-                                        Box(
-                                            modifier = Modifier.fillMaxWidth()
-                                        ) {
-                                            this.ChatUnit(
-                                                isMe = true,
-                                                id = id,
-                                                message = "테마 미리보기", // TODO
-                                                chatSequence = MyView.ChatSequence.Sequence
+                                ThemePreview.Palette -> {
+                                    Row(
+                                        modifier = Modifier.fillMaxSize()
+                                    ) {
+                                        listOf(
+                                            MaterialTheme.colorScheme.primary,
+                                            MaterialTheme.colorScheme.secondary,
+                                            MaterialTheme.colorScheme.tertiary,
+                                            MaterialTheme.colorScheme.surface,
+                                            MaterialTheme.colorScheme.surfaceVariant
+                                        ).forEach {
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .fillMaxHeight()
+                                                    .background(it)
                                             )
                                         }
                                     }
                                 }
-                            }
 
-                            ThemePreview.Screen -> {
-                                Scaffold(
-                                    topBar = {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(40.dp)
-                                                .background(MaterialTheme.colorScheme.surface)
-                                                .padding(horizontal = 10.dp)
-                                        ) {
+                                ThemePreview.Chat -> {
+                                    LazyColumn(
+                                        modifier = Modifier.fillMaxSize(),
+                                        userScrollEnabled = false
+                                    ) {
+                                        item {
+                                            Box(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                this.ChatUnit(
+                                                    isMe = true,
+                                                    id = id,
+                                                    message = "테마 미리보기", // TODO
+                                                    chatSequence = MyView.ChatSequence.Default
+                                                )
+                                            }
+                                        }
+                                        item {
+                                            Box(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                this.ChatUnit(
+                                                    isMe = false,
+                                                    id = id,
+                                                    message = "테마 미리보기", // TODO
+                                                    chatSequence = MyView.ChatSequence.Default
+                                                )
+                                            }
+                                        }
+                                        item {
+                                            Box(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                this.ChatUnit(
+                                                    isMe = true,
+                                                    id = id,
+                                                    message = "테마 미리보기", // TODO
+                                                    chatSequence = MyView.ChatSequence.Default
+                                                )
+                                            }
+                                        }
+                                        item {
+                                            Box(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                this.ChatUnit(
+                                                    isMe = true,
+                                                    id = id,
+                                                    message = "테마 미리보기", // TODO
+                                                    chatSequence = MyView.ChatSequence.Sequence
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+
+                                ThemePreview.Screen -> {
+                                    Scaffold(
+                                        topBar = {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(40.dp)
+                                                    .background(MaterialTheme.colorScheme.surface)
+                                                    .padding(horizontal = 10.dp)
+                                            ) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .width(40.dp)
+                                                        .height(10.dp)
+                                                        .align(Alignment.CenterStart)
+                                                        .background(MaterialTheme.colorScheme.primary)
+                                                )
+                                            }
+                                        },
+                                        bottomBar = {
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(40.dp)
+                                                    .background(
+                                                        MaterialTheme.colorScheme.surfaceColorAtElevation(
+                                                            3.dp
+                                                        )
+                                                    )
+                                            ) {
+                                                listOf(
+                                                    Icons.Filled.Chat,
+                                                    Icons.Filled.People,
+                                                    Icons.Filled.Person,
+                                                ).forEachIndexed { index, item ->
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .weight(1f)
+                                                            .fillMaxHeight()
+                                                            .let {
+                                                                if (index == 1) {
+                                                                    it
+                                                                        .padding(
+                                                                            vertical = 7.5.dp,
+                                                                            horizontal = 20.dp
+                                                                        )
+                                                                        .background(
+                                                                            color = MaterialTheme.colorScheme.secondary,
+                                                                            shape = CircleShape
+                                                                        )
+                                                                } else {
+                                                                    it.padding(10.dp)
+                                                                }
+                                                            },
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = item,
+                                                            contentDescription = null, // TODO
+                                                            tint = if (index == 1) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurfaceVariant
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        floatingActionButton = {
                                             Box(
                                                 modifier = Modifier
                                                     .width(40.dp)
-                                                    .height(10.dp)
-                                                    .align(Alignment.CenterStart)
-                                                    .background(MaterialTheme.colorScheme.primary)
-                                            )
-                                        }
-                                    },
-                                    bottomBar = {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(40.dp)
-                                                .background(
-                                                    MaterialTheme.colorScheme.surfaceColorAtElevation(
-                                                        3.dp
+                                                    .height(40.dp)
+                                                    .background(
+                                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                                        shape = MaterialTheme.shapes.small
                                                     )
+                                                    .padding(10.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.Edit,
+                                                    contentDescription = null, // TODO
+                                                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                                                 )
-                                        ) {
-                                            listOf(
-                                                Icons.Filled.Chat,
-                                                Icons.Filled.People,
-                                                Icons.Filled.Person,
-                                            ).forEachIndexed { index, item ->
-                                                Box(
-                                                    modifier = Modifier
-                                                        .weight(1f)
-                                                        .fillMaxHeight()
-                                                        .let {
-                                                            if (index == 1) {
-                                                                it
-                                                                    .padding(
-                                                                        vertical = 7.5.dp,
-                                                                        horizontal = 20.dp
-                                                                    )
-                                                                    .background(
-                                                                        color = MaterialTheme.colorScheme.secondary,
-                                                                        shape = CircleShape
-                                                                    )
-                                                            } else {
-                                                                it.padding(10.dp)
-                                                            }
-                                                        },
-                                                    contentAlignment = Alignment.Center
-                                                ) {
-                                                    Icon(
-                                                        imageVector = item,
-                                                        contentDescription = null, // TODO
-                                                        tint = if (index == 1) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurfaceVariant
-                                                    )
-                                                }
                                             }
                                         }
-                                    },
-                                    floatingActionButton = {
-                                        Box(
+                                    ) { paddingValues ->
+                                        Column(
                                             modifier = Modifier
-                                                .width(40.dp)
-                                                .height(40.dp)
-                                                .background(
-                                                    color = MaterialTheme.colorScheme.primaryContainer,
-                                                    shape = MaterialTheme.shapes.small
-                                                ),
-                                            contentAlignment = Alignment.Center
+                                                .fillMaxSize()
+                                                .padding(paddingValues = paddingValues)
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.Filled.Edit,
-                                                contentDescription = null, // TODO
-                                                tint = MaterialTheme.colorScheme.onPrimaryContainer
-                                            )
-                                        }
-                                    }
-                                ) { paddingValues ->
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(paddingValues = paddingValues)
-                                    ) {
-                                        listOf(80, 160, 100, 80, 30).forEach { width ->
-                                            Box(
-                                                modifier = Modifier
-                                                    .padding(5.dp)
-                                                    .width(width.dp)
-                                                    .height(10.dp)
-                                                    .background(MaterialTheme.colorScheme.onSurface)
-                                            )
+                                            listOf(80, 160, 100, 80, 30).forEach { width ->
+                                                Box(
+                                                    modifier = Modifier
+                                                        .padding(5.dp)
+                                                        .width(width.dp)
+                                                        .height(10.dp)
+                                                        .background(MaterialTheme.colorScheme.onSurface)
+                                                )
+                                            }
                                         }
                                     }
                                 }
-                            }
 
+                            }
                         }
                     }
                 }

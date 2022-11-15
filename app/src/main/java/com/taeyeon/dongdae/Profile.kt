@@ -10,6 +10,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Person
@@ -105,12 +106,6 @@ object Profile {
                         }
                     },
                     {
-                        Unit.SwitchUnit(
-                            title = "SwitchUnit",
-                            checked = Tester.tester,
-                            onCheckedChange = { checked -> Tester.tester = checked })
-                    },
-                    {
                         var selected by rememberSaveable { mutableStateOf(0) }
                         val list = listOf("하나", "둘", "셋")
 
@@ -122,6 +117,15 @@ object Profile {
                             },
                             list = list
                         )
+                    },
+                    {
+
+                    },
+                    {
+                        Unit.SwitchUnit(
+                            title = "SwitchUnit",
+                            checked = Tester.tester,
+                            onCheckedChange = { checked -> Tester.tester = checked })
                     },
                     {
                         var value by rememberSaveable { mutableStateOf(5f) }
@@ -670,8 +674,11 @@ object Profile {
                                                             modifier = Modifier
                                                                 .width(40.dp)
                                                                 .height(10.dp)
-                                                                .align(Alignment.CenterStart)
-                                                                .background(MaterialTheme.colorScheme.primary)
+                                                                .align(Alignment.Center)
+                                                                .background(
+                                                                    color = MaterialTheme.colorScheme.primary,
+                                                                    shape = RoundedCornerShape(percent = 20)
+                                                                )
                                                         )
                                                     }
                                                 },
@@ -752,7 +759,10 @@ object Profile {
                                                                 .padding(5.dp)
                                                                 .width(width.dp)
                                                                 .height(10.dp)
-                                                                .background(MaterialTheme.colorScheme.onSurface)
+                                                                .background(
+                                                                    color = MaterialTheme.colorScheme.onSurface,
+                                                                    shape = RoundedCornerShape(percent = 20)
+                                                                )
                                                         )
                                                     }
                                                 }
@@ -781,49 +791,50 @@ object Profile {
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(40.dp)
-                        .padding(horizontal = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(horizontal = 12.dp)
                 ) {
                     Text(
                         text = "테마",
                         color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.labelLarge
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier.align(Alignment.CenterStart)
                     )
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceColorAtElevation(9.dp),
+                        shape = MaterialTheme.shapes.medium,
+                        modifier = Modifier.align(Alignment.CenterEnd)
                     ) {
-                        ThemePreview.values().forEach { themePreview_ ->
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Surface(
-                                color = Color.Transparent,
-                                shape = MaterialTheme.shapes.medium,
-                                onClick = { themePreview = themePreview_ }
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            ThemePreview.values().forEach { themePreview_ ->
+                                Surface(
+                                    color = Color.Transparent,
+                                    shape = MaterialTheme.shapes.medium,
+                                    onClick = { themePreview = themePreview_ }
                                 ) {
-                                    RadioButton(
-                                        selected = themePreview == themePreview_,
-                                        onClick = null
-                                    )
-                                    Text(
-                                        text = themePreviewMap[themePreview_]!!,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        style = MaterialTheme.typography.labelLarge
-                                    )
+                                    Row(
+                                        modifier = Modifier.padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        RadioButton(
+                                            selected = themePreview == themePreview_,
+                                            onClick = null
+                                        )
+                                        Text(
+                                            text = themePreviewMap[themePreview_]!!,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            style = MaterialTheme.typography.labelLarge
+                                        )
+                                    }
                                 }
                             }
-                            Spacer(modifier = Modifier.width(4.dp))
                         }
                     }
                 }

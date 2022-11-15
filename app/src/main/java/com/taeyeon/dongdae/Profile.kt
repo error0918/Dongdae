@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.taeyeon.core.Utils
 import com.taeyeon.dongdae.MyView.ChatUnit
+import com.taeyeon.dongdae.ui.theme.Theme
 
 object Profile {
     private val lazyListState = LazyListState()
@@ -88,7 +89,7 @@ object Profile {
                 )
             ),
             Unit.BlockData(
-                title = "개발자 기능", // TODO
+                title = "설정", // TODO
                 unitList = listOf(
                     {
                         Unit.TextUnit(title = "TextUnit")
@@ -102,7 +103,10 @@ object Profile {
                         }
                     },
                     {
-                        Unit.SwitchUnit(title = "SwitchUnit", checked = Tester.tester, onCheckedChange =  { checked -> Tester.tester = checked })
+                        Unit.SwitchUnit(
+                            title = "SwitchUnit",
+                            checked = Tester.tester,
+                            onCheckedChange = { checked -> Tester.tester = checked })
                     },
                     {
                         var value by rememberSaveable { mutableStateOf(5f) }
@@ -110,8 +114,8 @@ object Profile {
                         Unit.SliderUnit(
                             title = "SliderUnit",
                             value = value,
-                            onValueChange = { value_ -> value = value_},
-                            valueRange = 0f .. 10f
+                            onValueChange = { value_ -> value = value_ },
+                            valueRange = 0f..10f
                         )
                     },
                     {
@@ -180,7 +184,29 @@ object Profile {
                                         ),
                                     horizontalArrangement = Arrangement.SpaceEvenly
                                 ) {
-                                    for (i in 1..10) {
+                                    val themeDataList: Map<@Composable (@Composable () -> kotlin.Unit) -> kotlin.Unit, String> =
+                                        mapOf(
+                                            @Composable { content: @Composable () -> kotlin.Unit ->
+                                                Theme(
+                                                    darkTheme = false,
+                                                    content = content
+                                                )
+                                            } to "라이트 모드",
+                                            @Composable { content: @Composable () -> kotlin.Unit ->
+                                                Theme(
+                                                    darkTheme = true,
+                                                    content = content
+                                                )
+                                            } to "다크 모드",
+                                            @Composable { content: @Composable () -> kotlin.Unit ->
+                                                Theme(
+                                                    darkTheme = isSystemInDarkTheme(),
+                                                    content = content
+                                                )
+                                            } to "시스템 설정"
+                                        )
+
+                                    themeDataList.forEach { pair ->
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Surface(
                                             color = Color.Transparent,
@@ -192,6 +218,7 @@ object Profile {
                                                 horizontalAlignment = Alignment.CenterHorizontally
                                             ) {
                                                 Unit.ThemePreviewUnit(
+                                                    theme = pair.key,
                                                     themePreview = themePreview
                                                 )
                                                 Row(
@@ -203,7 +230,7 @@ object Profile {
                                                         onClick = null
                                                     )
                                                     Text(
-                                                        text = "TODO",
+                                                        text = pair.value,
                                                         color = MaterialTheme.colorScheme.primary,
                                                         style = MaterialTheme.typography.labelLarge
                                                     )
@@ -271,8 +298,8 @@ object Profile {
                             .fillMaxWidth()
                             .height(IntrinsicSize.Min),
                         colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     ) {
                         Column(
@@ -283,7 +310,8 @@ object Profile {
                             unitList.forEachIndexed { index, unit ->
                                 unit()
                                 if (index != unitList.size - 1) {
-                                    val dividerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                                    val dividerColor =
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
                                     Canvas(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -294,7 +322,12 @@ object Profile {
                                             color = dividerColor,
                                             start = Offset(0f, 0f),
                                             end = Offset(size.width, 0f),
-                                            pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f))
+                                            pathEffect = PathEffect.dashPathEffect(
+                                                floatArrayOf(
+                                                    10f,
+                                                    10f
+                                                )
+                                            )
                                         )
                                     }
                                 }
@@ -501,211 +534,224 @@ object Profile {
 
         @Composable
         fun ThemePreviewUnit(
+            theme: @Composable (@Composable () -> kotlin.Unit) -> kotlin.Unit = @Composable { content ->
+                Theme(
+                    content = content
+                )
+            },
             themePreview: ThemePreview = ThemePreview.Palette
         ) {
             Surface(
-                color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.medium,
                 border = BorderStroke(
                     width = 3.dp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
                 modifier = Modifier
-                    .width(150.dp)
-                    .height(100.dp)
+                    .width(150.dp + 3.dp)
+                    .height(100.dp + 3.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(1.5.dp)
                 ) {
-                    CompositionLocalProvider(LocalDensity provides Density(density = LocalDensity.current.density / 2f)) {
-                        AnimatedContent(
-                            targetState = themePreview,
+                    theme {
+                        Surface(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.medium,
                             modifier = Modifier.fillMaxSize()
-                        ) { themePreview ->
-                            when (themePreview) {
+                        ) {
+                            //
+                            CompositionLocalProvider(LocalDensity provides Density(density = LocalDensity.current.density / 2f)) {
+                                AnimatedContent(
+                                    targetState = themePreview,
+                                    modifier = Modifier.fillMaxSize()
+                                ) { themePreview ->
+                                    when (themePreview) {
 
-                                ThemePreview.Palette -> {
-                                    Row(
-                                        modifier = Modifier.fillMaxSize()
-                                    ) {
-                                        listOf(
-                                            MaterialTheme.colorScheme.primary,
-                                            MaterialTheme.colorScheme.secondary,
-                                            MaterialTheme.colorScheme.tertiary,
-                                            MaterialTheme.colorScheme.surface,
-                                            MaterialTheme.colorScheme.surfaceVariant
-                                        ).forEach {
-                                            Spacer(
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .fillMaxHeight()
-                                                    .background(it)
-                                            )
-                                        }
-                                    }
-                                }
-
-                                ThemePreview.Chat -> {
-                                    LazyColumn(
-                                        modifier = Modifier.fillMaxSize(),
-                                        userScrollEnabled = false
-                                    ) {
-                                        item {
-                                            Box(
-                                                modifier = Modifier.fillMaxWidth()
-                                            ) {
-                                                this.ChatUnit(
-                                                    isMe = true,
-                                                    id = id,
-                                                    message = "테마 미리보기", // TODO
-                                                    chatSequence = MyView.ChatSequence.Default
-                                                )
-                                            }
-                                        }
-                                        item {
-                                            Box(
-                                                modifier = Modifier.fillMaxWidth()
-                                            ) {
-                                                this.ChatUnit(
-                                                    isMe = false,
-                                                    id = id,
-                                                    message = "테마 미리보기", // TODO
-                                                    chatSequence = MyView.ChatSequence.Default
-                                                )
-                                            }
-                                        }
-                                        item {
-                                            Box(
-                                                modifier = Modifier.fillMaxWidth()
-                                            ) {
-                                                this.ChatUnit(
-                                                    isMe = true,
-                                                    id = id,
-                                                    message = "테마 미리보기", // TODO
-                                                    chatSequence = MyView.ChatSequence.Default
-                                                )
-                                            }
-                                        }
-                                        item {
-                                            Box(
-                                                modifier = Modifier.fillMaxWidth()
-                                            ) {
-                                                this.ChatUnit(
-                                                    isMe = true,
-                                                    id = id,
-                                                    message = "테마 미리보기", // TODO
-                                                    chatSequence = MyView.ChatSequence.Sequence
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-
-                                ThemePreview.Screen -> {
-                                    Scaffold(
-                                        topBar = {
-                                            Box(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .height(40.dp)
-                                                    .background(MaterialTheme.colorScheme.surface)
-                                                    .padding(horizontal = 10.dp)
-                                            ) {
-                                                Box(
-                                                    modifier = Modifier
-                                                        .width(40.dp)
-                                                        .height(10.dp)
-                                                        .align(Alignment.CenterStart)
-                                                        .background(MaterialTheme.colorScheme.primary)
-                                                )
-                                            }
-                                        },
-                                        bottomBar = {
+                                        ThemePreview.Palette -> {
                                             Row(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .height(40.dp)
-                                                    .background(
-                                                        MaterialTheme.colorScheme.surfaceColorAtElevation(
-                                                            3.dp
-                                                        )
-                                                    )
+                                                modifier = Modifier.fillMaxSize()
                                             ) {
                                                 listOf(
-                                                    Icons.Filled.Chat,
-                                                    Icons.Filled.People,
-                                                    Icons.Filled.Person,
-                                                ).forEachIndexed { index, item ->
-                                                    Box(
+                                                    MaterialTheme.colorScheme.primary,
+                                                    MaterialTheme.colorScheme.secondary,
+                                                    MaterialTheme.colorScheme.tertiary,
+                                                    MaterialTheme.colorScheme.surface,
+                                                    MaterialTheme.colorScheme.surfaceVariant
+                                                ).forEach {
+                                                    Spacer(
                                                         modifier = Modifier
                                                             .weight(1f)
                                                             .fillMaxHeight()
-                                                            .let {
-                                                                if (index == 1) {
-                                                                    it
-                                                                        .padding(
-                                                                            vertical = 7.5.dp,
-                                                                            horizontal = 20.dp
-                                                                        )
-                                                                        .background(
-                                                                            color = MaterialTheme.colorScheme.secondary,
-                                                                            shape = CircleShape
-                                                                        )
-                                                                } else {
-                                                                    it.padding(10.dp)
-                                                                }
-                                                            },
-                                                        contentAlignment = Alignment.Center
+                                                            .background(it)
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                        ThemePreview.Chat -> {
+                                            LazyColumn(
+                                                modifier = Modifier.fillMaxSize(),
+                                                userScrollEnabled = false
+                                            ) {
+                                                item {
+                                                    Box(
+                                                        modifier = Modifier.fillMaxWidth()
                                                     ) {
-                                                        Icon(
-                                                            imageVector = item,
-                                                            contentDescription = null, // TODO
-                                                            tint = if (index == 1) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurfaceVariant
+                                                        this.ChatUnit(
+                                                            isMe = true,
+                                                            id = id,
+                                                            message = "테마 미리보기", // TODO
+                                                            chatSequence = MyView.ChatSequence.Default
+                                                        )
+                                                    }
+                                                }
+                                                item {
+                                                    Box(
+                                                        modifier = Modifier.fillMaxWidth()
+                                                    ) {
+                                                        this.ChatUnit(
+                                                            isMe = false,
+                                                            id = id,
+                                                            message = "테마 미리보기", // TODO
+                                                            chatSequence = MyView.ChatSequence.Default
+                                                        )
+                                                    }
+                                                }
+                                                item {
+                                                    Box(
+                                                        modifier = Modifier.fillMaxWidth()
+                                                    ) {
+                                                        this.ChatUnit(
+                                                            isMe = true,
+                                                            id = id,
+                                                            message = "테마 미리보기", // TODO
+                                                            chatSequence = MyView.ChatSequence.Default
+                                                        )
+                                                    }
+                                                }
+                                                item {
+                                                    Box(
+                                                        modifier = Modifier.fillMaxWidth()
+                                                    ) {
+                                                        this.ChatUnit(
+                                                            isMe = true,
+                                                            id = id,
+                                                            message = "테마 미리보기", // TODO
+                                                            chatSequence = MyView.ChatSequence.Sequence
                                                         )
                                                     }
                                                 }
                                             }
-                                        },
-                                        floatingActionButton = {
-                                            Box(
-                                                modifier = Modifier
-                                                    .width(40.dp)
-                                                    .height(40.dp)
-                                                    .background(
-                                                        color = MaterialTheme.colorScheme.primaryContainer,
-                                                        shape = MaterialTheme.shapes.small
-                                                    )
-                                                    .padding(10.dp),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Filled.Edit,
-                                                    contentDescription = null, // TODO
-                                                    tint = MaterialTheme.colorScheme.onPrimaryContainer
-                                                )
-                                            }
                                         }
-                                    ) { paddingValues ->
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .padding(paddingValues = paddingValues)
-                                        ) {
-                                            listOf(80, 160, 100, 80, 30).forEach { width ->
-                                                Box(
+
+                                        ThemePreview.Screen -> {
+                                            Scaffold(
+                                                topBar = {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .height(40.dp)
+                                                            .background(MaterialTheme.colorScheme.surface)
+                                                            .padding(horizontal = 10.dp)
+                                                    ) {
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .width(40.dp)
+                                                                .height(10.dp)
+                                                                .align(Alignment.CenterStart)
+                                                                .background(MaterialTheme.colorScheme.primary)
+                                                        )
+                                                    }
+                                                },
+                                                bottomBar = {
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .height(40.dp)
+                                                            .background(
+                                                                MaterialTheme.colorScheme.surfaceColorAtElevation(
+                                                                    3.dp
+                                                                )
+                                                            )
+                                                    ) {
+                                                        listOf(
+                                                            Icons.Filled.Chat,
+                                                            Icons.Filled.People,
+                                                            Icons.Filled.Person,
+                                                        ).forEachIndexed { index, item ->
+                                                            Box(
+                                                                modifier = Modifier
+                                                                    .weight(1f)
+                                                                    .fillMaxHeight()
+                                                                    .let {
+                                                                        if (index == 1) {
+                                                                            it
+                                                                                .padding(
+                                                                                    vertical = 7.5.dp,
+                                                                                    horizontal = 20.dp
+                                                                                )
+                                                                                .background(
+                                                                                    color = MaterialTheme.colorScheme.secondary,
+                                                                                    shape = CircleShape
+                                                                                )
+                                                                        } else {
+                                                                            it.padding(10.dp)
+                                                                        }
+                                                                    },
+                                                                contentAlignment = Alignment.Center
+                                                            ) {
+                                                                Icon(
+                                                                    imageVector = item,
+                                                                    contentDescription = null, // TODO
+                                                                    tint = if (index == 1) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurfaceVariant
+                                                                )
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                floatingActionButton = {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .width(40.dp)
+                                                            .height(40.dp)
+                                                            .background(
+                                                                color = MaterialTheme.colorScheme.primaryContainer,
+                                                                shape = MaterialTheme.shapes.small
+                                                            )
+                                                            .padding(10.dp),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = Icons.Filled.Edit,
+                                                            contentDescription = null, // TODO
+                                                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                                        )
+                                                    }
+                                                }
+                                            ) { paddingValues ->
+                                                Column(
                                                     modifier = Modifier
-                                                        .padding(5.dp)
-                                                        .width(width.dp)
-                                                        .height(10.dp)
-                                                        .background(MaterialTheme.colorScheme.onSurface)
-                                                )
+                                                        .fillMaxSize()
+                                                        .padding(paddingValues = paddingValues)
+                                                ) {
+                                                    listOf(80, 160, 100, 80, 30).forEach { width ->
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .padding(5.dp)
+                                                                .width(width.dp)
+                                                                .height(10.dp)
+                                                                .background(MaterialTheme.colorScheme.onSurface)
+                                                        )
+                                                    }
+                                                }
                                             }
                                         }
+
                                     }
                                 }
-
                             }
                         }
                     }

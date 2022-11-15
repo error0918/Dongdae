@@ -22,9 +22,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.taeyeon.core.Utils
 import com.taeyeon.dongdae.MyView.ChatUnit
@@ -109,7 +111,17 @@ object Profile {
                             onCheckedChange = { checked -> Tester.tester = checked })
                     },
                     {
-                        // TODO: DropDownUnit
+                        var selected by rememberSaveable { mutableStateOf(0) }
+                        val list = listOf("하나", "둘", "셋")
+
+                        Unit.DropDownUnit(
+                            title = "DropDownUnit",
+                            selected = selected,
+                            onSelected = { selected_, _ ->
+                                selected = selected_
+                            },
+                            list = list
+                        )
                     },
                     {
                         var value by rememberSaveable { mutableStateOf(5f) }
@@ -364,6 +376,95 @@ object Profile {
         }
 
         @Composable
+        fun DropDownUnit(
+            title: String,
+            selected: Int,
+            onSelected: (selected: Int, item: String) -> kotlin.Unit,
+            list: List<String>
+        ) { // TODO
+            var isDropDownMenuExpanded by remember { mutableStateOf(false) }
+            var unitWidth by remember { mutableStateOf(0) }
+
+            TextButton(
+                onClick = { isDropDownMenuExpanded = !isDropDownMenuExpanded },
+                contentPadding = PaddingValues(horizontal = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .onSizeChanged { intSize ->
+                        unitWidth = intSize.width
+                    }
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+
+                    Text(
+                        text = title,
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    )
+
+                    Row(
+                        modifier = Modifier.align(Alignment.CenterEnd),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = list[selected],
+                            textAlign = TextAlign.Center,
+                            maxLines = 1
+                        )
+                        Icon(
+                            imageVector = Icons.Filled.KeyboardArrowDown,
+                            contentDescription = null // TODO
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = isDropDownMenuExpanded,
+                        onDismissRequest = { isDropDownMenuExpanded = false },
+                        modifier = Modifier.width(with(LocalDensity.current) { unitWidth.toDp() }),
+                        offset = DpOffset(x = (-12).dp, y = 8.dp)
+                    ) {
+                        list.forEachIndexed { index, item ->
+                            DropdownMenuItem(
+                                text = { Text(text = item) },
+                                onClick = {
+                                    onSelected(index, item)
+                                    isDropDownMenuExpanded = false
+                                }
+                            )
+                            if (index != list.size - 1) {
+                                val dividerColor =
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                                Canvas(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(1.dp)
+                                ) {
+                                    drawLine(
+                                        color = dividerColor,
+                                        start = Offset(0f, 0f),
+                                        end = Offset(size.width, 0f),
+                                        pathEffect = PathEffect.dashPathEffect(
+                                            floatArrayOf(
+                                                10f,
+                                                10f
+                                            )
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+        @Composable
         fun SliderUnit(
             title: String,
             value: Float,
@@ -434,7 +535,7 @@ object Profile {
             Palette, Chat, Screen
         }
 
-        val themePreviewMap = mapOf(
+        private val themePreviewMap = mapOf(
             ThemePreview.Palette to "팔레트",
             ThemePreview.Chat to "채팅",
             ThemePreview.Screen to "화면",

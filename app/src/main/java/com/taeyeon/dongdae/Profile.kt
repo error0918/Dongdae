@@ -1,10 +1,12 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.taeyeon.dongdae
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -28,6 +30,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.taeyeon.core.Utils
+import com.taeyeon.dongdae.ui.theme.Theme
 
 object Profile {
     private val lazyListState = LazyListState()
@@ -91,6 +94,43 @@ object Profile {
                 title = "개발자 기능", // TODO
                 unitList = listOf(
                     {
+                        Theme(
+                            darkTheme = !isSystemInDarkTheme(),
+                            dynamicColor = false
+                        ) {
+                            Surface(
+                                color = MaterialTheme.colorScheme.surface,
+                                shape = MaterialTheme.shapes.medium,
+                                tonalElevation = 1.dp,
+                                modifier = Modifier
+                                    .width(150.dp)
+                                    .height(200.dp)
+                            ) {
+                                Scaffold(
+                                    topBar = {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(30.dp)
+                                                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+                                                .padding(horizontal = 8.dp)
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .width(40.dp)
+                                                    .height(10.dp)
+                                                    .align(Alignment.CenterStart)
+                                                    .background(MaterialTheme.colorScheme.primary)
+                                            )
+                                        }
+                                    }
+                                ) {
+
+                                }
+                            }
+                        }
+                    },
+                    {
                         Unit.TextUnit(title = "TextUnit")
                     },
                     {
@@ -131,6 +171,7 @@ object Profile {
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
+            state = lazyListState,
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {
             items(blockList) { blockData ->
@@ -332,8 +373,8 @@ object Profile {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp)
-                    .padding(horizontal = 12.dp)
+                    .padding(horizontal = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
                 Box(
@@ -349,22 +390,26 @@ object Profile {
                         modifier = Modifier.align(Alignment.CenterStart)
                     )
 
-                    Text(
-                        text = String.format("%.${roundingDigits}f", value),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.bodySmall,
+                    Box(
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
-                            .padding(vertical = 4.dp)
+                            .padding(vertical = 6.dp)
+                            .fillMaxHeight()
                             .background(
                                 color = MaterialTheme.colorScheme.primary,
                                 shape = CircleShape
                             )
                             .padding(
-                                vertical = 4.dp,
-                                horizontal = 12.dp
-                            )
-                    )
+                                horizontal = 14.dp
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = String.format("%.${roundingDigits}f", value),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
 
                 MyView.FullBackgroundSlider(

@@ -623,7 +623,7 @@ object Profile {
             selected: Int,
             onSelected: (selected: Int, item: String) -> kotlin.Unit,
             list: List<String>
-        ) { // TODO
+        ) {
             var isDropDownMenuExpanded by remember { mutableStateOf(false) }
             var unitWidth by remember { mutableStateOf(0) }
 
@@ -718,14 +718,35 @@ object Profile {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
-                    .padding(horizontal = 12.dp)
+                    .padding(
+                        start = 12.dp - getCornerSize(shape = MaterialTheme.shapes.medium),
+                        end = 12.dp
+                    )
             ) {
-                Text(
-                    text = title,
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.align(Alignment.CenterStart)
-                )
+
+                Surface(
+                    color = Color.Transparent,
+                    shape = MaterialTheme.shapes.medium,
+                    onClick = { onSelected(if (selected + 1 >= list.size) 0 else selected + 1, list[if (selected + 1 >= list.size) 0 else selected + 1]) },
+                    modifier = Modifier // TODO
+                        .width(IntrinsicSize.Min)
+                        .fillMaxHeight()
+                        .align(Alignment.CenterStart)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = title,
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                }
+
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceColorAtElevation(9.dp),
                     shape = MaterialTheme.shapes.medium,
@@ -759,6 +780,7 @@ object Profile {
                         }
                     }
                 }
+
             }
         }
 

@@ -119,7 +119,7 @@ object Profile {
                         )
                     },
                     {
-                        // TODO
+                        // TODO: TextField
                     },
                     {
                         Unit.SwitchUnit(
@@ -136,6 +136,22 @@ object Profile {
                             selected = selected,
                             onSelected = { selected_, _ ->
                                 selected = selected_
+                            },
+                            list = list
+                        )
+                    },
+                    {
+                        val checked = remember { mutableStateListOf<Int>() }
+                        val list = listOf("하나", "둘", "셋")
+
+                        Unit.CheckBoxUnit(
+                            title = "CheckBoxUnit",
+                            checked = checked.toSet(),
+                            onChecked = { checked_, _ ->
+                                if (checked.contains(checked_))
+                                    checked.remove(checked_)
+                                else
+                                    checked.add(checked_)
                             },
                             list = list
                         )
@@ -507,8 +523,7 @@ object Profile {
                     modifier = Modifier.align(Alignment.CenterEnd)
                 ) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         list.forEachIndexed { index, item ->
                             Surface(
@@ -524,6 +539,62 @@ object Profile {
                                     RadioButton(
                                         selected = selected == index,
                                         onClick = null
+                                    )
+                                    Text(
+                                        text = item,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        @Composable
+        fun CheckBoxUnit(
+            title: String,
+            checked: Set<Int>,
+            onChecked: (checked: Int, item: String) -> kotlin.Unit,
+            list: List<String>
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .padding(horizontal = 12.dp)
+            ) {
+                Text(
+                    text = title,
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceColorAtElevation(9.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        list.forEachIndexed { index, item ->
+                            Surface(
+                                color = Color.Transparent,
+                                shape = MaterialTheme.shapes.medium,
+                                onClick = { onChecked(index, item) }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                                ) {
+                                    Checkbox(
+                                        checked = checked.contains(index),
+                                        onCheckedChange = null
                                     )
                                     Text(
                                         text = item,

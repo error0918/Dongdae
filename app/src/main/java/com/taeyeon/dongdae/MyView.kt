@@ -1278,6 +1278,7 @@ object MyView {
         val time: String,
         val id: String,
         val image: ImageBitmap? = null,
+        val contentDescription: String? = null,
         val isSelectable: Boolean = true,
         val content: String,
         val isHeartAble: Boolean = true,
@@ -1295,6 +1296,7 @@ object MyView {
                 time = time,
                 id = id,
                 image = image,
+                contentDescription = contentDescription,
                 isSelectable = isSelectable,
                 content = content,
                 isHeartAble = isHeartAble,
@@ -1310,11 +1312,12 @@ object MyView {
         time: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")),
         id: String,
         image: ImageBitmap? = null,
+        contentDescription: String? = null,
         isSelectable: Boolean = true,
         content: String,
         isHeartAble: Boolean = true,
         password: String = "0000",
-        commentList: List<MyView.ChatData> = listOf()
+        commentList: List<ChatData> = listOf()
     ) {
         var isHeart by rememberSaveable { mutableStateOf(false) }
         var heartCount by rememberSaveable { mutableStateOf(12) }

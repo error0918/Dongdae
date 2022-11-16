@@ -3,6 +3,7 @@
 
 package com.taeyeon.dongdae
 
+import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import com.taeyeon.core.Settings
 import com.taeyeon.core.Utils
 import com.taeyeon.dongdae.MyView.ChatUnit
 import com.taeyeon.dongdae.ui.theme.Theme
@@ -81,57 +83,58 @@ object Profile {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
 
-                                Box(
+                                Surface(
+                                    color = uniqueColor,
+                                    shape = CircleShape,
+                                    border = BorderStroke(
+                                        width = 3.dp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    ),
                                     modifier = Modifier
                                         .padding(bottom = 8.dp)
                                         .size(120.dp)
-                                        .background(
-                                            color = uniqueColor,
-                                            shape = CircleShape
-                                        )
-                                        .border(
-                                            width = 3.dp,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            shape = CircleShape
-                                        )
                                 ) {
-
                                     Box(
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                            .align(Alignment.Center)
-                                            .background(
-                                                color = Color(
-                                                    red = 1 - uniqueColor.red,
-                                                    green = 1 - uniqueColor.green,
-                                                    blue = 1 - uniqueColor.blue,
-                                                    alpha = 0.2f
-                                                ),
-                                                shape = CircleShape
-                                            )
-                                    )
+                                        modifier = Modifier.fillMaxSize()
+                                    ) {
 
-                                    Box(
-                                        modifier = Modifier
-                                            .width(60.dp)
-                                            .height(30.dp)
-                                            .align(Alignment.BottomCenter)
-                                            .background(
-                                                color = Color(
-                                                    red = 1 - uniqueColor.red,
-                                                    green = 1 - uniqueColor.green,
-                                                    blue = 1 - uniqueColor.blue,
-                                                    alpha = 0.2f
-                                                ),
-                                                shape = RoundedCornerShape(
-                                                    topStartPercent = 75,
-                                                    topEndPercent = 75,
-                                                    bottomStartPercent = 0,
-                                                    bottomEndPercent = 0
+                                        Box(
+                                            modifier = Modifier
+                                                .size(40.dp)
+                                                .align(Alignment.Center)
+                                                .background(
+                                                    color = Color(
+                                                        red = 1 - uniqueColor.red,
+                                                        green = 1 - uniqueColor.green,
+                                                        blue = 1 - uniqueColor.blue,
+                                                        alpha = 0.2f
+                                                    ),
+                                                    shape = CircleShape
                                                 )
-                                            )
-                                    )
+                                        )
 
+                                        Box(
+                                            modifier = Modifier
+                                                .width(60.dp)
+                                                .height(30.dp)
+                                                .align(Alignment.BottomCenter)
+                                                .background(
+                                                    color = Color(
+                                                        red = 1 - uniqueColor.red,
+                                                        green = 1 - uniqueColor.green,
+                                                        blue = 1 - uniqueColor.blue,
+                                                        alpha = 0.2f
+                                                    ),
+                                                    shape = RoundedCornerShape(
+                                                        topStartPercent = 75,
+                                                        topEndPercent = 75,
+                                                        bottomStartPercent = 0,
+                                                        bottomEndPercent = 0
+                                                    )
+                                                )
+                                        )
+
+                                    }
                                 }
 
                                 Text(
@@ -207,9 +210,24 @@ object Profile {
                         }
                     },
                     {
-                        Text("adsf")
+                        Unit.DoubleTextUnit(
+                            title = "아이디",
+                            subTitle = id,
+                            copyText = id,
+                            isJumpLine = true
+                        )
                     }
                 )
+            ),
+            Unit.BlockData(
+                title = "기능", // TODO
+                unitList = listOf {
+                    Unit.TextButtonUnit(
+                        title = "환영 인사 보기" // TODO
+                    ) {
+                        screen = Screen.Welcome
+                    }
+                }
             ),
             Unit.BlockData(
                 title = "일반 설정", // TODO
@@ -224,14 +242,68 @@ object Profile {
             ),
             Unit.BlockData(
                 title = "테마 설정", // TODO
-                unitList = listOf(
+                unitList = arrayListOf<@Composable ColumnScope.() -> kotlin.Unit>(
                     {
-                        Text("adsf")
+                        Unit.ThemeSelectUnit(
+                            title = "다크 모드", // TODO
+                            selected = Settings.DarkMode.values().indexOf(darkMode),
+                            onSelected = { selected ->
+                                darkMode = Settings.DarkMode.values()[selected]
+                                save()
+                            },
+                            themeDataMap = mapOf(
+                                @Composable { content: @Composable () -> kotlin.Unit ->
+                                    Theme(
+                                        darkTheme = isSystemInDarkTheme(),
+                                        content = content
+                                    )
+                                } to "시스템 설정", // TODO
+                                @Composable { content: @Composable () -> kotlin.Unit ->
+                                    Theme(
+                                        darkTheme = false,
+                                        content = content
+                                    )
+                                } to "라이트 모드", // TODO
+                                @Composable { content: @Composable () -> kotlin.Unit ->
+                                    Theme(
+                                        darkTheme = true,
+                                        content = content
+                                    )
+                                } to "다크 모드" // TODO
+                            )
+                        )
                     },
                     {
                         Text("adsf")
                     }
-                )
+                ).also {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ) {
+                        it.add(index = 1) {
+                            Unit.ThemeSelectUnit(
+                                title = "컬러", // TODO
+                                selected = if (dynamicColor) 1 else 0,
+                                onSelected = { selected ->
+                                    dynamicColor = selected == 1
+                                    save()
+                                },
+                                themeDataMap = mapOf(
+                                    @Composable { content: @Composable () -> kotlin.Unit ->
+                                        Theme(
+                                            dynamicColor = false,
+                                            content = content
+                                        )
+                                    } to "기본 테마", // TODO
+                                    @Composable { content: @Composable () -> kotlin.Unit ->
+                                        Theme(
+                                            dynamicColor = true,
+                                            content = content
+                                        )
+                                    } to "다이나믹 컬러" // TODO
+                                )
+                            )
+                        }
+                    }
+                }.toList()
             ),
             Unit.BlockData(
                 title = "문제 해결", // TODO
@@ -360,6 +432,7 @@ object Profile {
                         var value by rememberSaveable { mutableStateOf(0) }
 
                         Unit.ThemeSelectUnit(
+                            title = "ThemeSelectUnit", // TODO
                             selected = value,
                             onSelected = { selected ->
                                 value = selected
@@ -387,6 +460,19 @@ object Profile {
                         )
                     }
                 )
+            ),
+            Unit.BlockData(
+                title = "개발자 기능", // TODO
+                unitList = listOf {
+                    Unit.SwitchUnit(
+                        title = "테스터", // TODO
+                        checked = Tester.tester,
+                        onCheckedChange = { checked ->
+                            Tester.tester = checked // TODO
+                            save()
+                        }
+                    )
+                }
             ),
             Unit.BlockData(
                 title = "앱에 관해서", // TODO
@@ -1331,6 +1417,7 @@ object Profile {
 
         @Composable
         fun ThemeSelectUnit(
+            title: String,
             selected: Int,
             onSelected: (selected: Int) -> kotlin.Unit,
             themeDataMap: Map<@Composable (@Composable () -> kotlin.Unit) -> kotlin.Unit, String>
@@ -1343,7 +1430,7 @@ object Profile {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 RadioUnit(
-                    title = "테마", // TODO
+                    title = title, // TODO
                     selected = themePreviewMap.keys.indexOf(themePreview),
                     onSelected = { index, _ ->
                         themePreview = themePreviewMap.keys.toList()[index]

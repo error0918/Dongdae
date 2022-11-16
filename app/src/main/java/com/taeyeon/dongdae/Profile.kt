@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Person
@@ -20,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.input.pointer.pointerInput
@@ -119,7 +121,28 @@ object Profile {
                         )
                     },
                     {
-                        // TODO: TextField
+                        var value by rememberSaveable { mutableStateOf("") }
+
+                        Unit.TextFieldUnit(
+                            title = "TextFieldUnit (isJumpLine = true)",
+                            value = value,
+                            onValueChange = { value_ ->
+                                value = value_
+                            },
+                            isJumpLine = true
+                        )
+                    },
+                    {
+                        var value by rememberSaveable { mutableStateOf("") }
+
+                        Unit.TextFieldUnit(
+                            title = "TextFieldUnit (isJumpLine = false)",
+                            value = value,
+                            onValueChange = { value_ ->
+                                value = value_
+                            },
+                            isJumpLine = false
+                        )
                     },
                     {
                         Unit.SwitchUnit(
@@ -370,6 +393,76 @@ object Profile {
                     textAlign = TextAlign.Start,
                     modifier = Modifier.fillMaxWidth()
                 )
+            }
+        }
+
+        @Composable
+        fun TextFieldUnit(
+            title: String,
+            value: String,
+            onValueChange: (value: String) -> kotlin.Unit,
+            isJumpLine: Boolean = false
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp)
+                ) {
+                    var titleTextWidth by remember { mutableStateOf(0) }
+
+                    Text(
+                        text = title,
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .onSizeChanged { intSize ->
+                                titleTextWidth = intSize.width
+                            }
+                    )
+
+                    if (!isJumpLine) {
+                        BasicTextField(
+                            value = value,
+                            onValueChange = onValueChange,
+                            textStyle = MaterialTheme.typography.labelSmall,
+                            maxLines = 1,
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .padding(start = with(LocalDensity.current) { titleTextWidth.toDp() + 8.dp })
+                                .align(Alignment.CenterEnd)
+                                .border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = MaterialTheme.shapes.medium
+                                )// TODO
+                        )
+                    } // TODO
+
+                }
+
+                if (isJumpLine) {
+                    BasicTextField(
+                        value = value,
+                        onValueChange = onValueChange,
+                        textStyle = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(40.dp)
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = MaterialTheme.shapes.medium
+                            )// TODO
+                    )
+                }
+
             }
         }
 

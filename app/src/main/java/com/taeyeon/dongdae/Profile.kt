@@ -21,9 +21,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -101,6 +101,22 @@ object Profile {
                     },
                     {
                         Unit.CopyableTextUnit(title = "CopyableTextUnit")
+                    },
+                    {
+                        Unit.DoubleTextUnit(
+                            title = "DoubleTextUnit",
+                            subTitle = "isJumpLine = true",
+                            copyText = "DoubleTextUnit (isJumpLine = true)",
+                            isJumpLine = true
+                        )
+                    },
+                    {
+                        Unit.DoubleTextUnit(
+                            title = "DoubleTextUnit",
+                            subTitle = "isJumpLine = false",
+                            copyText = "DoubleTextUnit (isJumpLine = false)",
+                            isJumpLine = false
+                        )
                     },
                     {
                         Unit.TextButtonUnit(title = "TextButtonUnit") { // TODO
@@ -286,31 +302,36 @@ object Profile {
                             unitList.forEachIndexed { index, unit ->
                                 unit()
                                 if (index != unitList.size - 1) {
-                                    val dividerColor =
-                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-                                    Canvas(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 5.5.dp)
-                                            .height(1.dp)
-                                    ) {
-                                        drawLine(
-                                            color = dividerColor,
-                                            start = Offset(0f, 0f),
-                                            end = Offset(size.width, 0f),
-                                            pathEffect = PathEffect.dashPathEffect(
-                                                floatArrayOf(
-                                                    10f,
-                                                    10f
-                                                )
-                                            )
-                                        )
-                                    }
+                                    DottedLineBorder()
                                 }
                             }
                         }
                     }
                 }
+            }
+        }
+
+        @Composable
+        fun DottedLineBorder() {
+            val dividerColor =
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+            Canvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 7.5.dp)
+                    .height(1.dp)
+            ) {
+                drawLine(
+                    color = dividerColor,
+                    start = Offset(0f, 0f),
+                    end = Offset(size.width, 0f),
+                    pathEffect = PathEffect.dashPathEffect(
+                        floatArrayOf(
+                            10f,
+                            10f
+                        )
+                    )
+                )
             }
         }
 
@@ -376,6 +397,83 @@ object Profile {
         }
 
         @Composable
+        fun DoubleTextUnit(
+            title: String,
+            subTitle: String,
+            copyText: String? = null,
+            isJumpLine: Boolean = false
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .padding(horizontal = 12.dp)
+                    .let {
+                        if (copyText == null) {
+                            it
+                        } else {
+                            it.pointerInput(Unit) {
+                                detectTapGestures(
+                                    onLongPress = {
+                                        Utils.copy(text = copyText)
+                                    }
+                                )
+                            }
+                        }
+                    }
+            ) {
+                var titleTextWidth by remember { mutableStateOf(0) }
+
+                Column(
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier
+                            .onSizeChanged { intSize ->
+                                titleTextWidth = intSize.width
+                            }
+                    )
+                    if (isJumpLine) {
+                        Text(
+                            text = subTitle,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                }
+
+                if (!isJumpLine) {
+                    Text(
+                        text = subTitle,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(start = with(LocalDensity.current) { titleTextWidth.toDp() + 8.dp })
+                    )
+                }
+
+                copyText?.let {
+                    IconButton(
+                        onClick = { Utils.copy(text = copyText) },
+                        modifier = Modifier
+                            .size(12.dp)
+                            .align(Alignment.TopEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.CopyAll,
+                            contentDescription = null, // TODO
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+
+            }
+        }
+
+        @Composable
         fun TextButtonUnit(
             title: String,
             onClick: () -> kotlin.Unit
@@ -409,6 +507,7 @@ object Profile {
                     .padding(horizontal = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -428,11 +527,7 @@ object Profile {
                     )
 
                     if (!isJumpLine) {
-                        BasicTextField(
-                            value = value,
-                            onValueChange = onValueChange,
-                            textStyle = MaterialTheme.typography.labelSmall,
-                            maxLines = 1,
+                        Box(
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .padding(start = with(LocalDensity.current) { titleTextWidth.toDp() + 8.dp })
@@ -441,17 +536,26 @@ object Profile {
                                     width = 1.dp,
                                     color = MaterialTheme.colorScheme.primary,
                                     shape = MaterialTheme.shapes.medium
-                                )// TODO
-                        )
-                    } // TODO
+                                )
+                                .padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            BasicTextField(
+                                value = value,
+                                onValueChange = onValueChange,
+                                textStyle = MaterialTheme.typography.labelSmall.copy(
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                ),
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                                maxLines = 1
+                            )
+                        }
+                    }
 
                 }
 
                 if (isJumpLine) {
-                    BasicTextField(
-                        value = value,
-                        onValueChange = onValueChange,
-                        textStyle = MaterialTheme.typography.labelSmall,
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(40.dp)
@@ -459,8 +563,20 @@ object Profile {
                                 width = 1.dp,
                                 color = MaterialTheme.colorScheme.primary,
                                 shape = MaterialTheme.shapes.medium
-                            )// TODO
-                    )
+                            )
+                            .padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        BasicTextField(
+                            value = value,
+                            onValueChange = onValueChange,
+                            textStyle = MaterialTheme.typography.labelSmall.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            ),
+                            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                            maxLines = 1
+                        )
+                    }
                 }
 
             }
@@ -636,7 +752,7 @@ object Profile {
                                     Text(
                                         text = item,
                                         color = MaterialTheme.colorScheme.primary,
-                                        style = MaterialTheme.typography.labelLarge
+                                        style = MaterialTheme.typography.labelSmall
                                     )
                                 }
                             }
@@ -692,7 +808,7 @@ object Profile {
                                     Text(
                                         text = item,
                                         color = MaterialTheme.colorScheme.primary,
-                                        style = MaterialTheme.typography.labelLarge
+                                        style = MaterialTheme.typography.labelSmall
                                     )
                                 }
                             }

@@ -119,13 +119,26 @@ object Profile {
                         )
                     },
                     {
-
+                        // TODO
                     },
                     {
                         Unit.SwitchUnit(
                             title = "SwitchUnit",
                             checked = Tester.tester,
                             onCheckedChange = { checked -> Tester.tester = checked })
+                    },
+                    {
+                        var selected by rememberSaveable { mutableStateOf(0) }
+                        val list = listOf("하나", "둘", "셋")
+
+                        Unit.RadioUnit(
+                            title = "RadioUnit",
+                            selected = selected,
+                            onSelected = { selected_, _ ->
+                                selected = selected_
+                            },
+                            list = list
+                        )
                     },
                     {
                         var value by rememberSaveable { mutableStateOf(5f) }
@@ -468,6 +481,63 @@ object Profile {
             }
         }
 
+
+        @Composable
+        fun RadioUnit(
+            title: String,
+            selected: Int,
+            onSelected: (selected: Int, item: String) -> kotlin.Unit,
+            list: List<String>
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .padding(horizontal = 12.dp)
+            ) {
+                Text(
+                    text = title,
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceColorAtElevation(9.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        list.forEachIndexed { index, item ->
+                            Surface(
+                                color = Color.Transparent,
+                                shape = MaterialTheme.shapes.medium,
+                                onClick = { onSelected(index, item) }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    RadioButton(
+                                        selected = selected == index,
+                                        onClick = null
+                                    )
+                                    Text(
+                                        text = item,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         @Composable
         fun SliderUnit(
             title: String,
@@ -575,7 +645,6 @@ object Profile {
                             shape = MaterialTheme.shapes.medium,
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            //
                             CompositionLocalProvider(LocalDensity provides Density(density = LocalDensity.current.density / 2f)) {
                                 AnimatedContent(
                                     targetState = themePreview,
@@ -677,7 +746,9 @@ object Profile {
                                                                 .align(Alignment.Center)
                                                                 .background(
                                                                     color = MaterialTheme.colorScheme.primary,
-                                                                    shape = RoundedCornerShape(percent = 20)
+                                                                    shape = RoundedCornerShape(
+                                                                        percent = 20
+                                                                    )
                                                                 )
                                                         )
                                                     }
@@ -761,7 +832,9 @@ object Profile {
                                                                 .height(10.dp)
                                                                 .background(
                                                                     color = MaterialTheme.colorScheme.onSurface,
-                                                                    shape = RoundedCornerShape(percent = 20)
+                                                                    shape = RoundedCornerShape(
+                                                                        percent = 20
+                                                                    )
                                                                 )
                                                         )
                                                     }
@@ -791,53 +864,14 @@ object Profile {
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
-                        .padding(horizontal = 12.dp)
-                ) {
-                    Text(
-                        text = "테마",
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier.align(Alignment.CenterStart)
-                    )
-                    Surface(
-                        color = MaterialTheme.colorScheme.surfaceColorAtElevation(9.dp),
-                        shape = MaterialTheme.shapes.medium,
-                        modifier = Modifier.align(Alignment.CenterEnd)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            ThemePreview.values().forEach { themePreview_ ->
-                                Surface(
-                                    color = Color.Transparent,
-                                    shape = MaterialTheme.shapes.medium,
-                                    onClick = { themePreview = themePreview_ }
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                    ) {
-                                        RadioButton(
-                                            selected = themePreview == themePreview_,
-                                            onClick = null
-                                        )
-                                        Text(
-                                            text = themePreviewMap[themePreview_]!!,
-                                            color = MaterialTheme.colorScheme.primary,
-                                            style = MaterialTheme.typography.labelLarge
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                RadioUnit(
+                    title = "테마", // TODO
+                    selected = themePreviewMap.keys.indexOf(themePreview),
+                    onSelected = { index, _ ->
+                        themePreview = themePreviewMap.keys.toList()[index]
+                    },
+                    list = themePreviewMap.values.toList()
+                )
                 Surface(
                     color = Color.Transparent,
                     shape = MaterialTheme.shapes.medium

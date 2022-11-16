@@ -93,6 +93,13 @@ object Profile {
                                     modifier = Modifier
                                         .padding(bottom = 8.dp)
                                         .size(120.dp)
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(
+                                                onLongPress = {
+                                                    Utils.copy(text = "#${subName.uppercase()}")
+                                                }
+                                            )
+                                        }
                                 ) {
                                     Box(
                                         modifier = Modifier.fillMaxSize()
@@ -140,13 +147,29 @@ object Profile {
                                 Text(
                                     text = name,
                                     color = MaterialTheme.colorScheme.primary,
-                                    style = MaterialTheme.typography.titleLarge
+                                    style = MaterialTheme.typography.titleLarge,
+                                    modifier = Modifier
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(
+                                                onLongPress = {
+                                                    Utils.copy(text = name)
+                                                }
+                                            )
+                                        }
                                 )
 
                                 Text(
                                     text = "($subName)",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(
+                                                onLongPress = {
+                                                    Utils.copy(text = subName)
+                                                }
+                                            )
+                                        }
                                 )
 
                             }
@@ -233,10 +256,18 @@ object Profile {
                 title = "일반 설정", // TODO
                 unitList = listOf(
                     {
-                        Text("adsf")
+                        var todoPassword by rememberSaveable { mutableStateOf("0000") }
+
+                        Unit.TextFieldUnit(
+                            title = "기본 비밀번호", // TODO
+                            value = todoPassword,
+                            onValueChange = { value ->
+                                todoPassword = value
+                            }
+                        )
                     },
                     {
-                        Text("adsf")
+                        Unit.TextUnit(title = "TODO")
                     }
                 )
             ),
@@ -274,7 +305,26 @@ object Profile {
                         )
                     },
                     {
-                        Text("adsf")
+                        Unit.SwitchUnit(
+                            title = "전체화면", // TODO
+                            checked = fullScreenMode,
+                            onCheckedChange = { checked ->
+                                fullScreenMode = checked
+                                Settings.applyFullScreenMode()
+                                save() // TODO: 재시작 안내
+                            }
+                        )
+                    },
+                    {
+                        Unit.SwitchUnit(
+                            title = "화면 항상 켜짐", // TODO
+                            checked = screenAlwaysOn,
+                            onCheckedChange = { checked ->
+                                screenAlwaysOn = checked
+                                Settings.applyScreenAlwaysOn()
+                                save() // TODO: 재시작 안내
+                            }
+                        )
                     }
                 ).also {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ) {
@@ -301,7 +351,7 @@ object Profile {
                                     } to "다이나믹 컬러" // TODO
                                 )
                             )
-                        }
+                        } // TODO: 다양한 컬러 팔레트 지원 (구현 시 안드로이드도 12 이하도 지원으로 변경)
                     }
                 }.toList()
             ),
@@ -309,155 +359,18 @@ object Profile {
                 title = "문제 해결", // TODO
                 unitList = listOf(
                     {
-                        Text("adsf")
-                    },
-                    {
-                        Text("adsf")
-                    }
-                )
-            ),
-            Unit.BlockData(
-                title = "설정", // TODO
-                unitList = listOf(
-                    {
-                        Unit.TextUnit(title = "TextUnit")
-                    },
-                    {
-                        Unit.CopyableTextUnit(title = "CopyableTextUnit")
-                    },
-                    {
-                        Unit.DoubleTextUnit(
-                            title = "DoubleTextUnit",
-                            subTitle = "isJumpLine = true",
-                            copyText = "DoubleTextUnit (isJumpLine = true)",
-                            isJumpLine = true
-                        )
-                    },
-                    {
-                        Unit.DoubleTextUnit(
-                            title = "DoubleTextUnit",
-                            subTitle = "isJumpLine = false",
-                            copyText = "DoubleTextUnit (isJumpLine = false)",
-                            isJumpLine = false
-                        )
-                    },
-                    {
-                        Unit.TextButtonUnit(title = "TextButtonUnit") { // TODO
+                        Unit.TextButtonUnit(
+                            title = "앱 재시작" // TODO
+                        ) {
                             // TODO
                         }
                     },
                     {
-                        var selected by rememberSaveable { mutableStateOf(0) }
-                        val list = listOf("하나", "둘", "셋")
-
-                        Unit.DropDownUnit(
-                            title = "DropDownUnit",
-                            selected = selected,
-                            onSelected = { selected_, _ ->
-                                selected = selected_
-                            },
-                            list = list
-                        )
-                    },
-                    {
-                        var value by rememberSaveable { mutableStateOf("") }
-
-                        Unit.TextFieldUnit(
-                            title = "TextFieldUnit (isJumpLine = true)",
-                            value = value,
-                            onValueChange = { value_ ->
-                                value = value_
-                            },
-                            isJumpLine = true
-                        )
-                    },
-                    {
-                        var value by rememberSaveable { mutableStateOf("") }
-
-                        Unit.TextFieldUnit(
-                            title = "TextFieldUnit (isJumpLine = false)",
-                            value = value,
-                            onValueChange = { value_ ->
-                                value = value_
-                            },
-                            isJumpLine = false
-                        )
-                    },
-                    {
-                        Unit.SwitchUnit(
-                            title = "SwitchUnit",
-                            checked = Tester.tester,
-                            onCheckedChange = { checked -> Tester.tester = checked })
-                    },
-                    {
-                        var selected by rememberSaveable { mutableStateOf(0) }
-                        val list = listOf("하나", "둘", "셋")
-
-                        Unit.RadioUnit(
-                            title = "RadioUnit",
-                            selected = selected,
-                            onSelected = { selected_, _ ->
-                                selected = selected_
-                            },
-                            list = list
-                        )
-                    },
-                    {
-                        val checked = remember { mutableStateListOf<Int>() }
-                        val list = listOf("하나", "둘", "셋")
-
-                        Unit.CheckBoxUnit(
-                            title = "CheckBoxUnit",
-                            checked = checked.toSet(),
-                            onChecked = { checked_, _ ->
-                                if (checked.contains(checked_))
-                                    checked.remove(checked_)
-                                else
-                                    checked.add(checked_)
-                            },
-                            list = list
-                        )
-                    },
-                    {
-                        var value by rememberSaveable { mutableStateOf(5f) }
-
-                        Unit.SliderUnit(
-                            title = "SliderUnit",
-                            value = value,
-                            onValueChange = { value_ -> value = value_ },
-                            valueRange = 0f..10f
-                        )
-                    },
-                    {
-                        var value by rememberSaveable { mutableStateOf(0) }
-
-                        Unit.ThemeSelectUnit(
-                            title = "ThemeSelectUnit", // TODO
-                            selected = value,
-                            onSelected = { selected ->
-                                value = selected
-                            },
-                            themeDataMap = mapOf(
-                                @Composable { content: @Composable () -> kotlin.Unit ->
-                                    Theme(
-                                        darkTheme = false,
-                                        content = content
-                                    )
-                                } to "라이트 모드",
-                                @Composable { content: @Composable () -> kotlin.Unit ->
-                                    Theme(
-                                        darkTheme = true,
-                                        content = content
-                                    )
-                                } to "다크 모드",
-                                @Composable { content: @Composable () -> kotlin.Unit ->
-                                    Theme(
-                                        darkTheme = isSystemInDarkTheme(),
-                                        content = content
-                                    )
-                                } to "시스템 설정"
-                            )
-                        )
+                        Unit.TextButtonUnit(
+                            title = "앱 초기화" // TODO
+                        ) {
+                            // TODO
+                        }
                     }
                 )
             ),
@@ -478,10 +391,39 @@ object Profile {
                 title = "앱에 관해서", // TODO
                 unitList = listOf(
                     {
-                        Text("adsf")
+                        Unit.TextButtonUnit(
+                            title = "시스템 설정" // TODO
+                        ) {
+                            // TODO
+                        }
                     },
                     {
-                        Text("adsf")
+                        Unit.TextButtonUnit(
+                            title = "깃허브" // TODO
+                        ) {
+                            // TODO
+                        }
+                    },
+                    {
+                        Unit.TextButtonUnit(
+                            title = "메일 문의" // TODO
+                        ) {
+                            // TODO
+                        }
+                    },
+                    {
+                        Unit.TextButtonUnit(
+                            title = "라이선스" // TODO
+                        ) {
+                            // TODO
+                        }
+                    },
+                    {
+                        Unit.TextButtonUnit(
+                            title = "앱 정보" // TODO
+                        ) {
+                            // TODO
+                        }
                     }
                 )
             )

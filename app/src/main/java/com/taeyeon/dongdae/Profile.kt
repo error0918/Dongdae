@@ -8,7 +8,9 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -20,6 +22,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
@@ -501,57 +505,71 @@ object Profile {
             onValueChange: (value: String) -> kotlin.Unit,
             isJumpLine: Boolean = false
         ) {
+            val focusRequester by remember { mutableStateOf(FocusRequester()) }
+
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp),
+                    .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                Box(
+                TextButton(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(40.dp)
-                ) {
-                    var titleTextWidth by remember { mutableStateOf(0) }
-
-                    Text(
-                        text = title,
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .onSizeChanged { intSize ->
-                                titleTextWidth = intSize.width
-                            }
-                    )
-
-                    if (!isJumpLine) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .padding(start = with(LocalDensity.current) { titleTextWidth.toDp() + 8.dp })
-                                .align(Alignment.CenterEnd)
-                                .border(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    shape = MaterialTheme.shapes.medium
-                                )
-                                .padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
-                            contentAlignment = Alignment.CenterStart
-                        ) {
-                            BasicTextField(
-                                value = value,
-                                onValueChange = onValueChange,
-                                textStyle = MaterialTheme.typography.labelSmall.copy(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                ),
-                                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                                maxLines = 1
-                            )
-                        }
+                        .height(40.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp),
+                    onClick = {
+                        if (focusRequester.captureFocus())
+                            TODO()
+                        else
+                            focusRequester.requestFocus()
                     }
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        var titleTextWidth by remember { mutableStateOf(0) }
 
+                        Text(
+                            text = title,
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.labelLarge,
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .onSizeChanged { intSize ->
+                                    titleTextWidth = intSize.width
+                                }
+                        )
+
+                        if (!isJumpLine) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .padding(start = with(LocalDensity.current) { titleTextWidth.toDp() + 8.dp })
+                                    .align(Alignment.CenterEnd)
+                                    .border(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = MaterialTheme.shapes.medium
+                                    )
+                                    .padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                BasicTextField(
+                                    value = value,
+                                    onValueChange = onValueChange,
+                                    textStyle = MaterialTheme.typography.labelSmall.copy(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    ),
+                                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                                    maxLines = 1,
+                                    modifier = Modifier
+                                        .focusRequester(focusRequester)
+                                )
+                            }
+                        }
+
+                    }
                 }
 
                 if (isJumpLine) {
@@ -559,6 +577,7 @@ object Profile {
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(40.dp)
+                            .padding(horizontal = 12.dp)
                             .border(
                                 width = 1.dp,
                                 color = MaterialTheme.colorScheme.primary,
@@ -574,7 +593,9 @@ object Profile {
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             ),
                             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                            maxLines = 1
+                            maxLines = 1,
+                            modifier = Modifier
+                                .focusRequester(focusRequester)
                         )
                     }
                 }

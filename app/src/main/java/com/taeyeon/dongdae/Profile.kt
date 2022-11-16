@@ -59,7 +59,67 @@ object Profile {
                 title = "프로필", // TODO
                 unitList = listOf(
                     {
-                        Text("adsf")
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+
+                            Box(
+                                modifier = Modifier
+                                    .size(120.dp)
+                                    .background(
+                                        color = uniqueColor,
+                                        shape = CircleShape
+                                    )
+                                    .border(
+                                        width = 3.dp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        shape = CircleShape
+                                    )
+                            ) {
+
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .align(Alignment.Center)
+                                        .background(
+                                            color = Color(
+                                                red = 1 - uniqueColor.red,
+                                                green = 1 - uniqueColor.green,
+                                                blue = 1 - uniqueColor.blue,
+                                                alpha = 0.2f
+                                            ),
+                                            shape = CircleShape
+                                        )
+                                )
+
+                                Box(
+                                    modifier = Modifier
+                                        .width(60.dp)
+                                        .height(30.dp)
+                                        .align(Alignment.BottomCenter)
+                                        .background(
+                                            color = Color(
+                                                red = 1 - uniqueColor.red,
+                                                green = 1 - uniqueColor.green,
+                                                blue = 1 - uniqueColor.blue,
+                                                alpha = 0.2f
+                                            ),
+                                            shape = RoundedCornerShape(
+                                                topStartPercent = 75,
+                                                topEndPercent = 75,
+                                                bottomStartPercent = 0,
+                                                bottomEndPercent = 0
+                                            )
+                                        )
+                                )
+
+                            }
+
+                        }
                     },
                     {
                         Text("adsf")

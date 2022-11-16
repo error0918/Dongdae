@@ -36,7 +36,9 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import com.taeyeon.core.Utils
 import com.taeyeon.dongdae.MyView.ChatUnit
 import com.taeyeon.dongdae.ui.theme.Theme
@@ -59,64 +61,147 @@ object Profile {
                 title = "프로필", // TODO
                 unitList = listOf(
                     {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 12.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
+                        var boxWidth by remember { mutableStateOf(0) }
 
-                            Box(
-                                modifier = Modifier
-                                    .size(120.dp)
-                                    .background(
-                                        color = uniqueColor,
-                                        shape = CircleShape
-                                    )
-                                    .border(
-                                        width = 3.dp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        shape = CircleShape
-                                    )
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp)
+                                .onSizeChanged { intSize ->
+                                    boxWidth = intSize.width
+                                }
+                        ) {
+                            var helpPopup by rememberSaveable {
+                                mutableStateOf(
+                                    false
+                                )
+                            }
+
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
 
                                 Box(
                                     modifier = Modifier
-                                        .size(40.dp)
-                                        .align(Alignment.Center)
+                                        .padding(bottom = 8.dp)
+                                        .size(120.dp)
                                         .background(
-                                            color = Color(
-                                                red = 1 - uniqueColor.red,
-                                                green = 1 - uniqueColor.green,
-                                                blue = 1 - uniqueColor.blue,
-                                                alpha = 0.2f
-                                            ),
+                                            color = uniqueColor,
                                             shape = CircleShape
                                         )
-                                )
-
-                                Box(
-                                    modifier = Modifier
-                                        .width(60.dp)
-                                        .height(30.dp)
-                                        .align(Alignment.BottomCenter)
-                                        .background(
-                                            color = Color(
-                                                red = 1 - uniqueColor.red,
-                                                green = 1 - uniqueColor.green,
-                                                blue = 1 - uniqueColor.blue,
-                                                alpha = 0.2f
-                                            ),
-                                            shape = RoundedCornerShape(
-                                                topStartPercent = 75,
-                                                topEndPercent = 75,
-                                                bottomStartPercent = 0,
-                                                bottomEndPercent = 0
-                                            )
+                                        .border(
+                                            width = 3.dp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            shape = CircleShape
                                         )
+                                ) {
+
+                                    Box(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .align(Alignment.Center)
+                                            .background(
+                                                color = Color(
+                                                    red = 1 - uniqueColor.red,
+                                                    green = 1 - uniqueColor.green,
+                                                    blue = 1 - uniqueColor.blue,
+                                                    alpha = 0.2f
+                                                ),
+                                                shape = CircleShape
+                                            )
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .width(60.dp)
+                                            .height(30.dp)
+                                            .align(Alignment.BottomCenter)
+                                            .background(
+                                                color = Color(
+                                                    red = 1 - uniqueColor.red,
+                                                    green = 1 - uniqueColor.green,
+                                                    blue = 1 - uniqueColor.blue,
+                                                    alpha = 0.2f
+                                                ),
+                                                shape = RoundedCornerShape(
+                                                    topStartPercent = 75,
+                                                    topEndPercent = 75,
+                                                    bottomStartPercent = 0,
+                                                    bottomEndPercent = 0
+                                                )
+                                            )
+                                    )
+
+                                }
+
+                                Text(
+                                    text = name,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.titleLarge
                                 )
 
+                                Text(
+                                    text = "($subName)",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+
+                            }
+
+                            IconButton(
+                                onClick = { helpPopup = !helpPopup },
+                                modifier = Modifier
+                                    .size(10.dp)
+                                    .align(Alignment.TopEnd)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.QuestionMark,
+                                    contentDescription = null, // TODO
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+
+                            if (helpPopup) {
+                                Popup(
+                                    alignment = Alignment.TopEnd,
+                                    offset = IntOffset(x = with(LocalDensity.current) { (-10).dp.toPx().toInt() }, y = 0)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .sizeIn(maxWidth = with(LocalDensity.current) { boxWidth.toDp() })
+                                            .background(
+                                                color = MaterialTheme.colorScheme.primaryContainer,
+                                                shape = RoundedCornerShape(8.dp)
+                                            )
+                                            .padding(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = """
+                                                아이디: 안드로이드의 고유 식별자입니다. 일부 상황에서 달라질 수 있습니다.
+                                                나만의 색: 아이디의 마지막 6글자를 HEX 컬러화한 값입니다.
+                                                이름: 아이디의 일부를 숫자로 변환해 그 순서에 맞는 멸조위기종 이름 중 하나를 가집니다.
+                                                서브이름: 아이디의 마지막 6글자입니다.
+                                            """.trimIndent(), // TODO
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            modifier = Modifier
+                                                .sizeIn(maxWidth = with(LocalDensity.current) { boxWidth.toDp() - 16.dp - 15.dp - 10.dp }) // 16.dp: Row Shape Padding, 15.dp: IconButton Size, 10.dp: Offset
+                                        )
+
+                                        IconButton(
+                                            onClick = { helpPopup = false },
+                                            modifier = Modifier
+                                                .padding(start = 8.dp)
+                                                .size(15.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Filled.Close,
+                                                contentDescription = null, // TODO
+                                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                            )
+                                        }
+                                    }
+                                }
                             }
 
                         }

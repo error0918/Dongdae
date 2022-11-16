@@ -694,7 +694,7 @@ object Community {
                                                     }
 
                                                     if (helpPopup) {
-                                                        Popup() {
+                                                        Popup {
                                                             Row(
                                                                 modifier = Modifier
                                                                     .background(

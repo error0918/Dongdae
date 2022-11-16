@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
@@ -506,6 +508,8 @@ object Profile {
             isJumpLine: Boolean = false
         ) {
             val focusRequester by remember { mutableStateOf(FocusRequester()) }
+            val focusManager = LocalFocusManager.current
+            var isFocused by remember { mutableStateOf(false) }
 
             Column(
                 modifier = Modifier
@@ -519,8 +523,8 @@ object Profile {
                         .height(40.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp),
                     onClick = {
-                        if (focusRequester.captureFocus())
-                            TODO()
+                        if (isFocused)
+                            focusManager.clearFocus()
                         else
                             focusRequester.requestFocus()
                     }
@@ -565,6 +569,9 @@ object Profile {
                                     maxLines = 1,
                                     modifier = Modifier
                                         .focusRequester(focusRequester)
+                                        .onFocusChanged {
+                                            isFocused = it.isFocused
+                                        }
                                 )
                             }
                         }
@@ -596,6 +603,9 @@ object Profile {
                             maxLines = 1,
                             modifier = Modifier
                                 .focusRequester(focusRequester)
+                                .onFocusChanged {
+                                    isFocused = it.isFocused
+                                }
                         )
                     }
                 }

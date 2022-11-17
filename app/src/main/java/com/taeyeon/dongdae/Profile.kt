@@ -1149,8 +1149,8 @@ object Profile {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
                 modifier = Modifier
-                    .width(150.dp + 3.dp)
-                    .height(100.dp + 3.dp)
+                    .width(120.dp + 3.dp)
+                    .height(120.dp + 3.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -1428,7 +1428,7 @@ object Profile {
                                         Text(
                                             text = pair.value,
                                             color = MaterialTheme.colorScheme.primary,
-                                            style = MaterialTheme.typography.labelLarge
+                                            style = MaterialTheme.typography.labelSmall
                                         )
                                     }
                                 }

@@ -742,68 +742,43 @@ object Profile {
                         )
 
                         if (!isJumpLine) {
-                            Box(
+                            MyView.MyTextField(
+                                value = value,
+                                onValueChange = onValueChange,
+                                textStyle = MaterialTheme.typography.labelSmall,
+                                maxLines = 1,
+                                textFiledAlignment = Alignment.Center,
                                 modifier = Modifier
+                                    .width(160.dp)
                                     .fillMaxHeight()
-                                    .padding(start = with(LocalDensity.current) { titleTextWidth.toDp() + 8.dp })
                                     .align(Alignment.CenterEnd)
-                                    .border(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        shape = MaterialTheme.shapes.medium
-                                    )
-                                    .padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                BasicTextField(
-                                    value = value,
-                                    onValueChange = onValueChange,
-                                    textStyle = MaterialTheme.typography.labelSmall.copy(
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    ),
-                                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                                    maxLines = 1,
-                                    modifier = Modifier
-                                        .focusRequester(focusRequester)
-                                        .onFocusChanged {
-                                            isFocused = it.isFocused
-                                        }
-                                )
-                            }
+                                    .padding(start = with(LocalDensity.current) { titleTextWidth.toDp() + 8.dp })
+                                    .focusRequester(focusRequester)
+                                    .onFocusChanged {
+                                        isFocused = it.isFocused
+                                    }
+                            )
                         }
 
                     }
                 }
 
                 if (isJumpLine) {
-                    Box(
+                    MyView.MyTextField(
+                        value = value,
+                        onValueChange = onValueChange,
+                        textStyle = MaterialTheme.typography.labelSmall,
+                        maxLines = 1,
+                        textFiledAlignment = Alignment.Center,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(40.dp)
                             .padding(horizontal = 12.dp)
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.medium
-                            )
-                            .padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        BasicTextField(
-                            value = value,
-                            onValueChange = onValueChange,
-                            textStyle = MaterialTheme.typography.labelSmall.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            ),
-                            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                            maxLines = 1,
-                            modifier = Modifier
-                                .focusRequester(focusRequester)
-                                .onFocusChanged {
-                                    isFocused = it.isFocused
-                                }
-                        )
-                    }
+                            .focusRequester(focusRequester)
+                            .onFocusChanged {
+                                isFocused = it.isFocused
+                            }
+                    )
                 }
 
             }

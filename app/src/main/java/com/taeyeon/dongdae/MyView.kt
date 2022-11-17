@@ -17,7 +17,11 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -28,6 +32,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -35,9 +42,12 @@ import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
@@ -62,34 +72,21 @@ object MyView {
             end = 24.dp,
             bottom = 18.dp
         )
-        val Shape: Shape
-            @Composable get() { return MaterialTheme.shapes.medium }
-        val ContainerColor: Color
-            @Composable get() { return MaterialTheme.colorScheme.surface }
+        val Shape: Shape @Composable get() = MaterialTheme.shapes.medium
+        val ContainerColor: Color @Composable get() = MaterialTheme.colorScheme.surface
         val TonalElevation = 2.dp
         val ListTextAlign = TextAlign.Start
-        val IconContentColor: Color
-            @Composable get() { return contentColorFor(backgroundColor = ContainerColor) }
-        val TitleContentColor: Color
-            @Composable get() { return contentColorFor(backgroundColor = ContainerColor) }
-        val TextContentColor: Color
-            @Composable get() { return contentColorFor(backgroundColor = ContainerColor) }
-        val ContentColor: Color
-            @Composable get() { return contentColorFor(backgroundColor = ContainerColor) }
-        val ListContentColor: Color
-            @Composable get() { return MaterialTheme.colorScheme.primary }
-        val ButtonContentColor: Color
-            @Composable get() { return MaterialTheme.colorScheme.primary }
-        val TitleTextStyle: TextStyle
-            @Composable get() { return MaterialTheme.typography.headlineSmall }
-        val TextTextStyle: TextStyle
-            @Composable get() { return MaterialTheme.typography.bodyMedium }
-        val ContentTextStyle: TextStyle
-            @Composable get() { return MaterialTheme.typography.bodyMedium }
-        val ListTextStyle: TextStyle
-            @Composable get() { return MaterialTheme.typography.labelLarge }
-        val ButtonTextStyle: TextStyle
-            @Composable get() { return MaterialTheme.typography.labelLarge }
+        val IconContentColor: Color @Composable get() = contentColorFor(backgroundColor = ContainerColor)
+        val TitleContentColor: Color @Composable get() = contentColorFor(backgroundColor = ContainerColor)
+        val TextContentColor: Color @Composable get() = contentColorFor(backgroundColor = ContainerColor)
+        val ContentColor: Color @Composable get() = contentColorFor(backgroundColor = ContainerColor)
+        val ListContentColor: Color @Composable get() = MaterialTheme.colorScheme.primary
+        val ButtonContentColor: Color @Composable get() = MaterialTheme.colorScheme.primary
+        val TitleTextStyle: TextStyle @Composable get() = MaterialTheme.typography.headlineSmall
+        val TextTextStyle: TextStyle @Composable get() = MaterialTheme.typography.bodyMedium
+        val ContentTextStyle: TextStyle @Composable get() = MaterialTheme.typography.bodyMedium
+        val ListTextStyle: TextStyle @Composable get() = MaterialTheme.typography.labelLarge
+        val ButtonTextStyle: TextStyle @Composable get() = MaterialTheme.typography.labelLarge
         val Properties = DialogProperties()
     }
 
@@ -863,7 +860,117 @@ object MyView {
     }
 
 
-    // TODO MYTEXTFIELD
+    object MyTextFieldDefaults {
+        val modifier: Modifier @Composable get() = Modifier
+        const val enabled: Boolean = true
+        const val readOnly: Boolean = false
+        val textStyle: TextStyle @Composable get() = LocalTextStyle.current
+        val leadingIcon: @Composable (() -> Unit)? = null
+        val trailingIcon: @Composable (() -> Unit)? = null
+        val visualTransformation: VisualTransformation = VisualTransformation.None
+        val keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+        val keyboardActions: KeyboardActions = KeyboardActions.Default
+        const val singleLine: Boolean = false
+        val maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE
+        val onTextLayout: (TextLayoutResult) -> Unit = {}
+        val interactionSource: MutableInteractionSource @Composable get() = remember { MutableInteractionSource() }
+        val cursorBrush: Brush @Composable get() = SolidColor(MaterialTheme.colorScheme.primary)
+        val shape: CornerBasedShape @Composable get() = MaterialTheme.shapes.medium
+        val containerColor: Color @Composable get() = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+        val contentColor: Color @Composable get() = MaterialTheme.colorScheme.primary
+        val textColor: Color @Composable get() = contentColor
+        val border: BorderStroke @Composable get() = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary)
+        val textFiledAlignment: Alignment = Alignment.CenterStart
+    }
+
+    @Composable
+    fun MyTextField(
+        value: String,
+        onValueChange: (String) -> Unit,
+        modifier: Modifier = Modifier,
+        enabled: Boolean = true,
+        readOnly: Boolean = false,
+        textStyle: TextStyle = LocalTextStyle.current,
+        leadingIcon: @Composable (() -> Unit)? = null,
+        trailingIcon: @Composable (() -> Unit)? = null,
+        visualTransformation: VisualTransformation = VisualTransformation.None,
+        keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+        keyboardActions: KeyboardActions = KeyboardActions.Default,
+        singleLine: Boolean = false,
+        maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+        onTextLayout: (TextLayoutResult) -> Unit = {},
+        interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+        cursorBrush: Brush = SolidColor(MaterialTheme.colorScheme.primary),
+        shape: CornerBasedShape = MaterialTheme.shapes.medium,
+        containerColor: Color = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp),
+        contentColor: Color = MaterialTheme.colorScheme.primary,
+        textColor: Color = contentColor,
+        border: BorderStroke = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
+        textFiledAlignment: Alignment = Alignment.CenterStart
+    ) {
+        val focusRequester by remember { mutableStateOf(FocusRequester()) }
+        val focusManager = LocalFocusManager.current
+        var isFocused by remember { mutableStateOf(false) }
+
+        Surface(
+            color = containerColor,
+            contentColor = contentColor,
+            shape = shape,
+            border = border,
+            onClick = {
+                if (isFocused)
+                    focusManager.clearFocus()
+                else
+                    focusRequester.requestFocus()
+            },
+            modifier = modifier
+        ) {
+            leadingIcon?.let {
+                it()
+            }
+            Row(
+                modifier = Modifier
+                    .padding(getCornerSize(shape = shape))
+                    .height(IntrinsicSize.Min),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    contentAlignment = textFiledAlignment
+                ) {
+                    BasicTextField(
+                        value = value,
+                        onValueChange = onValueChange,
+                        modifier = Modifier
+                            .width(IntrinsicSize.Min)
+                            .focusRequester(focusRequester)
+                            .onFocusChanged {
+                                isFocused = it.isFocused
+                            },
+                        enabled = enabled,
+                        readOnly = readOnly,
+                        textStyle = textStyle.copy(
+                            color = textColor
+                        ),
+                        keyboardOptions = keyboardOptions,
+                        keyboardActions = keyboardActions,
+                        singleLine = singleLine,
+                        maxLines = maxLines,
+                        visualTransformation = visualTransformation,
+                        onTextLayout = onTextLayout,
+                        interactionSource = interactionSource,
+                        cursorBrush = cursorBrush
+                    )
+                }
+            }
+            trailingIcon?.let{
+                it()
+            }
+        }
+    }
 
 
     object FullBackgroundSliderDefaults {

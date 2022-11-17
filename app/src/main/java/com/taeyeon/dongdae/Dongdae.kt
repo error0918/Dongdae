@@ -143,7 +143,7 @@ fun SetStatusBarColor(
 fun SetNavigationBarColor(
     color: Color = MaterialTheme.colorScheme.surfaceColorAtElevation(
         animateDpAsState(targetValue = if (Main.bottomSheetScaffoldState.bottomSheetState.isCollapsed) 3.dp else 1.dp).value
-    ) // BottomBar Color
+    )
 ) {
     val view = LocalView.current
     (view.context as Activity).window.navigationBarColor = color.toArgb()

@@ -116,7 +116,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    if (Tester.tester) Tester.Tester()
+                    if (tester) Tester.Tester()
                 }
             }
         }

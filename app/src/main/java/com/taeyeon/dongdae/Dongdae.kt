@@ -17,17 +17,16 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.core.SharedPreferencesManager
 import com.taeyeon.core.Utils
 
-var fullScreenMode by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.FullScreenMode)
-var screenAlwaysOn by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.ScreenAlwaysOn)
-var darkMode by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.DarkMode)
-var dynamicColor by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.DynamicColor)
+var darkMode by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.darkMode)
+var dynamicColor by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.dynamicColor)
+var fullScreenMode by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.fullScreenMode)
+var screenAlwaysOn by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.screenAlwaysOn)
+var tester by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.tester)
 
 var id by mutableStateOf("")
 var name by mutableStateOf("")
@@ -42,29 +41,28 @@ fun load() {
     name = getName(id)
     subName = getSubName(id)
     uniqueColor = getUniqueColor(id)
-
-    // TODO
 }
 
 fun save() {
     saveSettings()
-    // TODO
 }
 
 fun loadSettings() {
     Settings.loadSettings()
 
-    fullScreenMode = Settings.settingsData.FullScreenMode
-    screenAlwaysOn = Settings.settingsData.ScreenAlwaysOn
-    darkMode = Settings.settingsData.DarkMode
-    dynamicColor = Settings.settingsData.DynamicColor
+    darkMode = Settings.settingsData.darkMode
+    dynamicColor = Settings.settingsData.dynamicColor
+    fullScreenMode = Settings.settingsData.fullScreenMode
+    screenAlwaysOn = Settings.settingsData.screenAlwaysOn
+    tester = Settings.settingsData.tester
 }
 
 fun saveSettings() {
-    Settings.settingsData.FullScreenMode = fullScreenMode
-    Settings.settingsData.ScreenAlwaysOn = screenAlwaysOn
-    Settings.settingsData.DarkMode = darkMode
-    Settings.settingsData.DynamicColor = dynamicColor
+    Settings.settingsData.darkMode = darkMode
+    Settings.settingsData.dynamicColor = dynamicColor
+    Settings.settingsData.fullScreenMode = fullScreenMode
+    Settings.settingsData.screenAlwaysOn = screenAlwaysOn
+    Settings.settingsData.tester = tester
 
     Settings.saveSettings()
 }
@@ -122,7 +120,6 @@ fun SetStatusBarColor(
         Settings.DarkMode.SYSTEM_MODE -> isSystemInDarkTheme()
         Settings.DarkMode.LIGHT_MODE -> false
         Settings.DarkMode.DARK_MODE -> true
-        else -> isSystemInDarkTheme()
     }
 ) {
     val view = LocalView.current
@@ -161,5 +158,5 @@ fun getSubName(androidId: String = id): String {
 }
 
 fun getUniqueColor(androidId: String = id): Color {
-    return Color(android.graphics.Color.parseColor("#${getSubName(id)}"))
+    return Color(android.graphics.Color.parseColor("#${getSubName(androidId)}"))
 }

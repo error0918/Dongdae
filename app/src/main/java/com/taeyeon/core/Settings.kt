@@ -26,10 +26,11 @@ object Settings {
 
     val INITIAL_SETTINGS_DATA =
         SettingsData(
-            FullScreenMode = false,
-            ScreenAlwaysOn = false,
-            DarkMode = DarkMode.SYSTEM_MODE,
-            DynamicColor = false
+            darkMode = DarkMode.SYSTEM_MODE,
+            dynamicColor = false,
+            fullScreenMode = false,
+            screenAlwaysOn = false,
+            tester = false
         )
         get() {
             return field.clone()
@@ -38,37 +39,44 @@ object Settings {
     lateinit var settingsData: SettingsData
 
     class SettingsData(
-        FullScreenMode: Boolean = INITIAL_SETTINGS_DATA.FullScreenMode,
-        ScreenAlwaysOn: Boolean = INITIAL_SETTINGS_DATA.ScreenAlwaysOn,
-        DarkMode: DarkMode = INITIAL_SETTINGS_DATA.DarkMode,
-        DynamicColor: Boolean = INITIAL_SETTINGS_DATA.DynamicColor
+        fullScreenMode: Boolean = INITIAL_SETTINGS_DATA.fullScreenMode,
+        screenAlwaysOn: Boolean = INITIAL_SETTINGS_DATA.screenAlwaysOn,
+        darkMode: DarkMode = INITIAL_SETTINGS_DATA.darkMode,
+        dynamicColor: Boolean = INITIAL_SETTINGS_DATA.dynamicColor,
+        tester: Boolean = INITIAL_SETTINGS_DATA.tester
     ) : Cloneable {
-        var FullScreenMode: Boolean = false
+        var fullScreenMode: Boolean = false
             set(value) {
                 field = value
                 saveSettings()
             }
-        var ScreenAlwaysOn: Boolean = false
+        var screenAlwaysOn: Boolean = false
             set(value) {
                 field = value
                 saveSettings()
             }
-        var DarkMode: DarkMode = Settings.DarkMode.SYSTEM_MODE
+        var darkMode: DarkMode = DarkMode.SYSTEM_MODE
             set(value) {
                 field = value
                 saveSettings()
             }
-        var DynamicColor: Boolean = true
+        var dynamicColor: Boolean = true
+            set(value) {
+                field = value
+                saveSettings()
+            }
+        var tester: Boolean = true
             set(value) {
                 field = value
                 saveSettings()
             }
 
         init {
-            this.FullScreenMode = FullScreenMode
-            this.ScreenAlwaysOn = ScreenAlwaysOn
-            this.DarkMode = DarkMode
-            this.DynamicColor = DynamicColor
+            this.fullScreenMode = fullScreenMode
+            this.screenAlwaysOn = screenAlwaysOn
+            this.darkMode = darkMode
+            this.dynamicColor = dynamicColor
+            this.tester = tester
         }
 
         public override fun clone(): SettingsData {
@@ -85,10 +93,11 @@ object Settings {
         if (Core.isSetUp()) sharedPreferencesManager.putAny(SETTINGS_KEY, settingsData)
     }
 
+    @Suppress("DEPRECATION")
     fun applyFullScreenMode() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val window = Core.getActivity().window
-            if (settingsData.FullScreenMode) {
+            if (settingsData.fullScreenMode) {
                 window.setDecorFitsSystemWindows(false)
 
                 val controller = window.insetsController
@@ -99,7 +108,7 @@ object Settings {
                 window.setDecorFitsSystemWindows(true)
             }
         } else {
-            if (settingsData.FullScreenMode) {
+            if (settingsData.fullScreenMode) {
                 val flag: Int = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                         or View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -116,7 +125,7 @@ object Settings {
     }
 
     fun applyScreenAlwaysOn() {
-        if (settingsData.ScreenAlwaysOn) Core.getActivity().window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        if (settingsData.screenAlwaysOn) Core.getActivity().window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         else Core.getActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 

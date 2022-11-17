@@ -39,8 +39,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 object Tester {
-    var tester by mutableStateOf(true) // TODO
-
     private var testDialog by mutableStateOf(false)
 
     private lateinit var scope: CoroutineScope

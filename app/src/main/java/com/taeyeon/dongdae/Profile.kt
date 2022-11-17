@@ -256,6 +256,18 @@ object Profile {
                 title = "일반 설정", // TODO
                 unitList = listOf(
                     {
+                        var tab by rememberSaveable { mutableStateOf(0) }
+
+                        Unit.DropDownUnit(
+                            title = "기본 탭", // TODO
+                            selected = tab,
+                            onSelected = { selected, _ ->
+                                tab = selected
+                            },
+                            list = listOf("알림", "채팅", "커뮤니티", "프로필") // TODO
+                        ) // TODO
+                    },
+                    {
                         var todoPassword by rememberSaveable { mutableStateOf("0000") }
 
                         Unit.TextFieldUnit(
@@ -265,9 +277,6 @@ object Profile {
                                 todoPassword = value
                             }
                         )
-                    },
-                    {
-                        Unit.TextUnit(title = "TODO")
                     }
                 )
             ),
@@ -379,9 +388,9 @@ object Profile {
                 unitList = listOf {
                     Unit.SwitchUnit(
                         title = "테스터", // TODO
-                        checked = Tester.tester,
+                        checked = tester,
                         onCheckedChange = { checked ->
-                            Tester.tester = checked // TODO
+                            tester = checked // TODO
                             save()
                         }
                     )
@@ -932,14 +941,12 @@ object Profile {
                     color = Color.Transparent,
                     shape = MaterialTheme.shapes.medium,
                     onClick = { onSelected(if (selected + 1 >= list.size) 0 else selected + 1, list[if (selected + 1 >= list.size) 0 else selected + 1]) },
-                    modifier = Modifier // TODO
-                        .width(IntrinsicSize.Min)
+                    modifier = Modifier // TOD
                         .fillMaxHeight()
                         .align(Alignment.CenterStart)
                 ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
                             .padding(getCornerSize(shape = MaterialTheme.shapes.medium)),
                         contentAlignment = Alignment.Center
                     ) {
@@ -1367,8 +1374,7 @@ object Profile {
             var themePreview by rememberSaveable { mutableStateOf(ThemePreview.Palette) }
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 RadioUnit(

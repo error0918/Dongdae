@@ -168,7 +168,8 @@ object Community {
                         state = state,
                         refreshTriggerDistance = trigger,
                         scale = true,
-                        backgroundColor = MaterialTheme.colorScheme.primary
+                        backgroundColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             ) {

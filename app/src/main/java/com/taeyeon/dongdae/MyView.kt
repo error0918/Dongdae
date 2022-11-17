@@ -863,12 +863,15 @@ object MyView {
     }
 
 
+    // TODO MYTEXTFIELD
+
+
     object FullBackgroundSliderDefaults {
         const val enabled = true
         val valueRange = 0.01f .. 10f
         const val steps = 0
-        val isShowingPopup = true
-        val roundingDigits = 2
+        const val isShowingPopup = true
+        const val roundingDigits = 2
     }
 
     @Composable

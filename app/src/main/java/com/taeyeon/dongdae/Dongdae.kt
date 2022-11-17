@@ -22,6 +22,9 @@ import com.taeyeon.core.Settings
 import com.taeyeon.core.SharedPreferencesManager
 import com.taeyeon.core.Utils
 
+
+var defaultTab by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.defaultTab)
+var defaultPassword by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.defaultPassword)
 var darkMode by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.darkMode)
 var dynamicColor by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.dynamicColor)
 var fullScreenMode by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.fullScreenMode)
@@ -50,6 +53,8 @@ fun save() {
 fun loadSettings() {
     Settings.loadSettings()
 
+    defaultTab = Settings.settingsData.defaultTab
+    defaultPassword = Settings.settingsData.defaultPassword
     darkMode = Settings.settingsData.darkMode
     dynamicColor = Settings.settingsData.dynamicColor
     fullScreenMode = Settings.settingsData.fullScreenMode
@@ -58,6 +63,8 @@ fun loadSettings() {
 }
 
 fun saveSettings() {
+    Settings.settingsData.defaultTab = defaultTab
+    Settings.settingsData.defaultPassword = defaultPassword
     Settings.settingsData.darkMode = darkMode
     Settings.settingsData.dynamicColor = dynamicColor
     Settings.settingsData.fullScreenMode = fullScreenMode

@@ -256,25 +256,23 @@ object Profile {
                 title = "일반 설정", // TODO
                 unitList = listOf(
                     {
-                        var tab by rememberSaveable { mutableStateOf(0) }
-
                         Unit.DropDownUnit(
                             title = "기본 탭", // TODO
-                            selected = tab,
+                            selected = defaultTab,
                             onSelected = { selected, _ ->
-                                tab = selected
+                                defaultTab = selected
+                                save()
                             },
                             list = listOf("알림", "채팅", "커뮤니티", "프로필") // TODO
                         ) // TODO
                     },
                     {
-                        var todoPassword by rememberSaveable { mutableStateOf("0000") }
-
                         Unit.TextFieldUnit(
                             title = "기본 비밀번호", // TODO
-                            value = todoPassword,
+                            value = defaultPassword,
                             onValueChange = { value ->
-                                todoPassword = value
+                                defaultPassword = value
+                                save()
                             }
                         )
                     }
@@ -889,7 +887,14 @@ object Profile {
                                 onClick = {
                                     onSelected(index, item)
                                     isDropDownMenuExpanded = false
-                                }
+                                },
+                                modifier = Modifier
+                                    .let {
+                                        if (index == selected)
+                                            it.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                                        else
+                                            it
+                                    }
                             )
                             if (index != list.size - 1) {
                                 val dividerColor =

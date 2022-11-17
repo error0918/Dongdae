@@ -26,6 +26,8 @@ object Settings {
 
     val INITIAL_SETTINGS_DATA =
         SettingsData(
+            defaultTab = 2,
+            defaultPassword = "0000",
             darkMode = DarkMode.SYSTEM_MODE,
             dynamicColor = false,
             fullScreenMode = false,
@@ -39,12 +41,24 @@ object Settings {
     lateinit var settingsData: SettingsData
 
     class SettingsData(
+        defaultTab: Int = INITIAL_SETTINGS_DATA.defaultTab,
+        defaultPassword: String = INITIAL_SETTINGS_DATA.defaultPassword,
         fullScreenMode: Boolean = INITIAL_SETTINGS_DATA.fullScreenMode,
         screenAlwaysOn: Boolean = INITIAL_SETTINGS_DATA.screenAlwaysOn,
         darkMode: DarkMode = INITIAL_SETTINGS_DATA.darkMode,
         dynamicColor: Boolean = INITIAL_SETTINGS_DATA.dynamicColor,
         tester: Boolean = INITIAL_SETTINGS_DATA.tester
     ) : Cloneable {
+        var defaultTab: Int = 2
+            set(value) {
+                field = value
+                saveSettings()
+            }
+        var defaultPassword: String = "0000"
+            set(value) {
+                field = value
+                saveSettings()
+            }
         var fullScreenMode: Boolean = false
             set(value) {
                 field = value
@@ -72,6 +86,8 @@ object Settings {
             }
 
         init {
+            this.defaultTab = defaultTab
+            this.defaultPassword = defaultPassword
             this.fullScreenMode = fullScreenMode
             this.screenAlwaysOn = screenAlwaysOn
             this.darkMode = darkMode

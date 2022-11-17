@@ -367,7 +367,7 @@ object Community {
             var content by rememberSaveable { mutableStateOf("") }
             var isHeartAble by rememberSaveable { mutableStateOf(true) }
             var postCategory by rememberSaveable { mutableStateOf(MyView.PostCategory.Unspecified) }
-            var password by rememberSaveable { mutableStateOf("0000") }
+            var password by rememberSaveable { mutableStateOf(defaultPassword) }
 
             LaunchedEffect(true) {
                 if (!::sharedPreferencesManager.isInitialized) {

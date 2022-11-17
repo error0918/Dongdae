@@ -12,27 +12,28 @@ import com.taeyeon.dongdae.R
 import kotlin.system.exitProcess
 
 object Utils {
-    var defaultToastLength = Toast.LENGTH_SHORT
+    private var defaultToastLength = Toast.LENGTH_SHORT
         set(value) { if (value == Toast.LENGTH_SHORT || value == Toast.LENGTH_LONG) field = value }
-    var defaultIsShowToast = true
+    private var defaultIsShowToast = true
 
     fun toast(text: String, length: Int = defaultToastLength) {
         Toast.makeText(Core.getContext(), text, if (length == Toast.LENGTH_SHORT || length == Toast.LENGTH_LONG) length else defaultToastLength).show()
     }
 
-    fun copy(label: String = Info.getApplicationName(), text: String, isShowToast: Boolean = true, toastLength: Int = defaultToastLength) {
+    fun copy(label: String = Info.getApplicationName(), text: String, isShowToast: Boolean = defaultIsShowToast, toastLength: Int = defaultToastLength) {
         val clipboardManager = Core.getContext().getSystemService<ClipboardManager>()!!
         val clipData = ClipData.newPlainText(label, text)
         clipboardManager.setPrimaryClip(clipData)
         if (isShowToast) {
-            if (label != Info.getApplicationName()) {
-                toast(Core.getContext().resources.getString(R.string.copy_toast_message, text))
+            if (label == Info.getApplicationName()) {
+                toast(Core.getContext().resources.getString(R.string.copy_toast_message, text), toastLength)
             } else {
-                toast(Core.getContext().resources.getString(R.string.copy_toast_message_with_label, label, text))
+                toast(Core.getContext().resources.getString(R.string.copy_toast_message_with_label, label, text), toastLength)
             }
         }
     }
 
+    @Suppress("DEPRECATION")
     fun vibrate(milliseconds: Long) {
         val vibrator = Core.getContext().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibrator.vibrate(milliseconds)
@@ -55,7 +56,7 @@ object Utils {
         SharedPreferencesManager.clearAllSharedPreferencesManagers()
     }
 
-    // Custom
+    @Suppress("DEPRECATION")
     fun checkInternet(): Boolean {
         return Core.getContext().getSystemService<ConnectivityManager>()?.activeNetworkInfo?.isConnectedOrConnecting ?: false
     }

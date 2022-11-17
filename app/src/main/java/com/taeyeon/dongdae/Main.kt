@@ -19,9 +19,7 @@ import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -48,11 +46,17 @@ object Main {
         Community.partition,
         Profile.partition
     )
+    private val sheetList = listOf<@Composable () -> Unit>(
+        { NotificationSheet.Notification() },
+        { LicenseSheet.License() },
+        { InfoSheet.Info() }
+    )
 
     lateinit var scope: CoroutineScope
     lateinit var bottomSheetScaffoldState: BottomSheetScaffoldState
     lateinit var pagerState: PagerState
 
+    var sheetIndex by mutableStateOf(0)
     var toolbarColor by mutableStateOf(Color.Transparent)
 
 
@@ -117,7 +121,15 @@ object Main {
             title = { Text(text = stringResource(id = R.string.app_name)) },
             navigationIcon = {
                 IconButton(
-                    onClick = { /* TODO */ }
+                    onClick = {
+                        scope.launch {
+                            sheetIndex = 0
+                            if (bottomSheetScaffoldState.bottomSheetState.isExpanded)
+                                bottomSheetScaffoldState.bottomSheetState.collapse()
+                            else if (bottomSheetScaffoldState.bottomSheetState.isCollapsed)
+                                bottomSheetScaffoldState.bottomSheetState.expand()
+                        }
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Notifications,
@@ -131,14 +143,26 @@ object Main {
                         scope.launch {
                             if (bottomSheetScaffoldState.bottomSheetState.isExpanded)
                                 bottomSheetScaffoldState.bottomSheetState.collapse()
-                            else
+                            else if (bottomSheetScaffoldState.bottomSheetState.isCollapsed)
                                 bottomSheetScaffoldState.bottomSheetState.expand()
                         }
                     }
                 ) {
                     Icon(
-                        imageVector = if (bottomSheetScaffoldState.bottomSheetState.isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-                        contentDescription = if (bottomSheetScaffoldState.bottomSheetState.isExpanded) null else null // TODO
+                        imageVector =
+                            if (bottomSheetScaffoldState.bottomSheetState.isExpanded)
+                                Icons.Default.KeyboardArrowDown
+                            else if (bottomSheetScaffoldState.bottomSheetState.isCollapsed)
+                                Icons.Default.KeyboardArrowUp
+                            else
+                                Icons.Default.Circle,
+                        contentDescription =
+                            if (bottomSheetScaffoldState.bottomSheetState.isExpanded)
+                                null
+                            else if (bottomSheetScaffoldState.bottomSheetState.isCollapsed)
+                                null
+                            else
+                                null// TODO
                     )
                 }
             },
@@ -195,7 +219,7 @@ object Main {
                     )
                 }
 
-                Text(text = "TODO ".repeat(1000))
+                sheetList[sheetIndex]()
 
             }
         }

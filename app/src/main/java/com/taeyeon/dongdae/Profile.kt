@@ -1,4 +1,6 @@
-@file:OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterialApi::class
+)
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
 package com.taeyeon.dongdae
@@ -15,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Person
@@ -44,6 +47,7 @@ import com.taeyeon.core.Settings
 import com.taeyeon.core.Utils
 import com.taeyeon.dongdae.MyView.ChatUnit
 import com.taeyeon.dongdae.ui.theme.Theme
+import kotlinx.coroutines.launch
 
 object Profile {
     private val lazyListState = LazyListState()
@@ -422,14 +426,26 @@ object Profile {
                         Unit.TextButtonUnit(
                             title = "라이선스" // TODO
                         ) {
-                            // TODO
+                            Main.scope.launch {
+                                Main.sheetIndex = 1
+                                if (Main.bottomSheetScaffoldState.bottomSheetState.isExpanded)
+                                    Main.bottomSheetScaffoldState.bottomSheetState.collapse()
+                                else if (Main.bottomSheetScaffoldState.bottomSheetState.isCollapsed)
+                                    Main.bottomSheetScaffoldState.bottomSheetState.expand()
+                            }
                         }
                     },
                     {
                         Unit.TextButtonUnit(
                             title = "앱 정보" // TODO
                         ) {
-                            // TODO
+                            Main.scope.launch {
+                                Main.sheetIndex = 2
+                                if (Main.bottomSheetScaffoldState.bottomSheetState.isExpanded)
+                                    Main.bottomSheetScaffoldState.bottomSheetState.collapse()
+                                else if (Main.bottomSheetScaffoldState.bottomSheetState.isCollapsed)
+                                    Main.bottomSheetScaffoldState.bottomSheetState.expand()
+                            }
                         }
                     }
                 )

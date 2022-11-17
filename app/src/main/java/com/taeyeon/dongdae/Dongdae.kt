@@ -5,6 +5,7 @@ package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CornerBasedShape
@@ -140,7 +141,9 @@ fun SetStatusBarColor(
 
 @Composable
 fun SetNavigationBarColor(
-    color: Color = MaterialTheme.colorScheme.surfaceColorAtElevation(if (Main.bottomSheetScaffoldState.bottomSheetState.isCollapsed) 3.dp else 1.dp) // BottomBar Color
+    color: Color = MaterialTheme.colorScheme.surfaceColorAtElevation(
+        animateDpAsState(targetValue = if (Main.bottomSheetScaffoldState.bottomSheetState.isCollapsed) 3.dp else 1.dp).value
+    ) // BottomBar Color
 ) {
     val view = LocalView.current
     (view.context as Activity).window.navigationBarColor = color.toArgb()

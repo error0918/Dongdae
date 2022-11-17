@@ -146,6 +146,7 @@ fun SetNavigationBarColor(
     (view.context as Activity).window.navigationBarColor = color.toArgb()
 }
 
+
 fun getDigitNumber(number: Int, digits: Int): String {
     return if (digits > 0) {
         if (number.toString().length >= digits) {

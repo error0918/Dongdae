@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 object Main {
     private val snackbarHostState = SnackbarHostState()
     private val partitionList = listOf(
-        Notification.partition,
+        Addons.partition,
         Chat.partition,
         Community.partition,
         Profile.partition
@@ -159,7 +159,6 @@ object Main {
     fun BottomSheetContent() {
         Surface(
             color = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(

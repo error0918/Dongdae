@@ -55,7 +55,7 @@ object Community {
 
     private val lazyListState = LazyListState()
     val partition = Partition(
-        title = "TEST",
+        title = "커뮤니티", // TODO
         filledIcon = Icons.Filled.People,
         outlinedIcon = Icons.Outlined.PeopleOutline,
         lazyListState = lazyListState,

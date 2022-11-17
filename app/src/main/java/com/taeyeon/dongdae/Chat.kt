@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 object Chat {
     private val lazyListState = LazyListState()
     val partition = Partition(
-        title = "asdf",
+        title = "채팅", // TODO
         filledIcon = Icons.Filled.Chat,
         outlinedIcon = Icons.Outlined.Chat,
         lazyListState = lazyListState,

@@ -1,3 +1,6 @@
+@file:OptIn(ExperimentalMaterialApi::class)
+@file:Suppress("OPT_IN_IS_NOT_ENABLED")
+
 package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
@@ -5,6 +8,7 @@ import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CornerBasedShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.*
@@ -136,7 +140,7 @@ fun SetStatusBarColor(
 
 @Composable
 fun SetNavigationBarColor(
-    color: Color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp) // BottomBar Color
+    color: Color = MaterialTheme.colorScheme.surfaceColorAtElevation(if (Main.bottomSheetScaffoldState.bottomSheetState.isCollapsed) 3.dp else 1.dp) // BottomBar Color
 ) {
     val view = LocalView.current
     (view.context as Activity).window.navigationBarColor = color.toArgb()

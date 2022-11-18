@@ -36,6 +36,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onPlaced
@@ -876,9 +877,14 @@ object MyView {
         val cursorBrush: Brush @Composable get() = SolidColor(MaterialTheme.colorScheme.primary)
         val shape: CornerBasedShape @Composable get() = MaterialTheme.shapes.medium
         val containerColor: Color @Composable get() = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
-        val contentColor: Color @Composable get() = MaterialTheme.colorScheme.primary
+        val contentColor: Color @Composable get() = LocalContentColor.current
         val border: BorderStroke @Composable get() = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary)
         val textFiledAlignment: Alignment = Alignment.CenterStart
+        val padding: BoxPadding = BoxPadding.All
+
+        enum class BoxPadding {
+            None, All, Vertical, Horizontal
+        }
     }
 
     @SuppressLint("ModifierParameter")
@@ -905,8 +911,10 @@ object MyView {
         contentColor: Color = MyTextFieldDefaults.contentColor,
         textColor: Color = contentColor,
         border: BorderStroke = MyTextFieldDefaults.border,
-        textFiledAlignment: Alignment = MyTextFieldDefaults.textFiledAlignment
+        textFiledAlignment: Alignment = MyTextFieldDefaults.textFiledAlignment,
+        padding: MyTextFieldDefaults.BoxPadding = MyTextFieldDefaults.padding
     ) {
+        var size by remember { mutableStateOf(Size.Zero) }
         val focusRequester by remember { mutableStateOf(FocusRequester()) }
         val focusManager = LocalFocusManager.current
         var isFocused by remember { mutableStateOf(false) }
@@ -923,50 +931,80 @@ object MyView {
                     focusRequester.requestFocus()
             },
             modifier = modifier
-        ) {
-            leadingIcon?.let {
-                it()
-            }
-            Row(
-                modifier = Modifier
-                    .padding(getCornerSize(shape = shape))
-                    .height(IntrinsicSize.Min),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    contentAlignment = textFiledAlignment
-                ) {
-                    BasicTextField(
-                        value = value,
-                        onValueChange = onValueChange,
-                        modifier = Modifier
-                            .width(IntrinsicSize.Min)
-                            .focusRequester(focusRequester)
-                            .onFocusChanged {
-                                isFocused = it.isFocused
-                            },
-                        enabled = enabled,
-                        readOnly = readOnly,
-                        textStyle = textStyle.copy(
-                            color = textColor
-                        ),
-                        keyboardOptions = keyboardOptions,
-                        keyboardActions = keyboardActions,
-                        singleLine = singleLine,
-                        maxLines = maxLines,
-                        visualTransformation = visualTransformation,
-                        onTextLayout = onTextLayout,
-                        interactionSource = interactionSource,
-                        cursorBrush = cursorBrush
-                    )
+                .onSizeChanged { intSize ->
+                    size = intSize.toSize()
                 }
-            }
-            trailingIcon?.let{
-                it()
+        ) {
+            CompositionLocalProvider(LocalContentColor provides contentColor) {
+                Row(
+                    modifier = Modifier
+                        .padding(
+                            horizontal = when (padding) {
+                                MyTextFieldDefaults.BoxPadding.None -> 0.dp
+                                MyTextFieldDefaults.BoxPadding.All -> getCornerSize(
+                                    shape = shape,
+                                    size = size
+                                )
+                                MyTextFieldDefaults.BoxPadding.Horizontal -> getCornerSize(
+                                    shape = shape,
+                                    size = size
+                                )
+                                MyTextFieldDefaults.BoxPadding.Vertical -> 0.dp
+                            },
+                            vertical = when (padding) {
+                                MyTextFieldDefaults.BoxPadding.None -> 0.dp
+                                MyTextFieldDefaults.BoxPadding.All -> getCornerSize(
+                                    shape = shape,
+                                    size = size
+                                )
+                                MyTextFieldDefaults.BoxPadding.Horizontal -> 0.dp
+                                MyTextFieldDefaults.BoxPadding.Vertical -> getCornerSize(
+                                    shape = shape,
+                                    size = size
+                                )
+                            }
+                        )
+                        .height(IntrinsicSize.Min),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    leadingIcon?.let {
+                        it()
+                    }
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                        contentAlignment = textFiledAlignment
+                    ) {
+                        BasicTextField(
+                            value = value,
+                            onValueChange = onValueChange,
+                            modifier = Modifier
+                                .width(IntrinsicSize.Min)
+                                .focusRequester(focusRequester)
+                                .onFocusChanged {
+                                    isFocused = it.isFocused
+                                },
+                            enabled = enabled,
+                            readOnly = readOnly,
+                            textStyle = textStyle.copy(
+                                color = textColor
+                            ),
+                            keyboardOptions = keyboardOptions,
+                            keyboardActions = keyboardActions,
+                            singleLine = singleLine,
+                            maxLines = maxLines,
+                            visualTransformation = visualTransformation,
+                            onTextLayout = onTextLayout,
+                            interactionSource = interactionSource,
+                            cursorBrush = cursorBrush
+                        )
+                    }
+                    trailingIcon?.let {
+                        it()
+                    }
+                }
             }
         }
     }
@@ -1628,10 +1666,11 @@ object MyView {
                                 contentColor = MaterialTheme.colorScheme.onPrimary,
                                 shape = CircleShape
                             ) {
-                                OutlinedTextField(
-                                    value = "asdf",
+                                var commentValue by rememberSaveable { mutableStateOf("") }
+                                MyTextField(
+                                    value = commentValue,
                                     onValueChange = { value ->
-
+                                        commentValue = value
                                     },
                                     leadingIcon = {
                                         IconButton(
@@ -1639,8 +1678,7 @@ object MyView {
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Filled.KeyboardArrowLeft,
-                                                contentDescription = null, // TODO
-                                                tint = MaterialTheme.colorScheme.onPrimary
+                                                contentDescription = null // TODO
                                             )
                                         }
                                     },
@@ -1650,13 +1688,14 @@ object MyView {
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Filled.Send,
-                                                contentDescription = null, // TODO
-                                                tint = MaterialTheme.colorScheme.onPrimary
+                                                contentDescription = null // TODO
                                             )
                                         }
                                     },
                                     textStyle = MaterialTheme.typography.bodySmall,
+                                    contentColor = MaterialTheme.colorScheme.onSurface,
                                     shape = CircleShape,
+                                    padding = MyTextFieldDefaults.BoxPadding.Horizontal,
                                     modifier = Modifier
                                         .padding(4.dp)
                                         .fillMaxWidth()

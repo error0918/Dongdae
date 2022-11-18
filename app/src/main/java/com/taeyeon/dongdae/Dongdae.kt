@@ -1,27 +1,16 @@
-@file:OptIn(ExperimentalMaterialApi::class)
-@file:Suppress("OPT_IN_IS_NOT_ENABLED")
-
 package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CornerBasedShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.view.ViewCompat
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
@@ -111,10 +100,12 @@ data class Partition(
 
 
 @Composable
-fun getCornerSize(shape: CornerBasedShape): Dp {
+fun getCornerSize(
+    shape: CornerBasedShape,
+    size: Size = Size.Unspecified
+): Dp {
     var cornerRadius: Dp = 0.dp
     shape.let {
-        val size = Size.Unspecified
         with(LocalDensity.current) {
             val corners = listOf(it.topStart, it.topEnd, it.bottomStart, it.bottomEnd)
             corners.forEach { corner ->
@@ -135,7 +126,8 @@ fun SetStatusBarColor(
         Settings.DarkMode.DARK_MODE -> true
     }
 ) {
-    val systemUiController = rememberSystemUiController() || Main.bottomSheetScaffoldState.bottomSheetState.isAnimationRunning
+    val systemUiController = rememberSystemUiController()
+    LaunchedEffect(color, darkIcons) {
         systemUiController.setStatusBarColor(
             color = color,
             darkIcons = darkIcons
@@ -153,10 +145,12 @@ fun SetNavigationBarColor(
     }
 ) {
     val systemUiController = rememberSystemUiController()
-    systemUiController.setNavigationBarColor(
-        color = color,
-        darkIcons = darkIcons
-    )
+    LaunchedEffect(color, darkIcons) {
+        systemUiController.setNavigationBarColor(
+            color = color,
+            darkIcons = darkIcons
+        )
+    }
 }
 
 

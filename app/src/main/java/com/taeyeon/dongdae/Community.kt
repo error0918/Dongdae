@@ -1,5 +1,5 @@
 @file:OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class,
-    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class
 )
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.PeopleOutline
@@ -214,7 +215,7 @@ object Community {
 
                     }
 
-                    item {
+                    items(3) {
                         MyView.PostUnit(
                             id = id,
                             content = "한국사 수행평가 범위 어디야?",
@@ -289,7 +290,7 @@ object Community {
                     exit = fadeOut()
                 ) {
                     AnimatedVisibility(
-                        visible = !lazyListState.isScrollInProgress && (lazyListState.firstVisibleItemIndex != 0 || lazyListState.firstVisibleItemScrollOffset != 0),
+                        visible = (!lazyListState.isScrollInProgress && (lazyListState.firstVisibleItemIndex != 0 || lazyListState.firstVisibleItemScrollOffset != 0)) && !(Main.bottomSheetScaffoldState.bottomSheetState.isExpanded || Main.bottomSheetScaffoldState.bottomSheetState.isAnimationRunning),
                         enter = scaleIn(),
                         exit = scaleOut()
                     ) {

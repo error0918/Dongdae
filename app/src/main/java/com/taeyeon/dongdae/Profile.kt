@@ -5,6 +5,8 @@
 
 package com.taeyeon.dongdae
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -41,11 +43,14 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import com.taeyeon.core.Core
+import com.taeyeon.core.Info
 import com.taeyeon.core.Settings
 import com.taeyeon.core.Utils
 import com.taeyeon.dongdae.MyView.ChatUnit
 import com.taeyeon.dongdae.ui.theme.Theme
 import kotlinx.coroutines.launch
+
 
 object Profile {
     private val lazyListState = LazyListState()
@@ -60,6 +65,12 @@ object Profile {
 
     @Composable
     fun Profile() {
+        var isRestartDialog by rememberSaveable { mutableStateOf(false) }
+
+        if (isRestartDialog) {
+            //
+        }
+
         val blockList = listOf(
             Unit.BlockData(
                 title = "프로필", // TODO
@@ -403,21 +414,30 @@ object Profile {
                         Unit.TextButtonUnit(
                             title = "시스템 설정" // TODO
                         ) {
-                            // TODO
+                            val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + Info.getPackage()))
+                            intent.addCategory(Intent.CATEGORY_DEFAULT)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            Core.getActivity().startActivity(intent)
                         }
                     },
                     {
                         Unit.TextButtonUnit(
                             title = "깃허브" // TODO
                         ) {
-                            // TODO
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/error0918/Dongdae"))
+                            Core.getActivity().startActivity(intent)
                         }
                     },
                     {
                         Unit.TextButtonUnit(
                             title = "메일 문의" // TODO
                         ) {
-                            // TODO
+                            val intent = Intent(Intent.ACTION_SEND)
+                            intent.type = "plain/text"
+                            intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("developer.taeyeon@gmail.com"))
+                            intent.putExtra(Intent.EXTRA_SUBJECT, "동대 애플리케이션 관련 문의") // TODO
+                            intent.putExtra(Intent.EXTRA_TEXT, "동대에 관한 문의") // TODO
+                            Core.getActivity().startActivity(intent)
                         }
                     },
                     {

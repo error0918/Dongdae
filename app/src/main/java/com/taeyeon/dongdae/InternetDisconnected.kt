@@ -3,6 +3,7 @@
 
 package com.taeyeon.dongdae
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -42,7 +43,9 @@ object InternetDisconnected {
 
     @Composable
     fun TopBar() {
-        SetStatusBarColor()
+        SetStatusBarColor(
+            color = MaterialTheme.colorScheme.surface
+        )
 
         var isShowingDialog by rememberSaveable { mutableStateOf(false) }
         if (isShowingDialog) {
@@ -79,7 +82,9 @@ object InternetDisconnected {
 
     @Composable
     fun BottomBar() {
-        SetNavigationBarColor()
+        SetNavigationBarColor(
+            color = MaterialTheme.colorScheme.surface
+        )
 
         BottomAppBar {
             Surface(

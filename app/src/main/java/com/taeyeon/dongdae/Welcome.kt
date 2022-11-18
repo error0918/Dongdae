@@ -50,7 +50,9 @@ object Welcome {
 
     @Composable
     fun TopBar() {
-        SetStatusBarColor()
+        SetStatusBarColor(
+            color = MaterialTheme.colorScheme.surface
+        )
 
         TopAppBar(
             title = { Text(text = "환영합니다") }
@@ -59,7 +61,9 @@ object Welcome {
 
     @Composable
     fun BottomBar() {
-        SetNavigationBarColor()
+        SetNavigationBarColor(
+            color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+        )
 
         BottomAppBar {
             Box(

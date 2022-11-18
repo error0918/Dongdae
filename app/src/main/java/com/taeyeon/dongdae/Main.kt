@@ -9,6 +9,7 @@ package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -25,7 +26,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
@@ -76,18 +79,50 @@ object Main {
                 bottomStart = CornerSize(0.dp),
                 bottomEnd = CornerSize(0.dp)
             ),
-            sheetPeekHeight = 0.dp,
+            sheetPeekHeight = (-10).dp,
             sheetBackgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
             sheetContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             sheetContent = { BottomSheetContent() },
             content = {
-                Scaffold(
-                    topBar = { TopAppBar() },
-                    floatingActionButton = { if (!pagerState.isScrollInProgress) partitionList[pagerState.currentPage].fab?.let { it() } },
-                    bottomBar = { BottomBar() },
-                    snackbarHost = { SnackbarHost(snackbarHostState) }
-                ) { paddingValues ->
-                    MainContent(paddingValues = paddingValues)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .blur(
+                            radius = animateDpAsState(targetValue = if (bottomSheetScaffoldState.bottomSheetState.isExpanded || bottomSheetScaffoldState.bottomSheetState.isAnimationRunning) 3.dp else 0.dp).value
+                        )
+                ) {
+                    Scaffold(
+                        topBar = { TopAppBar() },
+                        floatingActionButton = { if (!pagerState.isScrollInProgress) partitionList[pagerState.currentPage].fab?.let { it() } },
+                        bottomBar = { BottomBar() },
+                        snackbarHost = { SnackbarHost(snackbarHostState) }
+                    ) { paddingValues ->
+                        MainContent(paddingValues = paddingValues)
+                    }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .background(
+                                animateColorAsState(
+                                    targetValue = if (bottomSheetScaffoldState.bottomSheetState.isExpanded || bottomSheetScaffoldState.bottomSheetState.isAnimationRunning) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+                                    else Color.Transparent
+                                ).value
+                            )
+                            .let {
+                                if (bottomSheetScaffoldState.bottomSheetState.isExpanded || bottomSheetScaffoldState.bottomSheetState.isAnimationRunning)
+                                    it
+                                        .pointerInput(Unit) {
+                                            detectTapGestures {
+                                                scope.launch {
+                                                    bottomSheetScaffoldState.bottomSheetState.collapse()
+                                                }
+                                            }
+                                        }
+                                else
+                                    it
+                            }
+                    )
                 }
             }
         )
@@ -175,8 +210,45 @@ object Main {
         )
 
         SetStatusBarColor(
-            color = toolbarColor
+            color = animateColorAsState(
+                targetValue = if (bottomSheetScaffoldState.bottomSheetState.isExpanded || bottomSheetScaffoldState.bottomSheetState.isAnimationRunning) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+                else Color.Transparent
+            ).value.compositeOver(toolbarColor)
         )
+    }
+
+    @Composable
+    fun BottomBar() {
+        SetNavigationBarColor(
+            color = animateColorAsState(
+                targetValue = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                    if (bottomSheetScaffoldState.bottomSheetState.isExpanded || bottomSheetScaffoldState.bottomSheetState.isAnimationRunning) 1.dp else 3.dp
+                )
+            ).value
+        )
+
+        NavigationBar {
+            partitionList.forEachIndexed { index, partition ->
+                val selected = index == pagerState.currentPage
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = if (selected) partition.filledIcon else partition.outlinedIcon,
+                            contentDescription = partition.title
+                        )
+                    },
+                    label = {
+                        Text(text = partition.title)
+                    }
+                )
+            }
+        }
     }
 
     @Composable
@@ -221,34 +293,6 @@ object Main {
 
                 sheetList[sheetIndex]()
 
-            }
-        }
-    }
-
-    @Composable
-    fun BottomBar() {
-        SetNavigationBarColor()
-
-        NavigationBar {
-            partitionList.forEachIndexed { index, partition ->
-                val selected = index == pagerState.currentPage
-                NavigationBarItem(
-                    selected = selected,
-                    onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = if (selected) partition.filledIcon else partition.outlinedIcon,
-                            contentDescription = partition.title
-                        )
-                    },
-                    label = {
-                        Text(text = partition.title)
-                    }
-                )
             }
         }
     }

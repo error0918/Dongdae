@@ -871,42 +871,41 @@ object MyView {
         val keyboardOptions: KeyboardOptions = KeyboardOptions.Default
         val keyboardActions: KeyboardActions = KeyboardActions.Default
         const val singleLine: Boolean = false
-        val maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE
         val onTextLayout: (TextLayoutResult) -> Unit = {}
         val interactionSource: MutableInteractionSource @Composable get() = remember { MutableInteractionSource() }
         val cursorBrush: Brush @Composable get() = SolidColor(MaterialTheme.colorScheme.primary)
         val shape: CornerBasedShape @Composable get() = MaterialTheme.shapes.medium
         val containerColor: Color @Composable get() = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
         val contentColor: Color @Composable get() = MaterialTheme.colorScheme.primary
-        val textColor: Color @Composable get() = contentColor
         val border: BorderStroke @Composable get() = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary)
         val textFiledAlignment: Alignment = Alignment.CenterStart
     }
 
+    @SuppressLint("ModifierParameter")
     @Composable
     fun MyTextField(
         value: String,
         onValueChange: (String) -> Unit,
-        modifier: Modifier = Modifier,
-        enabled: Boolean = true,
-        readOnly: Boolean = false,
-        textStyle: TextStyle = LocalTextStyle.current,
-        leadingIcon: @Composable (() -> Unit)? = null,
-        trailingIcon: @Composable (() -> Unit)? = null,
-        visualTransformation: VisualTransformation = VisualTransformation.None,
-        keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-        keyboardActions: KeyboardActions = KeyboardActions.Default,
-        singleLine: Boolean = false,
+        modifier: Modifier = MyTextFieldDefaults.modifier,
+        enabled: Boolean = MyTextFieldDefaults.enabled,
+        readOnly: Boolean = MyTextFieldDefaults.readOnly,
+        textStyle: TextStyle = MyTextFieldDefaults.textStyle,
+        leadingIcon: @Composable (() -> Unit)? = MyTextFieldDefaults.leadingIcon,
+        trailingIcon: @Composable (() -> Unit)? = MyTextFieldDefaults.trailingIcon,
+        visualTransformation: VisualTransformation = MyTextFieldDefaults.visualTransformation,
+        keyboardOptions: KeyboardOptions = MyTextFieldDefaults.keyboardOptions,
+        keyboardActions: KeyboardActions = MyTextFieldDefaults.keyboardActions,
+        singleLine: Boolean = MyTextFieldDefaults.singleLine,
         maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
-        onTextLayout: (TextLayoutResult) -> Unit = {},
-        interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-        cursorBrush: Brush = SolidColor(MaterialTheme.colorScheme.primary),
-        shape: CornerBasedShape = MaterialTheme.shapes.medium,
-        containerColor: Color = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp),
-        contentColor: Color = MaterialTheme.colorScheme.primary,
+        onTextLayout: (TextLayoutResult) -> Unit = MyTextFieldDefaults.onTextLayout,
+        interactionSource: MutableInteractionSource = MyTextFieldDefaults.interactionSource,
+        cursorBrush: Brush = MyTextFieldDefaults.cursorBrush,
+        shape: CornerBasedShape = MyTextFieldDefaults.shape,
+        containerColor: Color = MyTextFieldDefaults.containerColor,
+        contentColor: Color = MyTextFieldDefaults.contentColor,
         textColor: Color = contentColor,
-        border: BorderStroke = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
-        textFiledAlignment: Alignment = Alignment.CenterStart
+        border: BorderStroke = MyTextFieldDefaults.border,
+        textFiledAlignment: Alignment = MyTextFieldDefaults.textFiledAlignment
     ) {
         val focusRequester by remember { mutableStateOf(FocusRequester()) }
         val focusManager = LocalFocusManager.current

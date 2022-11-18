@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.core.SharedPreferencesManager
@@ -127,26 +128,35 @@ fun getCornerSize(shape: CornerBasedShape): Dp {
 @Suppress("DEPRECATION")
 @Composable
 fun SetStatusBarColor(
-    color: Color = MaterialTheme.colorScheme.surface,
-    isAppearanceLightStatusBars: Boolean = !when (darkMode) {
+    color: Color,
+    darkIcons: Boolean = !when (darkMode) {
         Settings.DarkMode.SYSTEM_MODE -> isSystemInDarkTheme()
         Settings.DarkMode.LIGHT_MODE -> false
         Settings.DarkMode.DARK_MODE -> true
     }
 ) {
-    val view = LocalView.current
-    (view.context as Activity).window.statusBarColor = color.toArgb()
-    ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = isAppearanceLightStatusBars
+    val systemUiController = rememberSystemUiController() || Main.bottomSheetScaffoldState.bottomSheetState.isAnimationRunning
+        systemUiController.setStatusBarColor(
+            color = color,
+            darkIcons = darkIcons
+        )
+    }
 }
 
 @Composable
 fun SetNavigationBarColor(
-    color: Color = MaterialTheme.colorScheme.surfaceColorAtElevation(
-        animateDpAsState(targetValue = if (Main.bottomSheetScaffoldState.bottomSheetState.isCollapsed) 3.dp else 1.dp).value
-    )
+    color: Color,
+    darkIcons: Boolean = !when (darkMode) {
+        Settings.DarkMode.SYSTEM_MODE -> isSystemInDarkTheme()
+        Settings.DarkMode.LIGHT_MODE -> false
+        Settings.DarkMode.DARK_MODE -> true
+    }
 ) {
-    val view = LocalView.current
-    (view.context as Activity).window.navigationBarColor = color.toArgb()
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setNavigationBarColor(
+        color = color,
+        darkIcons = darkIcons
+    )
 }
 
 

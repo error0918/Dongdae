@@ -85,11 +85,7 @@ object Main {
             sheetContent = { BottomSheetContent() },
             content = {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .blur(
-                            radius = animateDpAsState(targetValue = if (bottomSheetScaffoldState.bottomSheetState.isExpanded || bottomSheetScaffoldState.bottomSheetState.isAnimationRunning) 3.dp else 0.dp).value
-                        )
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     Scaffold(
                         topBar = { TopAppBar() },
@@ -105,7 +101,7 @@ object Main {
                             .fillMaxHeight()
                             .background(
                                 animateColorAsState(
-                                    targetValue = if (bottomSheetScaffoldState.bottomSheetState.isExpanded || bottomSheetScaffoldState.bottomSheetState.isAnimationRunning) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+                                    targetValue = if (bottomSheetScaffoldState.bottomSheetState.isExpanded || bottomSheetScaffoldState.bottomSheetState.isAnimationRunning) Color.Black.copy(alpha = 0.3f)
                                     else Color.Transparent
                                 ).value
                             )
@@ -211,7 +207,7 @@ object Main {
 
         SetStatusBarColor(
             color = animateColorAsState(
-                targetValue = if (bottomSheetScaffoldState.bottomSheetState.isExpanded || bottomSheetScaffoldState.bottomSheetState.isAnimationRunning) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+                targetValue = if (bottomSheetScaffoldState.bottomSheetState.isExpanded || bottomSheetScaffoldState.bottomSheetState.isAnimationRunning) Color.Black.copy(alpha = 0.3f)
                 else Color.Transparent
             ).value.compositeOver(toolbarColor)
         )

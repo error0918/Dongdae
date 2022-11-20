@@ -61,7 +61,7 @@ object Addons {
                     }
                 }
             ) {
-                Text(text = "오른쪽으로 넘기기 →") // TODO
+                Text(text = "→ 오른쪽으로 넘기기 →") // TODO
             }
 
         }

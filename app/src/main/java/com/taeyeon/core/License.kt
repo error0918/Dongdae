@@ -60,7 +60,7 @@ object License {
                                 "http://www.eclipse.org/legal/epl-v10.html" -> ECLIPSE_PUBLIC_LICENSE_1_0
                                 "https://jsoup.org/license" -> JSOUP_LICENSE
                                 "https://developer.android.com/studio/terms.html" -> THE_ANDROID_SOFTWARE_DEVELOPMENT_KIT_LICENSE_AGREEMENT
-                                else -> null
+                                else -> rawLicense
                             }
                         } else {
                             rawLicense

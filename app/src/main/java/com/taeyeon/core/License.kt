@@ -76,7 +76,7 @@ object License {
         licenses.sortedWith(compareBy { it.title }).toList()
     }
 
-    val APACHE_LICENSE_2_0 = """
+    private val APACHE_LICENSE_2_0 = """
                     
                                                      Apache License
                                                Version 2.0, January 2004
@@ -336,7 +336,7 @@ object License {
         This Agreement is governed by the laws of the State of New York and the intellectual property laws of the United States of America. No party to this Agreement will bring a legal action under this Agreement more than one year after the cause of action arose. Each party waives its rights to a jury trial in any resulting litigation.
     """.trimIndent()
 
-    val JSOUP_LICENSE = """
+    private val JSOUP_LICENSE = """
         The MIT License
         Copyright (c) 2009-2022 Jonathan Hedley <https://jsoup.org/>
         Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -356,7 +356,7 @@ object License {
         SOFTWARE.
     """.trimIndent()
 
-    val THE_ANDROID_SOFTWARE_DEVELOPMENT_KIT_LICENSE_AGREEMENT = """
+    private val THE_ANDROID_SOFTWARE_DEVELOPMENT_KIT_LICENSE_AGREEMENT = """
         Terms and conditions
 
         This is the Android Software Development Kit License Agreement

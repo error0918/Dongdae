@@ -8,6 +8,7 @@ import android.net.ConnectivityManager
 import android.os.Vibrator
 import android.widget.Toast
 import androidx.core.content.getSystemService
+import com.taeyeon.dongdae.MainActivity
 import com.taeyeon.dongdae.R
 import kotlin.system.exitProcess
 

@@ -40,9 +40,8 @@ class MainActivity : ComponentActivity() {
             splashScreen.setOnExitAnimationListener { splashScreenView ->
                 ObjectAnimator.ofPropertyValuesHolder(
                     splashScreenView.iconView,
-                    PropertyValuesHolder.ofFloat(View.ALPHA, 1f),
-                    PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 2f, 1f),
-                    PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 2f, 1f)
+                    //PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 2f, 1f),
+                    //PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 2f, 1f) // When Restarted Bug!!
                 ).run {
                     isSplashScreen = true
                     interpolator = AnticipateInterpolator()

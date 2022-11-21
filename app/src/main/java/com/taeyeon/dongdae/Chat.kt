@@ -1,5 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class,
-    ExperimentalPagerApi::class, ExperimentalMaterial3Api::class
+@file:OptIn(
+    ExperimentalAnimationApi::class,
+    ExperimentalPagerApi::class
 )
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
@@ -60,6 +61,7 @@ object Chat {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             ChatUnit(
+                                isMe = false,
                                 id = id,
                                 message = "Message".repeat(100)
                             )

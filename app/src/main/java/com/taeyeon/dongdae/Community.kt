@@ -1,5 +1,8 @@
-@file:OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class,
-    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class,
+@file:OptIn(
+    ExperimentalAnimationApi::class,
+    ExperimentalPagerApi::class,
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterialApi::class,
     ExperimentalComposeUiApi::class
 )
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")

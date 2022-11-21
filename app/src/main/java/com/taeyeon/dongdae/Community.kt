@@ -26,6 +26,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -386,54 +388,7 @@ object Community {
             when (writingPostPage) {
 
                 WritingPostPage.Wait -> {
-                    Popup(alignment = Alignment.Center) {
-                        val primaryColor = MaterialTheme.colorScheme.primary
-
-                        val startAngle by rememberInfiniteTransition().animateFloat(
-                            initialValue = 0f,
-                            targetValue = 360f,
-                            animationSpec = infiniteRepeatable(
-                                animation = tween(1000, easing = LinearEasing),
-                                repeatMode = RepeatMode.Restart
-                            )
-                        )
-                        val sweepAngle by rememberInfiniteTransition().animateFloat(
-                            initialValue = 60f,
-                            targetValue = 300f,
-                            animationSpec = infiniteRepeatable(
-                                animation = tween(1500, easing = LinearEasing),
-                                repeatMode = RepeatMode.Reverse
-                            )
-                        )
-
-                        Canvas(
-                            modifier = Modifier
-                                .shadow(
-                                    elevation = 10.dp,
-                                    shape = MaterialTheme.shapes.medium
-                                )
-                                .background(
-                                    color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-                                    shape = MaterialTheme.shapes.medium
-                                )
-                                .size(150.dp)
-                                .padding(30.dp)
-                        ) {
-
-                            drawArc(
-                                color = primaryColor,
-                                startAngle = startAngle,
-                                sweepAngle = sweepAngle,
-                                useCenter = false,
-                                size = Size(90.dp.toPx(), 90.dp.toPx()),
-                                style = Stroke(
-                                    width = 15.dp.toPx(),
-                                    cap = StrokeCap.Round
-                                )
-                            )
-
-                        }
-                    }
+                    MyView.LoadingPopup()
                 }
 
                 WritingPostPage.TemporarySaving -> {
@@ -727,7 +682,7 @@ object Community {
                                                         }
                                                     }
 
-                                                    OutlinedTextField(
+                                                    MyView.MyTextField(
                                                         value = password,
                                                         onValueChange = { value ->
                                                             if (value.length <= 4)
@@ -736,7 +691,8 @@ object Community {
                                                         },
                                                         trailingIcon = {
                                                             IconButton(
-                                                                onClick = { password = getDigitNumber(Random.nextInt(10000), 4) }
+                                                                onClick = { password = getDigitNumber(Random.nextInt(10000), 4) },
+                                                                modifier = Modifier.size(30.dp)
                                                             ) {
                                                                 Icon(
                                                                     imageVector = Icons.Filled.Refresh,
@@ -747,10 +703,9 @@ object Community {
                                                         keyboardOptions = KeyboardOptions(
                                                             keyboardType = KeyboardType.Number
                                                         ),
-                                                        textStyle = MaterialTheme.typography.labelMedium.copy(
-                                                            textAlign = TextAlign.Center
-                                                        ),
+                                                        textStyle = MaterialTheme.typography.labelSmall,
                                                         maxLines = 1,
+                                                        textFiledAlignment = Alignment.Center,
                                                         modifier = Modifier
                                                             .width(100.dp)
                                                             .align(Alignment.CenterEnd)

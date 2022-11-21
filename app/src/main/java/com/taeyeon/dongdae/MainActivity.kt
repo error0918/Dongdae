@@ -25,6 +25,7 @@ import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
+import com.taeyeon.core.SharedPreferencesManager
 import com.taeyeon.dongdae.ui.theme.Theme
 
 var screen by mutableStateOf(Screen.Main)
@@ -36,23 +37,29 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             var isSplashScreen = false
 
-            splashScreen.setSplashScreenTheme(R.style.Theme_Dongdae_Splash)
-            splashScreen.setOnExitAnimationListener { splashScreenView ->
-                ObjectAnimator.ofPropertyValuesHolder(
-                    splashScreenView.iconView,
-                    //PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 2f, 1f),
-                    //PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 2f, 1f) // When Restarted Bug!!
-                ).run {
-                    isSplashScreen = true
-                    interpolator = AnticipateInterpolator()
-                    duration = 100L
-                    doOnEnd {
-                        Core.initialize(applicationContext)
-                        splashScreenView.remove()
-                        isSplashed = true
+            if (!getSharedPreferences(SharedPreferencesManager.Companion.Public.NAME, SharedPreferencesManager.Companion.Public.MODE).getBoolean("isRestarted", false)) {
+                splashScreen.setSplashScreenTheme(R.style.Theme_Dongdae_Splash)
+                splashScreen.setOnExitAnimationListener { splashScreenView ->
+                    ObjectAnimator.ofPropertyValuesHolder(
+                        splashScreenView.iconView,
+                        PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 2f, 1f),
+                        PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 2f, 1f)
+                    ).run {
+                        isSplashScreen = true
+                        interpolator = AnticipateInterpolator()
+                        duration = 100L
+                        doOnEnd {
+                            Core.initialize(applicationContext)
+                            splashScreenView.remove()
+                            isSplashed = true
+                        }
+                        start()
                     }
-                    start()
                 }
+            } else {
+                val editor = getSharedPreferences(SharedPreferencesManager.Companion.Public.NAME, SharedPreferencesManager.Companion.Public.MODE).edit()
+                editor.putBoolean("isRestarted", false)
+                editor.apply()
             }
             if (!isSplashScreen) {
                 Core.initialize(applicationContext)

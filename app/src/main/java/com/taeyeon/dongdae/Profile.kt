@@ -10,14 +10,18 @@ import android.net.Uri
 import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -39,19 +43,20 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.taeyeon.core.Core
-import com.taeyeon.core.Info
-import com.taeyeon.core.Settings
-import com.taeyeon.core.Utils
+import com.taeyeon.core.*
 import com.taeyeon.dongdae.MyView.ChatUnit
 import com.taeyeon.dongdae.ui.theme.Theme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 
 object Profile {
@@ -67,8 +72,13 @@ object Profile {
 
     @Composable
     fun Profile() {
+        var isLoading by rememberSaveable { mutableStateOf(false) }
         var isRestartDialog by rememberSaveable { mutableStateOf(false) }
         var isInitializingDialog by rememberSaveable { mutableStateOf(false) }
+
+        if (isLoading) {
+            MyView.LoadingPopup()
+        }
 
         if (isRestartDialog) {
             MyView.MessageDialog(
@@ -94,8 +104,14 @@ object Profile {
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            Utils.restartApp()
-                            isRestartDialog = false
+                            Main.scope.launch {
+                                isRestartDialog = false
+                                isLoading = true
+                                SharedPreferencesManager.Companion.Public.putBoolean("isRestarted", true)
+                                delay(500)
+                                isLoading = false
+                                Utils.restartApp()
+                            }
                         }
                     ) {
                         Text(text = "재시작") // TODO
@@ -351,9 +367,28 @@ object Profile {
                             title = "기본 비밀번호", // TODO
                             value = defaultPassword,
                             onValueChange = { value ->
-                                defaultPassword = value
+                                if (value.length <= 4)
+                                    defaultPassword = value.replace(".", "")
+                                        .replace("-", "")
                                 save()
-                            }
+                            },
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = { defaultPassword = getDigitNumber(Random.nextInt(10000), 4) },
+                                    modifier = Modifier.size(30.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Refresh,
+                                        contentDescription = null // TODO
+                                    )
+                                }
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number
+                            ),
+                            textStyle = MaterialTheme.typography.labelSmall,
+                            maxLines = 1,
+                            textFiledAlignment = Alignment.Center
                         )
                     }
                 )
@@ -622,39 +657,26 @@ object Profile {
 
         @Composable
         fun TextUnit(
-            title: String
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-                    .padding(horizontal = 12.dp)
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.labelLarge,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier.align(Alignment.CenterStart)
-                )
-            }
-        }
-
-        @Composable
-        fun CopyableTextUnit(
             title: String,
-            copyText: String = title
+            copyText: String? = null
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
                     .padding(horizontal = 12.dp)
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onLongPress = {
-                                Utils.copy(text = copyText)
+                    .let {
+                        if (copyText == null) {
+                            it
+                        } else {
+                            it.pointerInput(Unit) {
+                                detectTapGestures(
+                                    onLongPress = {
+                                        Utils.copy(text = copyText)
+                                    }
+                                )
                             }
-                        )
+                        }
                     }
             ) {
 
@@ -665,17 +687,19 @@ object Profile {
                     modifier = Modifier.align(Alignment.CenterStart)
                 )
 
-                IconButton(
-                    onClick = {
-                        Utils.copy(text = copyText)
-                    },
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.CopyAll,
-                        contentDescription = null // TODO
-                    )
+                copyText?.let {
+                    IconButton(
+                        onClick = {
+                            Utils.copy(text = copyText)
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.CopyAll,
+                            contentDescription = null // TODO
+                        )
+                    }
                 }
 
             }
@@ -784,7 +808,16 @@ object Profile {
             title: String,
             value: String,
             onValueChange: (value: String) -> kotlin.Unit,
-            isJumpLine: Boolean = false
+            isJumpLine: Boolean = false,
+            textStyle: TextStyle = MaterialTheme.typography.labelSmall,
+            leadingIcon: @Composable() (() -> kotlin.Unit)? = MyView.MyTextFieldDefaults.leadingIcon,
+            trailingIcon: @Composable() (() -> kotlin.Unit)? = MyView.MyTextFieldDefaults.trailingIcon,
+            keyboardOptions: KeyboardOptions = MyView.MyTextFieldDefaults.keyboardOptions,
+            keyboardActions: KeyboardActions = MyView.MyTextFieldDefaults.keyboardActions,
+            singleLine: Boolean = MyView.MyTextFieldDefaults.singleLine,
+            maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+            interactionSource: MutableInteractionSource = MyView.MyTextFieldDefaults.interactionSource,
+            textFiledAlignment: Alignment = Alignment.Center
         ) {
             val focusRequester by remember { mutableStateOf(FocusRequester()) }
             val focusManager = LocalFocusManager.current
@@ -828,11 +861,17 @@ object Profile {
                             MyView.MyTextField(
                                 value = value,
                                 onValueChange = onValueChange,
-                                textStyle = MaterialTheme.typography.labelSmall,
-                                maxLines = 1,
-                                textFiledAlignment = Alignment.Center,
+                                textStyle = textStyle,
+                                leadingIcon = leadingIcon,
+                                trailingIcon = trailingIcon,
+                                keyboardOptions = keyboardOptions,
+                                keyboardActions = keyboardActions,
+                                singleLine = singleLine,
+                                maxLines = maxLines,
+                                interactionSource = interactionSource,
+                                textFiledAlignment = textFiledAlignment,
                                 modifier = Modifier
-                                    .width(160.dp)
+                                    .width(200.dp)
                                     .fillMaxHeight()
                                     .align(Alignment.CenterEnd)
                                     .padding(start = with(LocalDensity.current) { titleTextWidth.toDp() + 8.dp })
@@ -850,9 +889,15 @@ object Profile {
                     MyView.MyTextField(
                         value = value,
                         onValueChange = onValueChange,
-                        textStyle = MaterialTheme.typography.labelSmall,
-                        maxLines = 1,
-                        textFiledAlignment = Alignment.Center,
+                        textStyle = textStyle,
+                        leadingIcon = leadingIcon,
+                        trailingIcon = trailingIcon,
+                        keyboardOptions = keyboardOptions,
+                        keyboardActions = keyboardActions,
+                        singleLine = singleLine,
+                        maxLines = maxLines,
+                        interactionSource = interactionSource,
+                        textFiledAlignment = textFiledAlignment,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(40.dp)

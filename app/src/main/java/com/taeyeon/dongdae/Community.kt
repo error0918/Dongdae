@@ -61,7 +61,7 @@ object Community {
         composable = { Community() }
     )
 
-    @SuppressLint("FrequentlyChangedStateReadInComposition")
+    @SuppressLint("FrequentlyChangedStateReadInComposition", "NewApi")
     @Composable
     fun Community() {
         Column(
@@ -182,11 +182,43 @@ object Community {
                         bottom = 8.dp + with(LocalDensity.current) { subTopBarHeight.toDp() }
                     )
                 ) {
+                    val exChatData = MyView.ChatData(
+                        id = id,
+                        message = "MESSAGE",
+                        chatSequence = MyView.ChatSequence.Default
+                    )
+                    val exPostData = MyView.PostData(
+                        time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")),
+                        id = id,
+                        image = null,
+                        contentDescription = null,
+                        isSelectable = true,
+                        content = "CONTENT",
+                        isHeartAble = true,
+                        postCategory = MyView.PostCategory.Unspecified,
+                        password = "0000",
+                        commentList = listOf(
+                            exChatData
+                        ),
+                        postId = 0
+                    )
 
-                    item {
+                    val postDataList by lazy {
+                        val postDataArrayList = arrayListOf<MyView.PostData>()
+
+                        postDataArrayList.toList()
+                    } // TODO
+
+                    val organizedPostDataList = postDataList.filter {
+                        it.postCategory == MyView.PostCategory.values()[categoryIndex]
+                    }
+
+                    //val sortingList = listOf("최신순", "좋아요 순", "랜덤")
+                    /*item {
 
                         MyView.PostUnit(
                             id = id,
+                            image = ImageBitmap.imageResource(id = R.drawable.ic_launcher),
                             content = "얘들아 오늘 급식 어떤 거 나와? 🤤",
                             commentList = listOf(
                                 MyView.ChatData(
@@ -231,7 +263,7 @@ object Community {
                                 )
                             )
                         )
-                    }
+                    }*/
 
                     item {
                         ElevatedCard(

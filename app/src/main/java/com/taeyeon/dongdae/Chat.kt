@@ -60,7 +60,6 @@ object Chat {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             ChatUnit(
-                                isMe = false,
                                 id = id,
                                 message = "Message".repeat(100)
                             )
@@ -72,7 +71,6 @@ object Chat {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             ChatUnit(
-                                isMe = true,
                                 id = id,
                                 message = "Message"
                             )
@@ -84,7 +82,6 @@ object Chat {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             ChatUnit(
-                                isMe = true,
                                 id = id,
                                 message = "Message",
                                 chatSequence = MyView.ChatSequence.SequenceLast

@@ -1378,7 +1378,6 @@ object MyView {
     }
 
     data class ChatData(
-        val isMe: Boolean = false,
         val id: String,
         val message: String,
         val chatSequence: ChatSequence = ChatSequence.Default
@@ -1390,7 +1389,6 @@ object MyView {
     ) {
         chatData.run {
             ChatUnit(
-                isMe = isMe,
                 id = id,
                 message = message,
                 chatSequence = chatSequence
@@ -1400,10 +1398,10 @@ object MyView {
 
     @Composable
     fun BoxScope.ChatUnit(
-        isMe: Boolean = false,
         id: String,
         message: String,
-        chatSequence: ChatSequence = ChatSequence.Default
+        chatSequence: ChatSequence = ChatSequence.Default,
+        isMe: Boolean = com.taeyeon.dongdae.id == id,
     ) {
         val surfaceColor = if (isMe) MaterialTheme.colorScheme.inverseSurface else MaterialTheme.colorScheme.surfaceVariant
         Surface(
@@ -1485,9 +1483,46 @@ object MyView {
         val content: String,
         val isHeartAble: Boolean = true,
         var postCategory: PostCategory = PostCategory.Unspecified,
-        var password: String = "0000",
-        var commentList: List<MyView.ChatData> = listOf()
-    )
+        val password: String = "0000",
+        val commentList: List<ChatData> = listOf(),
+        val postId: Int
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as PostData
+
+            if (time != other.time) return false
+            if (id != other.id) return false
+            if (image != other.image) return false
+            if (contentDescription != other.contentDescription) return false
+            if (isSelectable != other.isSelectable) return false
+            if (content != other.content) return false
+            if (isHeartAble != other.isHeartAble) return false
+            if (postCategory != other.postCategory) return false
+            if (password != other.password) return false
+            if (commentList != other.commentList) return false
+            if (postId != other.postId) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = time.hashCode()
+            result = 31 * result + id.hashCode()
+            result = 31 * result + (image?.hashCode() ?: 0)
+            result = 31 * result + (contentDescription?.hashCode() ?: 0)
+            result = 31 * result + isSelectable.hashCode()
+            result = 31 * result + content.hashCode()
+            result = 31 * result + isHeartAble.hashCode()
+            result = 31 * result + postCategory.hashCode()
+            result = 31 * result + password.hashCode()
+            result = 31 * result + commentList.hashCode()
+            result = 31 * result + postId
+            return result
+        }
+    }
 
     @Composable
     fun PostUnit(
@@ -1502,8 +1537,10 @@ object MyView {
                 isSelectable = isSelectable,
                 content = content,
                 isHeartAble = isHeartAble,
+                postCategory = postCategory,
                 password = password,
-                commentList = commentList
+                commentList = commentList,
+                postId = postId
             )
         }
     }
@@ -1518,8 +1555,10 @@ object MyView {
         isSelectable: Boolean = true,
         content: String,
         isHeartAble: Boolean = true,
+        postCategory: PostCategory = PostCategory.Unspecified,
         password: String = "0000",
-        commentList: List<ChatData> = listOf()
+        commentList: List<ChatData> = listOf(),
+        postId: Int
     ) {
         var isHeart by rememberSaveable { mutableStateOf(false) }
         var heartCount by rememberSaveable { mutableStateOf(12) }
@@ -1568,7 +1607,7 @@ object MyView {
                             .fillMaxWidth()
                             .padding(getCornerSize(shape = MaterialTheme.shapes.medium) + 16.dp)
                     ) {
-                        val (nameUnit, contentImage, contentText, timeText, heart, dropDownMenuButton) = createRefs()
+                        val (nameUnit, contentImage, contentText, categoryText, timeText, heart, dropDownMenuButton) = createRefs()
 
                         NameUnit(
                             modifier = Modifier
@@ -1581,14 +1620,17 @@ object MyView {
 
                         image?.let {
                             Surface(
+                                shape = MaterialTheme.shapes.medium,
                                 modifier = Modifier
+                                    .heightIn(min = 100.dp, max = 200.dp)
                                     .constrainAs(contentImage) {
                                         top.linkTo(nameUnit.bottom, margin = 8.dp)
+                                        centerHorizontallyTo(parent)
                                     }
                             ) {
                                 Image(
                                     bitmap = image,
-                                    contentDescription = null
+                                    contentDescription = contentDescription
                                 )
                             }
                         }
@@ -1621,6 +1663,17 @@ object MyView {
                                     }
                             )
                         }
+
+                        Text(
+                            text = "카테고리: ${postCategoryNameList[PostCategory.values().indexOf(postCategory)]}",
+                            color = LocalContentColor.current.copy(alpha = 0.4f),
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier
+                                .constrainAs(categoryText) {
+                                    top.linkTo(contentText.bottom, margin = 8.dp)
+                                    start.linkTo(parent.start)
+                                }
+                        )
 
                         Text(
                             text = time,

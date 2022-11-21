@@ -68,7 +68,7 @@ object Main {
     fun Main() {
         scope = rememberCoroutineScope()
         bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
-        pagerState = rememberPagerState()
+        pagerState = rememberPagerState(initialPage = 2)
 
         BottomSheetScaffold(
             modifier = Modifier.fillMaxWidth(),
@@ -151,8 +151,8 @@ object Main {
             navigationIcon = {
                 IconButton(
                     onClick = {
+                        sheetIndex = 0
                         scope.launch {
-                            sheetIndex = 0
                             if (bottomSheetScaffoldState.bottomSheetState.isExpanded)
                                 bottomSheetScaffoldState.bottomSheetState.collapse()
                             else if (bottomSheetScaffoldState.bottomSheetState.isCollapsed)

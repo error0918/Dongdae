@@ -1,3 +1,6 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+@file:Suppress("OPT_IN_IS_NOT_ENABLED")
+
 package com.taeyeon.dongdae
 
 import android.content.Intent
@@ -8,10 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -32,13 +32,28 @@ object LicenseSheet {
 
     @Composable
     fun License() {
-        LazyColumn(
+        Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            items(com.taeyeon.core.License.Licenses) { license ->
-                LicenseViewer(
-                    license = license
-                )
+            TopAppBar(
+                title = { Text(text = "라이선스") }, // TODO
+                colors =TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Divider(modifier = Modifier.fillMaxWidth())
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                items(com.taeyeon.core.License.Licenses) { license ->
+                    LicenseViewer(
+                        license = license
+                    )
+                }
             }
         }
     }

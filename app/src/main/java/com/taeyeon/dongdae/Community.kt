@@ -1,5 +1,6 @@
 @file:OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class,
-    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class,
+    ExperimentalComposeUiApi::class
 )
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
@@ -8,7 +9,6 @@ package com.taeyeon.dongdae
 import android.annotation.SuppressLint
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,15 +24,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.KeyboardType
@@ -456,7 +451,8 @@ object Community {
                         },
                         properties = DialogProperties(
                             dismissOnBackPress = false,
-                            dismissOnClickOutside = false
+                            dismissOnClickOutside = false,
+                            usePlatformDefaultWidth = false
                         )
                     )
                 }
@@ -791,7 +787,8 @@ object Community {
                         },
                         properties = DialogProperties(
                             dismissOnBackPress = false,
-                            dismissOnClickOutside = false
+                            dismissOnClickOutside = false,
+                            usePlatformDefaultWidth = false
                         )
                     )
 

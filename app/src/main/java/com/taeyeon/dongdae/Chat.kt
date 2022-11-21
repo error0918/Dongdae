@@ -7,11 +7,11 @@ package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -23,8 +23,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -96,56 +96,42 @@ object Chat {
 
             var text by rememberSaveable { mutableStateOf("") }
             val maxLength = 300
-            OutlinedTextField(
+            val contentColor by animateColorAsState(targetValue = if (text.length >= maxLength) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary)
+            MyView.MyTextField(
                 value = text,
                 onValueChange = { if(it.length <= maxLength) text = it },
-                isError = text.length >= maxLength,
-                shape = MaterialTheme.shapes.medium,
-                label =
+                /*label =
                     if (text.isNotEmpty()) { { Text(text = "${text.length}/$maxLength") } }
-                    else null,
+                    else null,*/
                 trailingIcon = {
-                    IconButton(
-                        onClick = { /*TODO*/ },
-                        enabled = text.isNotBlank()
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Send,
-                            contentDescription = null
-                        )
+                        IconButton(
+                            onClick = { /*TODO*/ },
+                            enabled = text.isNotBlank(),
+                            modifier = Modifier
+                                .width(40.dp)
+                                .height(20.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Send,
+                                contentDescription = null // TODO
+                            )
+                        }
+                        if (text.isNotEmpty())
+                            Text(
+                                text = "${text.length}/$maxLength",
+                                style = MaterialTheme.typography.bodySmall
+                            )
                     }
                 },
-                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Justify),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    textColor = MaterialTheme.colorScheme.primary,
-                    disabledTextColor = MaterialTheme.colorScheme.outlineVariant,
-                    containerColor = Color.Transparent,
-                    cursorColor = MaterialTheme.colorScheme.primary,
-                    errorCursorColor = MaterialTheme.colorScheme.error,
-                    selectionColors = LocalTextSelectionColors.current,
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    disabledBorderColor = MaterialTheme.colorScheme.outlineVariant,
-                    errorBorderColor = MaterialTheme.colorScheme.error,
-                    focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.outline,
-                    disabledLeadingIconColor = MaterialTheme.colorScheme.outlineVariant,
-                    errorLeadingIconColor = MaterialTheme.colorScheme.error,
-                    focusedTrailingIconColor = MaterialTheme.colorScheme.primary,
-                    unfocusedTrailingIconColor = MaterialTheme.colorScheme.outline,
-                    disabledTrailingIconColor = MaterialTheme.colorScheme.outlineVariant,
-                    errorTrailingIconColor = MaterialTheme.colorScheme.error,
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.outline,
-                    disabledLabelColor = MaterialTheme.colorScheme.outlineVariant,
-                    errorLabelColor = MaterialTheme.colorScheme.error,
-                    placeholderColor = MaterialTheme.colorScheme.primary,
-                    disabledPlaceholderColor = MaterialTheme.colorScheme.outlineVariant,
-                    focusedSupportingTextColor = MaterialTheme.colorScheme.primary,
-                    unfocusedSupportingTextColor = MaterialTheme.colorScheme.outline,
-                    disabledSupportingTextColor = MaterialTheme.colorScheme.outlineVariant,
-                    errorSupportingTextColor = MaterialTheme.colorScheme.error
-                ),
+                textFiledAlignment = Alignment.CenterStart,
+                cursorBrush = SolidColor(contentColor),
+                containerColor = Color.Transparent,
+                contentColor = contentColor,
+                textColor = contentColor,
+                border = BorderStroke(width = 1.dp, color = contentColor),
                 modifier = Modifier
                     .padding(8.dp)
                     .background(

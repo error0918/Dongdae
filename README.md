@@ -1,6 +1,6 @@
 <div align=center>
 
-![동대](https://github.com/error0918/Dongdae/blob/master/app/src/main/res/drawable/ic_launcher.png?raw=true)
+<img src="https://github.com/error0918/Dongdae/blob/master/app/src/main/res/drawable/ic_launcher.png?raw=true" width="300" height="300"/>
   
 ### 🏫 동대 🏫
 동산인들을 위한 익명 커뮤니티

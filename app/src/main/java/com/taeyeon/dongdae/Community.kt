@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
@@ -194,6 +195,7 @@ object Community {
                         contentDescription = null,
                         isSelectable = true,
                         content = "CONTENT",
+                        heartCount = 0,
                         isHeartAble = true,
                         postCategory = MyView.PostCategory.Unspecified,
                         password = "0000",
@@ -206,64 +208,39 @@ object Community {
                     val postDataList by lazy {
                         val postDataArrayList = arrayListOf<MyView.PostData>()
 
+                        var total = 0
+                        for (index in 0 until 10) {
+                            for (postCategory in MyView.PostCategory.values()) {
+                                postDataArrayList.add(
+                                    exPostData.copy(
+                                        content = "$total Content",
+                                        heartCount = 100 - total,
+                                        postCategory = postCategory,
+                                        commentList = listOf(exChatData, exChatData),
+                                        postId = total++
+                                    )
+                                )
+                            }
+                        }
+
                         postDataArrayList.toList()
                     } // TODO
 
                     val organizedPostDataList = postDataList.filter {
-                        it.postCategory == MyView.PostCategory.values()[categoryIndex]
+                        if (categoryIndex == 0) true
+                        else it.postCategory == MyView.PostCategory.values()[categoryIndex]
+                    }.let { list ->
+                        when (sortingIndex) {
+                            0 -> list.sortedWith(compareBy { it.postId })
+                            1 -> list.sortedWith(compareBy<MyView.PostData> { it.heartCount }.thenBy { it.postId }).reversed()
+                            2 -> list.shuffled()
+                            else -> list
+                        }
                     }
 
-                    //val sortingList = listOf("최신순", "좋아요 순", "랜덤")
-                    /*item {
-
-                        MyView.PostUnit(
-                            id = id,
-                            image = ImageBitmap.imageResource(id = R.drawable.ic_launcher),
-                            content = "얘들아 오늘 급식 어떤 거 나와? 🤤",
-                            commentList = listOf(
-                                MyView.ChatData(
-                                    isMe = false,
-                                    id = id,
-                                    message = "오늘은 탕수육 나온대!",
-                                    chatSequence = MyView.ChatSequence.Start
-                                ),
-                                MyView.ChatData(
-                                    isMe = true,
-                                    id = id,
-                                    message = "와 정말? 맛있겠다!!",
-                                    chatSequence = MyView.ChatSequence.Start
-                                ),
-                                MyView.ChatData(
-                                    isMe = false,
-                                    id = id,
-                                    message = "응! 나도 기대하고 있어",
-                                    chatSequence = MyView.ChatSequence.Start
-                                )
-                            )
-                        )
-
+                    items(organizedPostDataList) {
+                        MyView.PostUnit(postData = it)
                     }
-
-                    items(3) {
-                        MyView.PostUnit(
-                            id = id,
-                            content = "한국사 수행평가 범위 어디야?",
-                            commentList = listOf(
-                                MyView.ChatData(
-                                    isMe = false,
-                                    id = id,
-                                    message = "아마 우리가 2학기 때 배우는 거 전체일걸?",
-                                    chatSequence = MyView.ChatSequence.Start
-                                ),
-                                MyView.ChatData(
-                                    isMe = true,
-                                    id = id,
-                                    message = "고마워~",
-                                    chatSequence = MyView.ChatSequence.Start
-                                )
-                            )
-                        )
-                    }*/
 
                     item {
                         ElevatedCard(

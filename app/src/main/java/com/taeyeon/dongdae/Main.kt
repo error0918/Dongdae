@@ -68,7 +68,7 @@ object Main {
     fun Main() {
         scope = rememberCoroutineScope()
         bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
-        pagerState = rememberPagerState(initialPage = 2)
+        pagerState = rememberPagerState(initialPage = defaultTab)
 
         BottomSheetScaffold(
             modifier = Modifier.fillMaxWidth(),
@@ -305,9 +305,6 @@ object Main {
                 modifier = Modifier.fillMaxSize()
             ) {
                 partitionList[it].composable()
-            }
-            LaunchedEffect(true) {
-                pagerState.scrollToPage(defaultTab)
             }
         }
     }

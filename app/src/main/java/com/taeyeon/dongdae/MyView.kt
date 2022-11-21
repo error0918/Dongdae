@@ -1481,48 +1481,13 @@ object MyView {
         val contentDescription: String? = null,
         val isSelectable: Boolean = true,
         val content: String,
+        val heartCount: Int,
         val isHeartAble: Boolean = true,
         var postCategory: PostCategory = PostCategory.Unspecified,
         val password: String = "0000",
         val commentList: List<ChatData> = listOf(),
         val postId: Int
-    ) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as PostData
-
-            if (time != other.time) return false
-            if (id != other.id) return false
-            if (image != other.image) return false
-            if (contentDescription != other.contentDescription) return false
-            if (isSelectable != other.isSelectable) return false
-            if (content != other.content) return false
-            if (isHeartAble != other.isHeartAble) return false
-            if (postCategory != other.postCategory) return false
-            if (password != other.password) return false
-            if (commentList != other.commentList) return false
-            if (postId != other.postId) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = time.hashCode()
-            result = 31 * result + id.hashCode()
-            result = 31 * result + (image?.hashCode() ?: 0)
-            result = 31 * result + (contentDescription?.hashCode() ?: 0)
-            result = 31 * result + isSelectable.hashCode()
-            result = 31 * result + content.hashCode()
-            result = 31 * result + isHeartAble.hashCode()
-            result = 31 * result + postCategory.hashCode()
-            result = 31 * result + password.hashCode()
-            result = 31 * result + commentList.hashCode()
-            result = 31 * result + postId
-            return result
-        }
-    }
+    )
 
     @Composable
     fun PostUnit(
@@ -1536,6 +1501,7 @@ object MyView {
                 contentDescription = contentDescription,
                 isSelectable = isSelectable,
                 content = content,
+                heartCount = heartCount,
                 isHeartAble = isHeartAble,
                 postCategory = postCategory,
                 password = password,
@@ -1554,6 +1520,7 @@ object MyView {
         contentDescription: String? = null,
         isSelectable: Boolean = true,
         content: String,
+        heartCount: Int,
         isHeartAble: Boolean = true,
         postCategory: PostCategory = PostCategory.Unspecified,
         password: String = "0000",
@@ -1561,9 +1528,8 @@ object MyView {
         postId: Int
     ) {
         var isHeart by rememberSaveable { mutableStateOf(false) }
-        var heartCount by rememberSaveable { mutableStateOf(12) }
         val onHeartClicked = { checked: Boolean ->
-            heartCount += if (checked) 1 else -1
+            // todo
             isHeart = checked
         }
 

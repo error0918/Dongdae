@@ -22,6 +22,8 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Power
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -66,9 +68,74 @@ object Profile {
     @Composable
     fun Profile() {
         var isRestartDialog by rememberSaveable { mutableStateOf(false) }
+        var isInitializingDialog by rememberSaveable { mutableStateOf(false) }
 
         if (isRestartDialog) {
-            //
+            MyView.MessageDialog(
+                onDismissRequest = { isRestartDialog = false },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Power,
+                        contentDescription = "재시작" // TODO
+                    )
+                },
+                title = { Text(text = "재시작") }, // TODO
+                text = {
+                    Text(
+                        text = "정상적인 작동을 위해서는 재시작이 필요합니다.\n" +
+                                "재시작하시겠습니까?"
+                    )
+                },
+                dismissButton = {
+                    TextButton(onClick = { isRestartDialog = false }) {
+                        Text(text = "닫기") // TODO
+                    }
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            Utils.restartApp()
+                            isRestartDialog = false
+                        }
+                    ) {
+                        Text(text = "재시작") // TODO
+                    }
+                }
+            )
+        }
+
+        if (isInitializingDialog) {
+            MyView.MessageDialog(
+                onDismissRequest = { isRestartDialog = false },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = "초기화" // TODO
+                    )
+                },
+                title = { Text(text = "초기화") }, // TODO
+                text = {
+                    Text(
+                        text = "앱의 모든 정보를 초기화시키겠습니까?"
+                    )
+                },
+                dismissButton = {
+                    TextButton(onClick = { isInitializingDialog = false }) {
+                        Text(text = "닫기") // TODO
+                    }
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            Utils.initializeData()
+                            isInitializingDialog = false
+                            isRestartDialog = true
+                        }
+                    ) {
+                        Text(text = "초기화") // TODO
+                    }
+                }
+            )
         }
 
         val blockList = listOf(
@@ -331,7 +398,8 @@ object Profile {
                             onCheckedChange = { checked ->
                                 fullScreenMode = checked
                                 Settings.applyFullScreenMode()
-                                save() // TODO: 재시작 안내
+                                save()
+                                isRestartDialog = true
                             }
                         )
                     },
@@ -342,7 +410,8 @@ object Profile {
                             onCheckedChange = { checked ->
                                 screenAlwaysOn = checked
                                 Settings.applyScreenAlwaysOn()
-                                save() // TODO: 재시작 안내
+                                save()
+                                isRestartDialog = true
                             }
                         )
                     }
@@ -381,16 +450,12 @@ object Profile {
                     {
                         Unit.TextButtonUnit(
                             title = "앱 재시작" // TODO
-                        ) {
-                            // TODO
-                        }
+                        ) { isRestartDialog = true }
                     },
                     {
                         Unit.TextButtonUnit(
                             title = "앱 초기화" // TODO
-                        ) {
-                            // TODO
-                        }
+                        ) { isInitializingDialog = true }
                     }
                 )
             ),

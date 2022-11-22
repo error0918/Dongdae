@@ -47,6 +47,10 @@ import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.taeyeon.core.SharedPreferencesManager
 import com.taeyeon.core.Utils
+import com.taeyeon.dongdae.data.ChatData
+import com.taeyeon.dongdae.data.PostCategory
+import com.taeyeon.dongdae.data.PostData
+import com.taeyeon.dongdae.data.postCategoryNameList
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -94,12 +98,12 @@ object Community {
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
-                        items(MyView.postCategoryNameList.size) { index ->
+                        items(postCategoryNameList.size) { index ->
                             val selected = index == categoryIndex
                             FilterChip(
                                 selected = selected,
                                 onClick = { categoryIndex = index },
-                                label = { Text(text = if (index == 0) "전체" else MyView.postCategoryNameList[index]) }, // TODO
+                                label = { Text(text = if (index == 0) "전체" else postCategoryNameList[index]) }, // TODO
                                 leadingIcon = {
                                     Icon(
                                         imageVector = if (selected) Icons.Default.CheckCircle else Icons.Default.CheckCircleOutline,
@@ -186,12 +190,11 @@ object Community {
                         bottom = 8.dp + with(LocalDensity.current) { subTopBarHeight.toDp() }
                     )
                 ) {
-                    val exChatData = MyView.ChatData(
+                    val exChatData = ChatData(
                         id = id,
-                        message = "MESSAGE",
-                        chatSequence = MyView.ChatSequence.Default
+                        message = "MESSAGE"
                     )
-                    val exPostData = MyView.PostData(
+                    val exPostData = PostData(
                         time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")),
                         id = id,
                         image = null,
@@ -200,7 +203,7 @@ object Community {
                         content = "CONTENT",
                         heartCount = 0,
                         isHeartAble = true,
-                        postCategory = MyView.PostCategory.Unspecified,
+                        postCategory = PostCategory.Unspecified,
                         password = "0000",
                         commentList = listOf(
                             exChatData
@@ -209,11 +212,11 @@ object Community {
                     )
 
                     val postDataList by lazy {
-                        val postDataArrayList = arrayListOf<MyView.PostData>()
+                        val postDataArrayList = arrayListOf<PostData>()
 
                         var total = 0
                         for (index in 0 until 10) {
-                            for (postCategory in MyView.PostCategory.values()) {
+                            for (postCategory in PostCategory.values()) {
                                 postDataArrayList.add(
                                     exPostData.copy(
                                         content = "$total Content",
@@ -231,11 +234,11 @@ object Community {
 
                     val organizedPostDataList = postDataList.filter {
                         if (categoryIndex == 0) true
-                        else it.postCategory == MyView.PostCategory.values()[categoryIndex]
+                        else it.postCategory == PostCategory.values()[categoryIndex]
                     }.let { list ->
                         when (sortingIndex) {
                             0 -> list.sortedWith(compareBy { it.postId })
-                            1 -> list.sortedWith(compareBy<MyView.PostData> { it.heartCount }.thenBy { it.postId }).reversed()
+                            1 -> list.sortedWith(compareBy<PostData> { it.heartCount }.thenBy { it.postId }).reversed()
                             2 -> list.shuffled()
                             else -> list
                         }
@@ -377,7 +380,7 @@ object Community {
             var isSelectable by rememberSaveable { mutableStateOf(true) }
             var content by rememberSaveable { mutableStateOf("") }
             var isHeartAble by rememberSaveable { mutableStateOf(true) }
-            var postCategory by rememberSaveable { mutableStateOf(MyView.PostCategory.Unspecified) }
+            var postCategory by rememberSaveable { mutableStateOf(PostCategory.Unspecified) }
             var password by rememberSaveable { mutableStateOf(defaultPassword) }
 
             LaunchedEffect(true) {
@@ -435,7 +438,7 @@ object Community {
                                             isSelectable = true
                                             content = ""
                                             isHeartAble = true
-                                            postCategory = MyView.PostCategory.Unspecified
+                                            postCategory = PostCategory.Unspecified
                                             password = "0000"
 
                                             writingPostPage = WritingPostPage.Writing
@@ -450,7 +453,7 @@ object Community {
                                             isSelectable = sharedPreferencesManager.getBoolean(isSelectableKey, true)
                                             content = sharedPreferencesManager.getString(contentKey, "")
                                             isHeartAble = sharedPreferencesManager.getBoolean(isHeartAbleKey, true)
-                                            postCategory = sharedPreferencesManager.getAny(postCategoryKey, MyView.PostCategory::class.java, MyView.PostCategory.Unspecified)
+                                            postCategory = sharedPreferencesManager.getAny(postCategoryKey, PostCategory::class.java, PostCategory.Unspecified)
                                             password = sharedPreferencesManager.getString(passwordKey, "0000")
 
                                             writingPostPage = WritingPostPage.Writing
@@ -591,7 +594,7 @@ object Community {
                                                             verticalAlignment = Alignment.CenterVertically
                                                         ) {
                                                             Text(
-                                                                text = (MyView.postCategoryNameList[MyView.PostCategory.values()
+                                                                text = (postCategoryNameList[PostCategory.values()
                                                                     .indexOf(postCategory)]),
                                                                 textAlign = TextAlign.Center,
                                                                 maxLines = 1,
@@ -610,12 +613,12 @@ object Community {
                                                             },
                                                             modifier = Modifier.width(100.dp)
                                                         ) {
-                                                            MyView.postCategoryNameList.forEachIndexed { index, item ->
+                                                            postCategoryNameList.forEachIndexed { index, item ->
                                                                 DropdownMenuItem(
                                                                     text = { Text(text = item) },
                                                                     onClick = {
                                                                         postCategory =
-                                                                            MyView.PostCategory.values()[index]
+                                                                            PostCategory.values()[index]
                                                                         isDropDownMenuExpanded =
                                                                             false
                                                                     }

@@ -30,7 +30,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.taeyeon.dongdae.MyView.ChatUnit
+import com.taeyeon.dongdae.data.ChatSequence
 import kotlinx.coroutines.launch
 
 object Chat {
@@ -50,6 +56,30 @@ object Chat {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
+            val database = Firebase.database.getReference("chat")
+
+            database.addChildEventListener(object: ChildEventListener {
+                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onChildRemoved(snapshot: DataSnapshot) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 state = lazyListState,
@@ -86,7 +116,7 @@ object Chat {
                             ChatUnit(
                                 id = id,
                                 message = "Message",
-                                chatSequence = MyView.ChatSequence.SequenceLast
+                                chatSequence = ChatSequence.SequenceLast
                             )
                         }
                     }

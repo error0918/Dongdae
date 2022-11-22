@@ -3,17 +3,15 @@ package com.taeyeon.dongdae.data
 import androidx.compose.ui.graphics.ImageBitmap
 
 data class PostData(
-    val time: String,
     val id: String,
+    val content: String,
     val image: ImageBitmap? = null,
     val contentDescription: String? = null,
     val isSelectable: Boolean = true,
-    val content: String,
-    val heartCount: Int,
     val isHeartAble: Boolean = true,
     var postCategory: PostCategory = PostCategory.Unspecified,
     val password: String = "0000",
-    val commentList: List<ChatData> = listOf(),
+    val time: String,
     val postId: Int
 ) {
     companion object {
@@ -26,3 +24,8 @@ data class PostData(
         } // TODO
     }
 }
+
+data class PostDataPlus(
+    val heartCount: Int,
+    val commentList: List<ChatData> = listOf(),
+)

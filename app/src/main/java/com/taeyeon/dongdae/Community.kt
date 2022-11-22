@@ -48,9 +48,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.taeyeon.core.SharedPreferencesManager
 import com.taeyeon.core.Utils
 import com.taeyeon.dongdae.data.ChatData
-import com.taeyeon.dongdae.data.PostCategory
 import com.taeyeon.dongdae.data.PostData
-import com.taeyeon.dongdae.data.postCategoryNameList
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -98,12 +96,12 @@ object Community {
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
-                        items(postCategoryNameList.size) { index ->
+                        items(PostData.postCategoryNameList.size) { index ->
                             val selected = index == categoryIndex
                             FilterChip(
                                 selected = selected,
                                 onClick = { categoryIndex = index },
-                                label = { Text(text = if (index == 0) "전체" else postCategoryNameList[index]) }, // TODO
+                                label = { Text(text = if (index == 0) "전체" else PostData.postCategoryNameList[index]) }, // TODO
                                 leadingIcon = {
                                     Icon(
                                         imageVector = if (selected) Icons.Default.CheckCircle else Icons.Default.CheckCircleOutline,
@@ -203,7 +201,7 @@ object Community {
                         content = "CONTENT",
                         heartCount = 0,
                         isHeartAble = true,
-                        postCategory = PostCategory.Unspecified,
+                        postCategory = PostData.Companion.PostCategory.Unspecified,
                         password = "0000",
                         commentList = listOf(
                             exChatData
@@ -216,7 +214,7 @@ object Community {
 
                         var total = 0
                         for (index in 0 until 10) {
-                            for (postCategory in PostCategory.values()) {
+                            for (postCategory in PostData.Companion.PostCategory.values()) {
                                 postDataArrayList.add(
                                     exPostData.copy(
                                         content = "$total Content",
@@ -234,7 +232,7 @@ object Community {
 
                     val organizedPostDataList = postDataList.filter {
                         if (categoryIndex == 0) true
-                        else it.postCategory == PostCategory.values()[categoryIndex]
+                        else it.postCategory == PostData.Companion.PostCategory.values()[categoryIndex]
                     }.let { list ->
                         when (sortingIndex) {
                             0 -> list.sortedWith(compareBy { it.postId })
@@ -380,7 +378,7 @@ object Community {
             var isSelectable by rememberSaveable { mutableStateOf(true) }
             var content by rememberSaveable { mutableStateOf("") }
             var isHeartAble by rememberSaveable { mutableStateOf(true) }
-            var postCategory by rememberSaveable { mutableStateOf(PostCategory.Unspecified) }
+            var postCategory by rememberSaveable { mutableStateOf(PostData.Companion.PostCategory.Unspecified) }
             var password by rememberSaveable { mutableStateOf(defaultPassword) }
 
             LaunchedEffect(true) {
@@ -438,7 +436,7 @@ object Community {
                                             isSelectable = true
                                             content = ""
                                             isHeartAble = true
-                                            postCategory = PostCategory.Unspecified
+                                            postCategory = PostData.Companion.PostCategory.Unspecified
                                             password = "0000"
 
                                             writingPostPage = WritingPostPage.Writing
@@ -453,7 +451,7 @@ object Community {
                                             isSelectable = sharedPreferencesManager.getBoolean(isSelectableKey, true)
                                             content = sharedPreferencesManager.getString(contentKey, "")
                                             isHeartAble = sharedPreferencesManager.getBoolean(isHeartAbleKey, true)
-                                            postCategory = sharedPreferencesManager.getAny(postCategoryKey, PostCategory::class.java, PostCategory.Unspecified)
+                                            postCategory = sharedPreferencesManager.getAny(postCategoryKey, PostData.Companion.PostCategory::class.java, PostData.Companion.PostCategory.Unspecified)
                                             password = sharedPreferencesManager.getString(passwordKey, "0000")
 
                                             writingPostPage = WritingPostPage.Writing
@@ -594,8 +592,7 @@ object Community {
                                                             verticalAlignment = Alignment.CenterVertically
                                                         ) {
                                                             Text(
-                                                                text = (postCategoryNameList[PostCategory.values()
-                                                                    .indexOf(postCategory)]),
+                                                                text = (PostData.postCategoryNameList[PostData.Companion.PostCategory.values().indexOf(postCategory)]),
                                                                 textAlign = TextAlign.Center,
                                                                 maxLines = 1,
                                                                 modifier = Modifier.weight(1f)
@@ -613,14 +610,12 @@ object Community {
                                                             },
                                                             modifier = Modifier.width(100.dp)
                                                         ) {
-                                                            postCategoryNameList.forEachIndexed { index, item ->
+                                                            PostData.postCategoryNameList.forEachIndexed { index, item ->
                                                                 DropdownMenuItem(
                                                                     text = { Text(text = item) },
                                                                     onClick = {
-                                                                        postCategory =
-                                                                            PostCategory.values()[index]
-                                                                        isDropDownMenuExpanded =
-                                                                            false
+                                                                        postCategory = PostData.Companion.PostCategory.values()[index]
+                                                                        isDropDownMenuExpanded = false
                                                                     }
                                                                 )
                                                             }

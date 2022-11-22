@@ -1377,8 +1377,8 @@ object MyView {
     @Composable
     fun BoxScope.ChatUnit(
         chatData: ChatData,
-        chatSequence: ChatSequence = ChatSequence.Default,
-        isMe: Boolean = com.taeyeon.dongdae.id == id,
+        chatSequence: ChatData.Companion.ChatSequence = ChatData.Companion.ChatSequence.Default,
+        isMe: Boolean = com.taeyeon.dongdae.id == chatData.id,
     ) {
         chatData.run {
             ChatUnit(
@@ -1394,14 +1394,14 @@ object MyView {
     fun BoxScope.ChatUnit(
         id: String,
         message: String,
-        chatSequence: ChatSequence = ChatSequence.Default,
+        chatSequence: ChatData.Companion.ChatSequence = ChatData.Companion.ChatSequence.Default,
         isMe: Boolean = com.taeyeon.dongdae.id == id,
     ) {
         val surfaceColor = if (isMe) MaterialTheme.colorScheme.inverseSurface else MaterialTheme.colorScheme.surfaceVariant
         Surface(
             modifier = Modifier
                 .padding(
-                    top = if (chatSequence == ChatSequence.Default) 16.dp else 8.dp,
+                    top = if (chatSequence == ChatData.Companion.ChatSequence.Default) 16.dp else 8.dp,
                     bottom = 0.dp,
                     start = if (isMe) 80.dp else 8.dp,
                     end = if (isMe) 8.dp else 80.dp
@@ -1493,7 +1493,7 @@ object MyView {
         content: String,
         heartCount: Int,
         isHeartAble: Boolean = true,
-        postCategory: PostCategory = PostCategory.Unspecified,
+        postCategory: PostData.Companion.PostCategory = PostData.Companion.PostCategory.Unspecified,
         password: String = "0000",
         commentList: List<ChatData> = listOf(),
         postId: Int
@@ -1602,7 +1602,7 @@ object MyView {
                         }
 
                         Text(
-                            text = "카테고리: ${postCategoryNameList[PostCategory.values().indexOf(postCategory)]}",
+                            text = "카테고리: ${PostData.postCategoryNameList[PostData.Companion.PostCategory.values().indexOf(postCategory)]}",
                             color = LocalContentColor.current.copy(alpha = 0.4f),
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier

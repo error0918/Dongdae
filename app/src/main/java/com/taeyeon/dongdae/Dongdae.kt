@@ -12,10 +12,20 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.ChildEvent
+import com.google.firebase.database.ktx.snapshots
+import com.google.firebase.ktx.Firebase
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.core.SharedPreferencesManager
 import com.taeyeon.core.Utils
+import com.taeyeon.dongdae.data.ChatData
+import kotlinx.coroutines.flow.collectIndexed
+import kotlinx.coroutines.launch
 
 
 var defaultTab by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.defaultTab)
@@ -67,6 +77,53 @@ fun saveSettings() {
     Settings.settingsData.tester = tester
 
     Settings.saveSettings()
+}
+
+
+object FDManager {
+    private const val ChatId = "chat"
+    private const val PostId = "post"
+
+    val chatDatabase = Firebase.database.getReference(ChatId).child(ChatId)
+    val postDatabase = Firebase.database.getReference(PostId).child(PostId)
+
+    fun initializeChat(
+        onInitialized: () -> Unit,
+        onChildAdded: (snapshot: DataSnapshot, previousChildName: String?) -> Unit
+    ) {
+        onInitialized()
+        chatDatabase.addChildEventListener(object: ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                onChildAdded(snapshot, previousChildName)
+            }
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
+    fun initializePost(
+        onInitialized: () -> Unit,
+        onChildAdded: (snapshot: DataSnapshot, previousChildName: String?) -> Unit
+    ) {
+        onInitialized()
+        postDatabase.addChildEventListener(object: ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                onChildAdded(snapshot, previousChildName)
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
 }
 
 
@@ -169,7 +226,7 @@ fun getAndroidId(): String = android.provider.Settings.Secure.getString(Core.get
 
 fun getName(androidId: String = id): String {
     val endangeredSpecies = Core.getContext().resources.getStringArray(R.array.endangered_species)
-    return endangeredSpecies[Integer.parseInt(androidId.substring(0..5), 16) % endangeredSpecies.size]
+    return endangeredSpecies[Integer.parseInt(androidId.substring(0..5), 16) % endangeredSpecies.size - 1]
 }
 
 fun getSubName(androidId: String = id): String {

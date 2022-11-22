@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -30,13 +31,11 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.database.ktx.snapshots
+import com.taeyeon.core.Utils
 import com.taeyeon.dongdae.MyView.ChatUnit
-import com.taeyeon.dongdae.data.ChatSequence
+import com.taeyeon.dongdae.data.ChatData
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
 
 object Chat {
@@ -50,77 +49,53 @@ object Chat {
         composable = { Chat() }
     )
 
+    val chatDataList =  mutableStateListOf<ChatData>()
+
     @SuppressLint("FrequentlyChangedStateReadInComposition")
     @Composable
     fun Chat() {
+        LaunchedEffect(true) {
+            FDManager.initializeChat(
+                onInitialized = {
+                    Main.scope.launch {
+                        FDManager.chatDatabase.snapshots.collectIndexed { _, value ->
+                            value.getValue(ChatData::class.java)?.let {
+                                Chat.chatDataList.add(it)
+                            }
+                        }
+                    }
+                },
+                onChildAdded = { snapshot, _ ->
+                    snapshot.getValue(ChatData::class.java)?.let { chatData ->
+                        if (chatData.id.isNotBlank() && chatData.message.isNotBlank())
+                            if (chatDataList.indexOf(chatData) == -1) chatDataList.add(
+                                chatData
+                            )
+                    }
+                }
+            )
+        }
+
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            val database = Firebase.database.getReference("chat")
-
-            database.addChildEventListener(object: ChildEventListener {
-                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onChildRemoved(snapshot: DataSnapshot) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
-            })
-
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 state = lazyListState,
                 contentPadding = PaddingValues(bottom = 100.dp + 8.dp * 2)
             ) {
-                for (i in 0 until 100) {
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            ChatUnit(
-                                isMe = false,
-                                id = id,
-                                message = "Message".repeat(100)
-                            )
-                        }
-                    }
 
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
+                items(chatDataList) { chatData ->
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (chatData.id.isNotBlank() && chatData.message.isNotBlank())
                             ChatUnit(
-                                id = id,
-                                message = "Message"
+                                chatData = chatData
                             )
-                        }
-                    }
-
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            ChatUnit(
-                                id = id,
-                                message = "Message",
-                                chatSequence = ChatSequence.SequenceLast
-                            )
-                        }
                     }
                 }
+
             }
 
             var text by rememberSaveable { mutableStateOf("") }
@@ -137,7 +112,16 @@ object Chat {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         IconButton(
-                            onClick = { /*TODO*/ },
+                            onClick = {
+                                /*TODO*/
+                                FDManager.chatDatabase.push().setValue(
+                                    ChatData(
+                                        id = id,
+                                        message = text
+                                    )
+                                )
+                                text = ""
+                            },
                             enabled = text.isNotBlank(),
                             modifier = Modifier
                                 .width(40.dp)

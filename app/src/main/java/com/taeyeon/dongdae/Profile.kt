@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.taeyeon.core.*
 import com.taeyeon.dongdae.MyView.ChatUnit
-import com.taeyeon.dongdae.data.ChatSequence
+import com.taeyeon.dongdae.data.ChatData
 import com.taeyeon.dongdae.ui.theme.Theme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -1323,7 +1323,7 @@ object Profile {
                                                             isMe = true,
                                                             id = id,
                                                             message = "테마 미리보기", // TODO
-                                                            chatSequence = ChatSequence.Default
+                                                            chatSequence = ChatData.Companion.ChatSequence.Default
                                                         )
                                                     }
                                                 }
@@ -1335,7 +1335,7 @@ object Profile {
                                                             isMe = false,
                                                             id = id,
                                                             message = "테마 미리보기", // TODO
-                                                            chatSequence = ChatSequence.Default
+                                                            chatSequence = ChatData.Companion.ChatSequence.Default
                                                         )
                                                     }
                                                 }
@@ -1347,7 +1347,7 @@ object Profile {
                                                             isMe = true,
                                                             id = id,
                                                             message = "테마 미리보기", // TODO
-                                                            chatSequence = ChatSequence.Default
+                                                            chatSequence = ChatData.Companion.ChatSequence.Default
                                                         )
                                                     }
                                                 }
@@ -1359,7 +1359,7 @@ object Profile {
                                                             isMe = true,
                                                             id = id,
                                                             message = "테마 미리보기", // TODO
-                                                            chatSequence = ChatSequence.Sequence
+                                                            chatSequence = ChatData.Companion.ChatSequence.Sequence
                                                         )
                                                     }
                                                 }

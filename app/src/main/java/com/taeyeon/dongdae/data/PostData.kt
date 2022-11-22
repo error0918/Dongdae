@@ -2,14 +2,6 @@ package com.taeyeon.dongdae.data
 
 import androidx.compose.ui.graphics.ImageBitmap
 
-enum class PostCategory {
-    Unspecified, Study, SchoolLife, Tip, Game, QA
-}
-
-val postCategoryNameList by lazy {
-    listOf("없음", "공부", "학교 생활", "팁", "게임", "Q&A")
-} // TODO
-
 data class PostData(
     val time: String,
     val id: String,
@@ -23,4 +15,14 @@ data class PostData(
     val password: String = "0000",
     val commentList: List<ChatData> = listOf(),
     val postId: Int
-)
+) {
+    companion object {
+        enum class PostCategory {
+            Unspecified, Study, SchoolLife, Tip, Game, QA
+        }
+
+        val postCategoryNameList by lazy {
+            listOf("없음", "공부", "학교 생활", "팁", "게임", "Q&A")
+        } // TODO
+    }
+}

@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.firebase.database.ktx.snapshots
-import com.taeyeon.core.Utils
 import com.taeyeon.dongdae.MyView.ChatUnit
 import com.taeyeon.dongdae.data.ChatData
 import kotlinx.coroutines.flow.collectIndexed
@@ -60,7 +59,7 @@ object Chat {
                     Main.scope.launch {
                         FDManager.chatDatabase.snapshots.collectIndexed { _, value ->
                             value.getValue(ChatData::class.java)?.let {
-                                Chat.chatDataList.add(it)
+                                chatDataList.add(it)
                             }
                         }
                     }
@@ -68,9 +67,8 @@ object Chat {
                 onChildAdded = { snapshot, _ ->
                     snapshot.getValue(ChatData::class.java)?.let { chatData ->
                         if (chatData.id.isNotBlank() && chatData.message.isNotBlank())
-                            if (chatDataList.indexOf(chatData) == -1) chatDataList.add(
-                                chatData
-                            )
+                            if (chatDataList.indexOf(chatData) == -1)
+                                chatDataList.add(chatData)
                     }
                 }
             )
@@ -113,7 +111,6 @@ object Chat {
                     ) {
                         IconButton(
                             onClick = {
-                                /*TODO*/
                                 FDManager.chatDatabase.push().setValue(
                                     ChatData(
                                         id = id,

@@ -84,8 +84,8 @@ object FDManager {
     private const val ChatId = "chat"
     private const val PostId = "post"
 
-    val chatDatabase = Firebase.database.getReference(ChatId).child(ChatId)
-    val postDatabase = Firebase.database.getReference(PostId).child(PostId)
+    val chatDatabase = Firebase.database.getReference(ChatId)
+    val postDatabase = Firebase.database.getReference(PostId)
 
     fun initializeChat(
         onInitialized: () -> Unit,

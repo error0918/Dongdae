@@ -48,7 +48,7 @@ object Chat {
         composable = { Chat() }
     )
 
-    val chatDataList =  mutableStateListOf<ChatData>()
+    private val chatDataList =  mutableStateListOf<ChatData>()
 
     @SuppressLint("FrequentlyChangedStateReadInComposition")
     @Composable
@@ -57,7 +57,8 @@ object Chat {
             FDManager.initializeChat(
                 onInitialized = {
                     Main.scope.launch {
-                        FDManager.chatDatabase.snapshots.collectIndexed { _, value ->
+                        FDManager.chatDatabase.snapshots.collectIndexed { _, snapshot ->
+                            val value = snapshot.children.toList()[0]
                             value.getValue(ChatData::class.java)?.let {
                                 chatDataList.add(it)
                             }
@@ -65,10 +66,12 @@ object Chat {
                     }
                 },
                 onChildAdded = { snapshot, _ ->
-                    snapshot.getValue(ChatData::class.java)?.let { chatData ->
+                    val value = snapshot.children.toList()[0]
+                    value.getValue(ChatData::class.java)?.let { chatData ->
                         if (chatData.id.isNotBlank() && chatData.message.isNotBlank())
                             if (chatDataList.indexOf(chatData) == -1)
                                 chatDataList.add(chatData)
+                        // TODO
                     }
                 }
             )
@@ -114,7 +117,8 @@ object Chat {
                                 FDManager.chatDatabase.push().setValue(
                                     ChatData(
                                         id = id,
-                                        message = text
+                                        message = text,
+                                        dataID = chatDataList.size
                                     )
                                 )
                                 text = ""
@@ -180,7 +184,7 @@ object Chat {
                         FilledIconButton(
                             onClick = {
                                 Main.scope.launch {
-                                    lazyListState.animateScrollToItem(299)
+                                    lazyListState.animateScrollToItem(chatDataList.size - 1)
                                 }
                             }
                         ) {

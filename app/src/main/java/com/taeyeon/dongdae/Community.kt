@@ -78,7 +78,7 @@ object Community {
     @Composable
     fun Community() {
         LaunchedEffect(true) {
-            FDManager.initializeChat(
+            FDManager.initializePost(
                 onInitialized = {
                     Main.scope.launch {
                         FDManager.postDatabase.snapshots.collectIndexed { _, snapshot ->
@@ -223,58 +223,12 @@ object Community {
                         bottom = 8.dp + with(LocalDensity.current) { subTopBarHeight.toDp() }
                     )
                 ) {
-                    /*val exChatData = ChatData(
-                        id = id,
-                        message = "MESSAGE",
-                        chatId = 0
-                    )
-                    val exPostData = PostData(
-                        id = id,
-
-                        content = "CONTENT",
-                        image = null,
-                        heartCount = 0,
-                        postCategory = PostCategory.Unspecified,
-
-                        isSelectable = true,
-                        isHeartAble = true,
-                        password = "0000",
-
-                        commentList = listOf(
-                            exChatData
-                        ),
-
-                        time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")),
-                        postId = 0
-                    )
-
-                    val postDataList by lazy {
-                        val postDataArrayList = arrayListOf<PostData>()
-
-                        var total = 0
-                        for (index in 0 until 10) {
-                            for (postCategory in PostCategory.values()) {
-                                postDataArrayList.add(
-                                    exPostData.copy(
-                                        content = "$total Content",
-                                        heartCount = 100 - total,
-                                        postCategory = postCategory,
-                                        commentList = listOf(exChatData, exChatData),
-                                        postId = total++
-                                    )
-                                )
-                            }
-                        }
-
-                        postDataArrayList.toList()
-                    } // TODO*/
-
                     val organizedPostDataList = postDataList.filter {
                         if (categoryIndex == 0) true
                         else it.postCategory == PostCategory.values()[categoryIndex]
                     }.let { list ->
                         when (sortingIndex) {
-                            0 -> list.sortedWith(compareBy { it.postId })
+                            0 -> list.sortedWith(compareBy { it.postId }).reversed()
                             1 -> list.sortedWith(compareBy<PostData> { it.heartCount }.thenBy { it.postId }).reversed()
                             2 -> list.shuffled()
                             else -> list
@@ -958,9 +912,10 @@ object Community {
                                                     password = password,
                                                     
                                                     time = time,
-                                                    postId = 1 // TODO
+                                                    postId = postDataList.size // TODO
                                                 )
                                             )
+                                            writingPostPage = WritingPostPage.NoticeSuccess
                                         }
                                     }
                                 ) {

@@ -918,7 +918,7 @@ object MyView {
         padding: MyTextFieldDefaults.BoxPadding = MyTextFieldDefaults.padding
     ) {
         var size by remember { mutableStateOf(Size.Zero) }
-        val focusRequester by remember { mutableStateOf(FocusRequester()) }
+        val focusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
         var isFocused by remember { mutableStateOf(false) }
 
@@ -1377,8 +1377,8 @@ object MyView {
     @Composable
     fun BoxScope.ChatUnit(
         chatData: ChatData,
-        chatSequence: ChatData.Companion.ChatSequence = ChatData.Companion.ChatSequence.Default,
-        isMe: Boolean = com.taeyeon.dongdae.id == chatData.id,
+        chatSequence: ChatSequence = ChatSequence.Default,
+        isMe: Boolean = id == chatData.id,
     ) {
         chatData.run {
             ChatUnit(
@@ -1394,14 +1394,14 @@ object MyView {
     fun BoxScope.ChatUnit(
         id: String,
         message: String,
-        chatSequence: ChatData.Companion.ChatSequence = ChatData.Companion.ChatSequence.Default,
+        chatSequence: ChatSequence = ChatSequence.Default,
         isMe: Boolean = com.taeyeon.dongdae.id == id,
     ) {
         val surfaceColor = if (isMe) MaterialTheme.colorScheme.inverseSurface else MaterialTheme.colorScheme.surfaceVariant
         Surface(
             modifier = Modifier
                 .padding(
-                    top = if (chatSequence == ChatData.Companion.ChatSequence.Default) 16.dp else 8.dp,
+                    top = if (chatSequence == ChatSequence.Default) 16.dp else 8.dp,
                     bottom = 0.dp,
                     start = if (isMe) 80.dp else 8.dp,
                     end = if (isMe) 8.dp else 80.dp
@@ -1469,7 +1469,6 @@ object MyView {
                 time = time,
                 id = id,
                 image = image,
-                contentDescription = contentDescription,
                 isSelectable = isSelectable,
                 content = content,
                 heartCount = heartCount,
@@ -1487,13 +1486,12 @@ object MyView {
     fun PostUnit(
         time: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")),
         id: String,
-        image: ImageBitmap? = null,
-        contentDescription: String? = null,
+        image: Pair<ImageBitmap, String?>? = null,
         isSelectable: Boolean = true,
         content: String,
         heartCount: Int,
         isHeartAble: Boolean = true,
-        postCategory: PostData.Companion.PostCategory = PostData.Companion.PostCategory.Unspecified,
+        postCategory: PostCategory = PostCategory.Unspecified,
         password: String = "0000",
         commentList: List<ChatData> = listOf(),
         postId: Int
@@ -1566,8 +1564,8 @@ object MyView {
                                     }
                             ) {
                                 Image(
-                                    bitmap = image,
-                                    contentDescription = contentDescription
+                                    bitmap = image.first,
+                                    contentDescription = image.second
                                 )
                             }
                         }
@@ -1602,7 +1600,7 @@ object MyView {
                         }
 
                         Text(
-                            text = "카테고리: ${PostData.postCategoryNameList[PostData.Companion.PostCategory.values().indexOf(postCategory)]}",
+                            text = "카테고리: ${postCategoryNameList[PostCategory.values().indexOf(postCategory)]}",
                             color = LocalContentColor.current.copy(alpha = 0.4f),
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier

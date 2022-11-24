@@ -11,7 +11,6 @@ package com.taeyeon.dongdae
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.*
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,6 +31,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.KeyboardType
@@ -45,10 +45,15 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.google.firebase.database.ktx.snapshots
 import com.taeyeon.core.SharedPreferencesManager
 import com.taeyeon.core.Utils
-import com.taeyeon.dongdae.data.ChatData
+import com.taeyeon.dongdae.data.PostCategory
 import com.taeyeon.dongdae.data.PostData
+import com.taeyeon.dongdae.data.postCategoryNameList
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -67,9 +72,39 @@ object Community {
         composable = { Community() }
     )
 
+    private val postDataList =  mutableStateListOf<PostData>()
+
     @SuppressLint("FrequentlyChangedStateReadInComposition", "NewApi")
     @Composable
     fun Community() {
+        LaunchedEffect(true) {
+            FDManager.initializeChat(
+                onInitialized = {
+                    Main.scope.launch {
+                        FDManager.postDatabase.snapshots.collectIndexed { _, snapshot ->
+                            if (snapshot.hasChildren()) {
+                                val value = snapshot.children.first()
+                                value.getValue(PostData::class.java)?.let {
+                                    postDataList.add(it)
+                                }
+                            }
+                        }
+                    }
+                },
+                onChildAdded = { snapshot, _ ->
+                    if (snapshot.hasChildren()) {
+                        val value = snapshot.children.first()
+                        value.getValue(PostData::class.java)?.let { postData ->
+                            if (postDataList.indexOf(postData) == -1)
+                                postDataList.add(postData)
+
+                            // TODO
+                        }
+                    }
+                }
+            )
+        }
+
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -96,12 +131,12 @@ object Community {
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp)
                     ) {
-                        items(PostData.postCategoryNameList.size) { index ->
+                        items(postCategoryNameList.size) { index ->
                             val selected = index == categoryIndex
                             FilterChip(
                                 selected = selected,
                                 onClick = { categoryIndex = index },
-                                label = { Text(text = if (index == 0) "전체" else PostData.postCategoryNameList[index]) }, // TODO
+                                label = { Text(text = if (index == 0) "전체" else postCategoryNameList[index]) }, // TODO
                                 leadingIcon = {
                                     Icon(
                                         imageVector = if (selected) Icons.Default.CheckCircle else Icons.Default.CheckCircleOutline,
@@ -188,24 +223,28 @@ object Community {
                         bottom = 8.dp + with(LocalDensity.current) { subTopBarHeight.toDp() }
                     )
                 ) {
-                    val exChatData = ChatData(
+                    /*val exChatData = ChatData(
                         id = id,
-                        message = "MESSAGE"
+                        message = "MESSAGE",
+                        chatId = 0
                     )
                     val exPostData = PostData(
-                        time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")),
                         id = id,
-                        image = null,
-                        contentDescription = null,
-                        isSelectable = true,
+
                         content = "CONTENT",
+                        image = null,
                         heartCount = 0,
+                        postCategory = PostCategory.Unspecified,
+
+                        isSelectable = true,
                         isHeartAble = true,
-                        postCategory = PostData.Companion.PostCategory.Unspecified,
                         password = "0000",
+
                         commentList = listOf(
                             exChatData
                         ),
+
+                        time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")),
                         postId = 0
                     )
 
@@ -214,7 +253,7 @@ object Community {
 
                         var total = 0
                         for (index in 0 until 10) {
-                            for (postCategory in PostData.Companion.PostCategory.values()) {
+                            for (postCategory in PostCategory.values()) {
                                 postDataArrayList.add(
                                     exPostData.copy(
                                         content = "$total Content",
@@ -228,11 +267,11 @@ object Community {
                         }
 
                         postDataArrayList.toList()
-                    } // TODO
+                    } // TODO*/
 
                     val organizedPostDataList = postDataList.filter {
                         if (categoryIndex == 0) true
-                        else it.postCategory == PostData.Companion.PostCategory.values()[categoryIndex]
+                        else it.postCategory == PostCategory.values()[categoryIndex]
                     }.let { list ->
                         when (sortingIndex) {
                             0 -> list.sortedWith(compareBy { it.postId })
@@ -358,6 +397,7 @@ object Community {
 
         private const val timeKey = "time"
         private const val imageKey = "image"
+        private const val contentDescriptionKey = "contentDescription"
         private const val isSelectableKey = "isSelectable"
         private const val contentKey = "content"
         private const val isHeartAbleKey = "isHeartAble"
@@ -373,13 +413,15 @@ object Community {
         fun WritePostDialog() {
             var writingPostPage by rememberSaveable { mutableStateOf(WritingPostPage.Wait) }
 
-            var time by rememberSaveable { mutableStateOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm"))) }
-            var image by rememberSaveable { mutableStateOf<ImageBitmap?>(null) }
-            var isSelectable by rememberSaveable { mutableStateOf(true) }
             var content by rememberSaveable { mutableStateOf("") }
+            var image by rememberSaveable { mutableStateOf<Pair<ImageBitmap, String?>?>(null) }
+            var postCategory by rememberSaveable { mutableStateOf(PostCategory.Unspecified) }
+            
+            var isSelectable by rememberSaveable { mutableStateOf(true) }
             var isHeartAble by rememberSaveable { mutableStateOf(true) }
-            var postCategory by rememberSaveable { mutableStateOf(PostData.Companion.PostCategory.Unspecified) }
             var password by rememberSaveable { mutableStateOf(defaultPassword) }
+            
+            var time by rememberSaveable { mutableStateOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm"))) }
 
             LaunchedEffect(true) {
                 if (!::sharedPreferencesManager.isInitialized) {
@@ -436,7 +478,7 @@ object Community {
                                             isSelectable = true
                                             content = ""
                                             isHeartAble = true
-                                            postCategory = PostData.Companion.PostCategory.Unspecified
+                                            postCategory = PostCategory.Unspecified
                                             password = "0000"
 
                                             writingPostPage = WritingPostPage.Writing
@@ -447,11 +489,16 @@ object Community {
                                     TextButton(
                                         onClick = {
                                             time = sharedPreferencesManager.getString(timeKey, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")))
-                                            image = sharedPreferencesManager.getAny<ImageBitmap?>(imageKey, ImageBitmap::class.java, null)
+
+                                            image = sharedPreferencesManager.getAny<ImageBitmap?>(imageKey, ImageBitmap::class.java, null).let {
+                                                if (it == null) null
+                                                else it to sharedPreferencesManager.getString(contentDescriptionKey, "").let { description -> description.ifEmpty { null } }
+                                            }
+
                                             isSelectable = sharedPreferencesManager.getBoolean(isSelectableKey, true)
                                             content = sharedPreferencesManager.getString(contentKey, "")
                                             isHeartAble = sharedPreferencesManager.getBoolean(isHeartAbleKey, true)
-                                            postCategory = sharedPreferencesManager.getAny(postCategoryKey, PostData.Companion.PostCategory::class.java, PostData.Companion.PostCategory.Unspecified)
+                                            postCategory = sharedPreferencesManager.getAny(postCategoryKey, PostCategory::class.java, PostCategory.Unspecified)
                                             password = sharedPreferencesManager.getString(passwordKey, "0000")
 
                                             writingPostPage = WritingPostPage.Writing
@@ -592,7 +639,7 @@ object Community {
                                                             verticalAlignment = Alignment.CenterVertically
                                                         ) {
                                                             Text(
-                                                                text = (PostData.postCategoryNameList[PostData.Companion.PostCategory.values().indexOf(postCategory)]),
+                                                                text = (postCategoryNameList[PostCategory.values().indexOf(postCategory)]),
                                                                 textAlign = TextAlign.Center,
                                                                 maxLines = 1,
                                                                 modifier = Modifier.weight(1f)
@@ -610,11 +657,11 @@ object Community {
                                                             },
                                                             modifier = Modifier.width(100.dp)
                                                         ) {
-                                                            PostData.postCategoryNameList.forEachIndexed { index, item ->
+                                                            postCategoryNameList.forEachIndexed { index, item ->
                                                                 DropdownMenuItem(
                                                                     text = { Text(text = item) },
                                                                     onClick = {
-                                                                        postCategory = PostData.Companion.PostCategory.values()[index]
+                                                                        postCategory = PostCategory.values()[index]
                                                                         isDropDownMenuExpanded = false
                                                                     }
                                                                 )
@@ -745,12 +792,59 @@ object Community {
 
                                 var isImageDialog by rememberSaveable { mutableStateOf(false) }
 
-                                if (!isImageDialog) {
-                                    /*MyView.ListDialog(
+                                if (isImageDialog) {
+                                    MyView.ListDialog(
                                         onDismissRequest = { isImageDialog = false },
-                                        items = ,
-                                        onItemClick =
-                                    )*/
+                                        text = {
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(vertical = 100.dp),
+                                                verticalArrangement = Arrangement.Center,
+                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            ) {
+
+                                                Text(
+                                                    text = "조금만 기달려주세요! 😄", // TODO
+                                                    style = MaterialTheme.typography.titleLarge
+                                                )
+
+                                                Text(
+                                                    text = """
+                                                        이곳에서는 이미지를 업로드할 수 있을 예정입니다.
+                                                    """.trimIndent(), // TODO
+                                                    textAlign = TextAlign.Center,
+                                                    style = MaterialTheme.typography.titleMedium
+                                                )
+
+                                            }
+                                        },
+                                        items = listOf(
+                                            "업로드하기",
+                                            "제거하기",
+                                            "이미지 설명 넣기"
+                                        ), // TODO
+                                        itemContent = { _, item ->
+                                            Column(modifier = Modifier.fillMaxWidth()) {
+                                                TextButton(
+                                                    onClick = { /* TODO */ },
+                                                    shape = RectangleShape
+                                                ) {
+                                                    Text(
+                                                        text = item,
+                                                        textAlign = TextAlign.Center,
+                                                        modifier = Modifier.fillMaxWidth()
+                                                    )
+                                                }
+                                                Divider(modifier = Modifier.fillMaxWidth())
+                                            }
+                                        },
+                                        button = {
+                                            TextButton(onClick = { isImageDialog = false }) {
+                                                Text(text = "") // TODO
+                                            }
+                                        }
+                                    )
                                 }
 
                                 OutlinedButton(
@@ -760,10 +854,11 @@ object Community {
                                     Text(text = "이미지: 업로드되지 않음") // TODO
                                 }
 
-                                OutlinedTextField(
+                                Text(text = "내용")
+                                MyView.MyTextField(
                                     value = content,
                                     onValueChange = { value -> content = value },
-                                    label = { Text(text = "내용") },
+                                    textFiledAlignment = Alignment.TopStart,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .weight(1f)
@@ -789,9 +884,14 @@ object Community {
                                 }
                                 TextButton(
                                     modifier = Modifier.align(Alignment.CenterEnd),
-                                    onClick = { /* TODO */ }
+                                    onClick = {
+                                        writingPostPage = WritingPostPage.CheckBeforeUploading
+                                    }
                                 ) {
-                                    Text(text = "게시하기") // TODO
+                                    Text(
+                                        text = "게시하기",
+                                        color = MaterialTheme.colorScheme.primary
+                                    ) // TODO
                                 }
                             }
                         },
@@ -828,7 +928,7 @@ object Community {
                         title = { Text(text = "업로드") }, // TODO
                         text = {
                             Text(
-                                text = "TODO",
+                                text = "업로드하시겠습니까?",
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }, // TODO
@@ -845,7 +945,23 @@ object Community {
                                 TextButton(
                                     modifier = Modifier.align(Alignment.CenterEnd),
                                     onClick = {
-                                        /* TODO */
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            FDManager.postDatabase.child(postDataList.size.toString()).push().setValue(
+                                                PostData(
+                                                    id = id,
+                                                    
+                                                    content = content,
+                                                    image = image,
+                                                    
+                                                    isSelectable = isSelectable,
+                                                    isHeartAble = isHeartAble,
+                                                    password = password,
+                                                    
+                                                    time = time,
+                                                    postId = 1 // TODO
+                                                )
+                                            )
+                                        }
                                     }
                                 ) {
                                     Text(text = "업로드하기") // TODO
@@ -887,12 +1003,6 @@ object Community {
 
             }
         }
-
-        /*suspend fun writePost(
-            postData: MyView.PostData
-        ) {
-            // TODO
-        }*/
 
     }
 

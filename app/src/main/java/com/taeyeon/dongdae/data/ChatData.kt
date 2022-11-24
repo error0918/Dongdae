@@ -3,7 +3,7 @@ package com.taeyeon.dongdae.data
 data class ChatData(
     val id: String = "",
     val message: String = "",
-    val dataID: Int = 0
+    val chatId: Int = 0
 )
 
 enum class ChatSequence {

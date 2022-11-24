@@ -1,6 +1,7 @@
 @file:OptIn(
     ExperimentalAnimationApi::class,
-    ExperimentalPagerApi::class
+    ExperimentalPagerApi::class,
+    ExperimentalMaterialApi::class
 )
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -58,20 +60,24 @@ object Chat {
                 onInitialized = {
                     Main.scope.launch {
                         FDManager.chatDatabase.snapshots.collectIndexed { _, snapshot ->
-                            val value = snapshot.children.toList()[0]
-                            value.getValue(ChatData::class.java)?.let {
-                                chatDataList.add(it)
+                            if (snapshot.hasChildren()) {
+                                val value = snapshot.children.first()
+                                value.getValue(ChatData::class.java)?.let {
+                                    chatDataList.add(it)
+                                }
                             }
                         }
                     }
                 },
                 onChildAdded = { snapshot, _ ->
-                    val value = snapshot.children.toList()[0]
-                    value.getValue(ChatData::class.java)?.let { chatData ->
-                        if (chatData.id.isNotBlank() && chatData.message.isNotBlank())
+                    if (snapshot.hasChildren()) {
+                        val value = snapshot.children.first()
+                        value.getValue(ChatData::class.java)?.let { chatData ->
                             if (chatDataList.indexOf(chatData) == -1)
                                 chatDataList.add(chatData)
-                        // TODO
+
+                            // TODO
+                        }
                     }
                 }
             )
@@ -102,23 +108,21 @@ object Chat {
             var text by rememberSaveable { mutableStateOf("") }
             val maxLength = 300
             val contentColor by animateColorAsState(targetValue = if (text.length >= maxLength) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary)
+
             MyView.MyTextField(
                 value = text,
                 onValueChange = { if(it.length <= maxLength) text = it },
-                /*label =
-                    if (text.isNotEmpty()) { { Text(text = "${text.length}/$maxLength") } }
-                    else null,*/
                 trailingIcon = {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         IconButton(
                             onClick = {
-                                FDManager.chatDatabase.push().setValue(
+                                FDManager.chatDatabase.child(chatDataList.size.toString()).push().setValue(
                                     ChatData(
                                         id = id,
                                         message = text,
-                                        dataID = chatDataList.size
+                                        chatId = chatDataList.size
                                     )
                                 )
                                 text = ""
@@ -157,6 +161,49 @@ object Chat {
                     .padding(8.dp)
                     .align(Alignment.BottomCenter)
             )
+
+            Popup(
+                alignment = Alignment.BottomCenter,
+                offset = IntOffset(
+                    x = 0,
+                    y = with(LocalDensity.current) {
+                        -(80.dp - 12.dp).toPx().toInt()
+                    }
+                )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(96.dp)
+                        .height(24.dp)
+                        .let {
+                            if (Main.pagerState.currentPage == 1 && Main.bottomSheetScaffoldState.bottomSheetState.isCollapsed)
+                                it.background(
+                                    color = animateColorAsState(targetValue = if (text.length >= maxLength) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer).value,
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                            else it
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    AnimatedVisibility(
+                        visible = Main.pagerState.currentPage == 1,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        AnimatedVisibility(
+                            visible = text.isNotEmpty() && Main.bottomSheetScaffoldState.bottomSheetState.isCollapsed,
+                            enter = scaleIn(),
+                            exit = scaleOut()
+                        ) {
+                            Text(
+                                text = "${text.length}/$maxLength",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = animateColorAsState(targetValue = if (text.length >= maxLength) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer).value
+                            )
+                        }
+                    }
+                }
+            }
         }
 
         Popup(
@@ -177,7 +224,7 @@ object Chat {
                     exit = fadeOut()
                 ) {
                     AnimatedVisibility(
-                        visible = !lazyListState.isScrollInProgress && lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index != lazyListState.layoutInfo.totalItemsCount - 1,
+                        visible = !lazyListState.isScrollInProgress && lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index != lazyListState.layoutInfo.totalItemsCount - 1 && Main.bottomSheetScaffoldState.bottomSheetState.isCollapsed,
                         enter = scaleIn(),
                         exit = scaleOut()
                     ) {

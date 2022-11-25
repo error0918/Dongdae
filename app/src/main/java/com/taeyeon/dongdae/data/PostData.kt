@@ -7,7 +7,7 @@ data class PostData(
 
     val content: String = "",
     val image: Pair<ImageBitmap, String?>? = null,
-    val heartCount: Int = 0,
+    val heartList: List<String> = listOf(),
     var postCategory: PostCategory = PostCategory.Unspecified,
 
     val isSelectable: Boolean = true,

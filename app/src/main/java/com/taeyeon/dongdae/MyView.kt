@@ -1462,21 +1462,29 @@ object MyView {
 
     @Composable
     fun PostUnit(
-        postData: PostData
+        postData: PostData,
+
+        onHeartClicked: () -> Unit = {  }
     ) {
         postData.run {
             PostUnit(
-                time = time,
                 id = id,
-                image = image,
-                isSelectable = isSelectable,
+
                 content = content,
-                heartCount = heartCount,
-                isHeartAble = isHeartAble,
+                image = image,
+                heartList = heartList,
                 postCategory = postCategory,
+
+                isSelectable = isSelectable,
+                isHeartAble = isHeartAble,
                 password = password,
+
                 commentList = commentList,
-                postId = postId
+
+                time = time,
+                postId = postId,
+
+                onHeartClicked = onHeartClicked
             )
         }
     }
@@ -1484,24 +1492,24 @@ object MyView {
     @SuppressLint("NewApi")
     @Composable
     fun PostUnit(
-        time: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")),
         id: String,
-        image: Pair<ImageBitmap, String?>? = null,
-        isSelectable: Boolean = true,
-        content: String,
-        heartCount: Int,
-        isHeartAble: Boolean = true,
-        postCategory: PostCategory = PostCategory.Unspecified,
-        password: String = "0000",
-        commentList: List<ChatData> = listOf(),
-        postId: Int
-    ) {
-        var isHeart by rememberSaveable { mutableStateOf(false) }
-        val onHeartClicked = { checked: Boolean ->
-            // todo
-            isHeart = checked
-        }
 
+        content: String,
+        image: Pair<ImageBitmap, String?>? = null,
+        heartList: List<String>,
+        postCategory: PostCategory = PostCategory.Unspecified,
+
+        isSelectable: Boolean = true,
+        isHeartAble: Boolean = true,
+        password: String = "0000",
+
+        commentList: List<ChatData> = listOf(),
+
+        time: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm")),
+        postId: Int,
+
+        onHeartClicked: () -> Unit = {  }
+    ) {
         var isCommentShowing by rememberSaveable { mutableStateOf(false) }
         var isCommenting by rememberSaveable { mutableStateOf(false) }
         var isDropDownMenuExpanded by remember { mutableStateOf(false) }
@@ -1623,7 +1631,7 @@ object MyView {
 
                         if (isHeartAble) {
                             Surface(
-                                onClick = { onHeartClicked(!isHeart) },
+                                onClick = onHeartClicked,
                                 color = Color.Transparent,
                                 shape = CircleShape,
                                 modifier = Modifier
@@ -1637,12 +1645,12 @@ object MyView {
                                     modifier = Modifier.padding(8.dp)
                                 ) {
                                     Icon(
-                                        imageVector = if (isHeart) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                        tint = if (isHeart) Color.Red else LocalContentColor.current,
+                                        imageVector = if (heartList.indexOf(id) != -1) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                        tint = if (heartList.indexOf(id) != -1) Color.Red else LocalContentColor.current,
                                         contentDescription = null // TODO
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = "$heartCount")
+                                    Text(text = "${heartList.size}")
                                 }
                             }
                         }

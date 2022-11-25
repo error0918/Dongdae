@@ -84,8 +84,12 @@ object Community {
                         FDManager.postDatabase.snapshots.collectIndexed { _, snapshot ->
                             if (snapshot.hasChildren()) {
                                 val value = snapshot.children.first()
-                                value.getValue(PostData::class.java)?.let {
-                                    postDataList.add(it)
+                                value.getValue(PostData::class.java)?.let { postData ->
+                                    postDataList.forEach {
+                                        if (postData.postId != it.postId) {
+                                            postDataList.add(postData)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -95,10 +99,35 @@ object Community {
                     if (snapshot.hasChildren()) {
                         val value = snapshot.children.first()
                         value.getValue(PostData::class.java)?.let { postData ->
-                            if (postDataList.indexOf(postData) == -1)
-                                postDataList.add(postData)
-
-                            // TODO
+                            postDataList.forEach {
+                                if (postData.postId != it.postId) {
+                                    postDataList.add(postData)
+                                }
+                            }
+                        }
+                    }
+                },
+                onChildChanged = { snapshot, _ ->
+                    if (snapshot.hasChildren()) {
+                        val value = snapshot.children.first()
+                        value.getValue(PostData::class.java)?.let { postData ->
+                            postDataList.forEachIndexed { index, item ->
+                                if (postData.postId == item.postId) {
+                                    postDataList[index] = item
+                                }
+                            }
+                        }
+                    }
+                },
+                onChildRemoved = { snapshot ->
+                    if (snapshot.hasChildren()) {
+                        val value = snapshot.children.first()
+                        value.getValue(PostData::class.java)?.let { postData ->
+                            postDataList.forEach {
+                                if (postData.postId == it.postId) {
+                                    postDataList.remove(it)
+                                }
+                            }
                         }
                     }
                 }
@@ -229,7 +258,7 @@ object Community {
                     }.let { list ->
                         when (sortingIndex) {
                             0 -> list.sortedWith(compareBy { it.postId }).reversed()
-                            1 -> list.sortedWith(compareBy<PostData> { it.heartCount }.thenBy { it.postId }).reversed()
+                            1 -> list.sortedWith(compareBy<PostData> { it.heartList.size }.thenBy { it.postId }).reversed()
                             2 -> list.shuffled()
                             else -> list
                         }

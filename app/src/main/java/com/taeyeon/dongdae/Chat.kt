@@ -62,8 +62,12 @@ object Chat {
                         FDManager.chatDatabase.snapshots.collectIndexed { _, snapshot ->
                             if (snapshot.hasChildren()) {
                                 val value = snapshot.children.first()
-                                value.getValue(ChatData::class.java)?.let {
-                                    chatDataList.add(it)
+                                value.getValue(ChatData::class.java)?.let { chatData ->
+                                    chatDataList.forEach {
+                                        if (chatData.chatId != it.chatId) {
+                                            chatDataList.add(it)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -73,10 +77,35 @@ object Chat {
                     if (snapshot.hasChildren()) {
                         val value = snapshot.children.first()
                         value.getValue(ChatData::class.java)?.let { chatData ->
-                            if (chatDataList.indexOf(chatData) == -1)
-                                chatDataList.add(chatData)
-
-                            // TODO
+                            chatDataList.forEach {
+                                if (chatData.chatId != it.chatId) {
+                                    chatDataList.add(it)
+                                }
+                            }
+                        }
+                    }
+                },
+                onChildChanged = { snapshot, _ ->
+                    if (snapshot.hasChildren()) {
+                        val value = snapshot.children.first()
+                        value.getValue(ChatData::class.java)?.let { chatData ->
+                            chatDataList.forEachIndexed { index, item ->
+                                if (chatData.chatId == item.chatId) {
+                                    chatDataList[index] = item
+                                }
+                            }
+                        }
+                    }
+                },
+                onChildRemoved = { snapshot ->
+                    if (snapshot.hasChildren()) {
+                        val value = snapshot.children.first()
+                        value.getValue(ChatData::class.java)?.let { chatData ->
+                            chatDataList.forEach {
+                                if (chatData.chatId == it.chatId) {
+                                    chatDataList.remove(it)
+                                }
+                            }
                         }
                     }
                 }

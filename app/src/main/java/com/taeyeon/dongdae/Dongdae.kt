@@ -16,16 +16,11 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.ChildEvent
-import com.google.firebase.database.ktx.snapshots
 import com.google.firebase.ktx.Firebase
 import com.taeyeon.core.Core
 import com.taeyeon.core.Settings
 import com.taeyeon.core.SharedPreferencesManager
 import com.taeyeon.core.Utils
-import com.taeyeon.dongdae.data.ChatData
-import kotlinx.coroutines.flow.collectIndexed
-import kotlinx.coroutines.launch
 
 
 var defaultTab by mutableStateOf(Settings.INITIAL_SETTINGS_DATA.defaultTab)
@@ -89,15 +84,21 @@ object FDManager {
 
     fun initializeChat(
         onInitialized: () -> Unit,
-        onChildAdded: (snapshot: DataSnapshot, previousChildName: String?) -> Unit
+        onChildAdded: (snapshot: DataSnapshot, previousChildName: String?) -> Unit,
+        onChildChanged: (snapshot: DataSnapshot, previousChildName: String?) -> Unit,
+        onChildRemoved: (snapshot: DataSnapshot) -> Unit
     ) {
         onInitialized()
-        chatDatabase.addChildEventListener(object: ChildEventListener {
+        postDatabase.addChildEventListener(object: ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 onChildAdded(snapshot, previousChildName)
             }
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
-            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                onChildChanged(snapshot, previousChildName)
+            }
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                onChildRemoved(snapshot)
+            }
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onCancelled(error: DatabaseError) {}
         })
@@ -105,22 +106,22 @@ object FDManager {
 
     fun initializePost(
         onInitialized: () -> Unit,
-        onChildAdded: (snapshot: DataSnapshot, previousChildName: String?) -> Unit
+        onChildAdded: (snapshot: DataSnapshot, previousChildName: String?) -> Unit,
+        onChildChanged: (snapshot: DataSnapshot, previousChildName: String?) -> Unit,
+        onChildRemoved: (snapshot: DataSnapshot) -> Unit
     ) {
         onInitialized()
         postDatabase.addChildEventListener(object: ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 onChildAdded(snapshot, previousChildName)
             }
-
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
-
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                TODO("Not yet implemented")
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                onChildChanged(snapshot, previousChildName)
             }
-
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                onChildRemoved(snapshot)
+            }
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
-
             override fun onCancelled(error: DatabaseError) {}
         })
     }

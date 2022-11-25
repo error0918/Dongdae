@@ -63,9 +63,10 @@ object Chat {
                             if (snapshot.hasChildren()) {
                                 val value = snapshot.children.first()
                                 value.getValue(ChatData::class.java)?.let { chatData ->
+                                    if (chatDataList.size == 0) chatDataList.add(chatData)
                                     chatDataList.forEach {
                                         if (chatData.chatId != it.chatId) {
-                                            chatDataList.add(it)
+                                            chatDataList.add(chatData)
                                         }
                                     }
                                 }
@@ -79,7 +80,7 @@ object Chat {
                         value.getValue(ChatData::class.java)?.let { chatData ->
                             chatDataList.forEach {
                                 if (chatData.chatId != it.chatId) {
-                                    chatDataList.add(it)
+                                    chatDataList.add(chatData)
                                 }
                             }
                         }
@@ -91,7 +92,7 @@ object Chat {
                         value.getValue(ChatData::class.java)?.let { chatData ->
                             chatDataList.forEachIndexed { index, item ->
                                 if (chatData.chatId == item.chatId) {
-                                    chatDataList[index] = item
+                                    chatDataList[index] = chatData
                                 }
                             }
                         }

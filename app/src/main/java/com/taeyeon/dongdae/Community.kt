@@ -13,10 +13,7 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
@@ -54,6 +51,7 @@ import com.taeyeon.dongdae.data.postCategoryNameList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectIndexed
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -85,11 +83,7 @@ object Community {
                             if (snapshot.hasChildren()) {
                                 val value = snapshot.children.first()
                                 value.getValue(PostData::class.java)?.let { postData ->
-                                    postDataList.forEach {
-                                        if (postData.postId != it.postId) {
-                                            postDataList.add(postData)
-                                        }
-                                    }
+                                    postDataList.add(postData)
                                 }
                             }
                         }
@@ -113,7 +107,7 @@ object Community {
                         value.getValue(PostData::class.java)?.let { postData ->
                             postDataList.forEachIndexed { index, item ->
                                 if (postData.postId == item.postId) {
-                                    postDataList[index] = item
+                                    postDataList[index] = postData
                                 }
                             }
                         }
@@ -264,8 +258,32 @@ object Community {
                         }
                     }
 
-                    items(organizedPostDataList) {
-                        MyView.PostUnit(postData = it)
+                    items(organizedPostDataList) { item ->
+                        MyView.PostUnit(
+                            postData = item,
+                            onHeartClicked = {
+                                FDManager.postDatabase.child(item.postId.toString()).let {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        FDManager.postDatabase
+                                            .child(item.postId.toString())
+                                            .child(FDManager.postDatabase.child(item.postId.toString()).snapshots.first().children.first().key!!)
+                                            .updateChildren(
+                                            mapOf(
+                                                "heartList" to item.heartList.let {
+                                                    if (it.indexOf(id) != -1)
+                                                        it
+                                                    else {
+                                                        val list = it.toMutableList()
+                                                        list.add(id)
+                                                        list.toList()
+                                                    }
+                                                }
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        )
                     }
 
                     item {

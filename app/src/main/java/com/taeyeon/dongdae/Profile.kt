@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import com.taeyeon.core.*
 import com.taeyeon.dongdae.MyView.ChatUnit
-import com.taeyeon.dongdae.data.ChatData
 import com.taeyeon.dongdae.data.ChatSequence
 import com.taeyeon.dongdae.ui.theme.Theme
 import kotlinx.coroutines.delay

@@ -50,7 +50,6 @@ import com.taeyeon.dongdae.data.PostData
 import com.taeyeon.dongdae.data.postCategoryNameList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -79,11 +78,17 @@ object Community {
             FDManager.initializePost(
                 onInitialized = {
                     Main.scope.launch {
-                        FDManager.postDatabase.snapshots.collectIndexed { _, snapshot ->
+                        FDManager.postDatabase.snapshots.collect { snapshot ->
                             if (snapshot.hasChildren()) {
                                 val value = snapshot.children.first()
                                 value.getValue(PostData::class.java)?.let { postData ->
-                                    postDataList.add(postData)
+                                    if (postData.content.isNotEmpty()) {
+                                        var isIncluded = false
+                                        postDataList.forEach {
+                                            if (postData.postId == it.postId) isIncluded = true
+                                        }
+                                        if (!isIncluded) postDataList.add(postData)
+                                    }
                                 }
                             }
                         }
@@ -93,10 +98,12 @@ object Community {
                     if (snapshot.hasChildren()) {
                         val value = snapshot.children.first()
                         value.getValue(PostData::class.java)?.let { postData ->
-                            postDataList.forEach {
-                                if (postData.postId != it.postId) {
-                                    postDataList.add(postData)
+                            if (postData.content.isNotEmpty()) {
+                                var isIncluded = false
+                                postDataList.forEach {
+                                    if (postData.postId == it.postId) isIncluded = true
                                 }
+                                if (!isIncluded) postDataList.add(postData)
                             }
                         }
                     }
@@ -105,10 +112,12 @@ object Community {
                     if (snapshot.hasChildren()) {
                         val value = snapshot.children.first()
                         value.getValue(PostData::class.java)?.let { postData ->
-                            postDataList.forEachIndexed { index, item ->
-                                if (postData.postId == item.postId) {
-                                    postDataList[index] = postData
+                            if (postData.content.isNotEmpty()) {
+                                var index = 0
+                                postDataList.forEachIndexed { listIndex, item ->
+                                    if (postData.postId == item.postId) index = listIndex
                                 }
+                                postDataList[index] = postData
                             }
                         }
                     }
@@ -117,10 +126,12 @@ object Community {
                     if (snapshot.hasChildren()) {
                         val value = snapshot.children.first()
                         value.getValue(PostData::class.java)?.let { postData ->
-                            postDataList.forEach {
-                                if (postData.postId == it.postId) {
-                                    postDataList.remove(it)
+                            if (postData.content.isNotEmpty()) {
+                                var index = 0
+                                postDataList.forEachIndexed { listIndex, item ->
+                                    if (postData.postId == item.postId) index = listIndex
                                 }
+                                postDataList.removeAt(index)
                             }
                         }
                     }
@@ -269,14 +280,10 @@ object Community {
                                             .child(FDManager.postDatabase.child(item.postId.toString()).snapshots.first().children.first().key!!)
                                             .updateChildren(
                                             mapOf(
-                                                "heartList" to item.heartList.let {
-                                                    if (it.indexOf(id) != -1)
-                                                        it
-                                                    else {
-                                                        val list = it.toMutableList()
-                                                        list.add(id)
-                                                        list.toList()
-                                                    }
+                                                "heartList" to item.heartList.toMutableList().let { list ->
+                                                    if (list.indexOf(id) != -1) list.remove(id)
+                                                    else list.add(id)
+                                                    list.toList()
                                                 }
                                             )
                                         )

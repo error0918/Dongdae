@@ -1645,8 +1645,8 @@ object MyView {
                                     modifier = Modifier.padding(8.dp)
                                 ) {
                                     Icon(
-                                        imageVector = if (heartList.indexOf(id) != -1) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                        tint = if (heartList.indexOf(id) != -1) Color.Red else LocalContentColor.current,
+                                        imageVector = if (heartList.indexOf(com.taeyeon.dongdae.id) != -1) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                        tint = if (heartList.indexOf(com.taeyeon.dongdae.id) != -1) Color.Red else LocalContentColor.current,
                                         contentDescription = null // TODO
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))

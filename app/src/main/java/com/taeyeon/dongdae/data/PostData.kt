@@ -10,7 +10,9 @@ data class PostData(
     val heartList: List<String> = listOf(),
     var postCategory: PostCategory = PostCategory.Unspecified,
 
+    @JvmField
     val isSelectable: Boolean = true,
+    @JvmField
     val isHeartAble: Boolean = true,
     val password: String = "0000",
 

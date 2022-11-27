@@ -36,7 +36,6 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.firebase.database.ktx.snapshots
 import com.taeyeon.dongdae.MyView.ChatUnit
 import com.taeyeon.dongdae.data.ChatData
-import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
 
 object Chat {
@@ -59,15 +58,16 @@ object Chat {
             FDManager.initializeChat(
                 onInitialized = {
                     Main.scope.launch {
-                        FDManager.chatDatabase.snapshots.collectIndexed { _, snapshot ->
+                        FDManager.chatDatabase.snapshots.collect { snapshot ->
                             if (snapshot.hasChildren()) {
                                 val value = snapshot.children.first()
                                 value.getValue(ChatData::class.java)?.let { chatData ->
-                                    if (chatDataList.size == 0) chatDataList.add(chatData)
-                                    chatDataList.forEach {
-                                        if (chatData.chatId != it.chatId) {
-                                            chatDataList.add(chatData)
+                                    if (chatData.message.isNotEmpty()) {
+                                        var isIncluded = false
+                                        chatDataList.forEach {
+                                            if (chatData.chatId == it.chatId) isIncluded = true
                                         }
+                                        if (!isIncluded) chatDataList.add(chatData)
                                     }
                                 }
                             }
@@ -78,9 +78,16 @@ object Chat {
                     if (snapshot.hasChildren()) {
                         val value = snapshot.children.first()
                         value.getValue(ChatData::class.java)?.let { chatData ->
-                            chatDataList.forEach {
-                                if (chatData.chatId != it.chatId) {
+                            if (chatData.message.isNotEmpty()) {
+                                var isIncluded = false
+                                chatDataList.forEach {
+                                    if (chatData.chatId == it.chatId) isIncluded = true
+                                }
+                                if (!isIncluded) {
                                     chatDataList.add(chatData)
+                                    Main.scope.launch {
+                                        lazyListState.scrollToItem(chatDataList.size - 1)
+                                    }
                                 }
                             }
                         }
@@ -90,10 +97,12 @@ object Chat {
                     if (snapshot.hasChildren()) {
                         val value = snapshot.children.first()
                         value.getValue(ChatData::class.java)?.let { chatData ->
-                            chatDataList.forEachIndexed { index, item ->
-                                if (chatData.chatId == item.chatId) {
-                                    chatDataList[index] = chatData
+                            if (chatData.message.isNotEmpty()) {
+                                var index = 0
+                                chatDataList.forEachIndexed { listIndex, item ->
+                                    if (chatData.chatId == item.chatId) index = listIndex
                                 }
+                                chatDataList[index] = chatData
                             }
                         }
                     }
@@ -102,10 +111,12 @@ object Chat {
                     if (snapshot.hasChildren()) {
                         val value = snapshot.children.first()
                         value.getValue(ChatData::class.java)?.let { chatData ->
-                            chatDataList.forEach {
-                                if (chatData.chatId == it.chatId) {
-                                    chatDataList.remove(it)
+                            if (chatData.message.isNotEmpty()) {
+                                var index = 0
+                                chatDataList.forEachIndexed { listIndex, item ->
+                                    if (chatData.chatId == item.chatId) index = listIndex
                                 }
+                                chatDataList.removeAt(index)
                             }
                         }
                     }

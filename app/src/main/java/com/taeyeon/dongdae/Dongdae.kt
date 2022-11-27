@@ -89,7 +89,7 @@ object FDManager {
         onChildRemoved: (snapshot: DataSnapshot) -> Unit
     ) {
         onInitialized()
-        postDatabase.addChildEventListener(object: ChildEventListener {
+        chatDatabase.addChildEventListener(object: ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 onChildAdded(snapshot, previousChildName)
             }
@@ -226,6 +226,7 @@ fun getDigitNumber(number: Int, digits: Int): String {
 fun getAndroidId(): String = android.provider.Settings.Secure.getString(Core.getContext().contentResolver, android.provider.Settings.Secure.ANDROID_ID)
 
 fun getName(androidId: String = id): String {
+    if (androidId == "0".repeat(17)) return "관리자" // TODO
     val endangeredSpecies = Core.getContext().resources.getStringArray(R.array.endangered_species)
     return endangeredSpecies[Integer.parseInt(androidId.substring(0..5), 16) % endangeredSpecies.size - 1]
 }
